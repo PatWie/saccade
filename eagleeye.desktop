@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Eagle Eye
+GenericName=Image Viewer
+Comment=Sophisticated image viewer for comparing images
+Exec=/home/patwie/git/eagle_eye/build/eagle_eye
+Terminal=false
+Icon=/home/patwie/git/eagle_eye/Icon/256x256/eagleeye.png
+Categories=ImageViewer;Science;
+StartupNotify=true
