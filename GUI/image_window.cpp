@@ -48,6 +48,9 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   connect( _canvas, SIGNAL(sigMarkerToImageWindow(Marker)),
            this, SLOT(slotMarkerToMainWindow(Marker)));
 
+  connect( _canvas, SIGNAL(sigPropertyToImagewindow(Canvas::property_t)),
+           this, SLOT(slotPropertyToMainwindow(Canvas::property_t)));
+
   _canvas->slotUpdateCanvas();
 
   // statusbar
@@ -266,6 +269,10 @@ void GUI::ImageWindow::slotMarkerToMainWindow(Marker m) {
   emit sigMarkerToMainwindow(m);
 }
 
+void GUI::ImageWindow::slotPropertyToMainwindow(Canvas::property_t p) {
+  emit sigPropertyToMainwindow(p);
+}
+
 
 void GUI::ImageWindow::slotShowCoords(QPoint p) {
   std::stringstream stream;
@@ -293,9 +300,18 @@ void GUI::ImageWindow::slotShowCoords(QPoint p) {
 }
 
 void GUI::ImageWindow::slotShowZoom(double p) {
-  std::string val = "Zoom " + std::to_string(p);
+  std::ostringstream out;
+  out << std::setprecision(3) << p;
+
+  std::string val = "Zoom " + out.str();
   _statusLabelZoom->setText(val.c_str());
 }
+
+void GUI::ImageWindow::slotShowProperty(Canvas::property_t p) {
+  slotShowZoom(p.zoom_factor);
+}
+
+
 
 void GUI::ImageWindow::slotShowMarkers(Marker m) {
   _canvas->setMarker(m);
