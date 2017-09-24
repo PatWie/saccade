@@ -45,6 +45,7 @@ class ImageWindow  : public QMainWindow {
 
   void sigCoordToMainwindow(QPoint);
   void sigMarkerToMainwindow(Marker);
+  void sigPropertyToMainwindow(Canvas::property_t);
   void sigSetZoomAction(double);
 
  public slots:
@@ -65,10 +66,12 @@ class ImageWindow  : public QMainWindow {
 
   void slotCoordToMainWindow(QPoint);
   void slotMarkerToMainWindow(Marker);
+  void slotPropertyToMainwindow(Canvas::property_t);
 
   void slotShowCoords(QPoint);
   void slotShowZoom(double p);
   void slotShowMarkers(Marker);
+  void slotShowProperty(Canvas::property_t);
 
 
  private:

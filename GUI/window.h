@@ -29,8 +29,9 @@ class Window  : public QMainWindow {
 
  signals:
   void sigUpdateConnectedViews( Canvas*);
-  void sigDistributeCoords(QPoint);
-  void sigDistributeMarkers(Marker);
+  void sigDistributeCoord(QPoint);
+  void sigDistributeMarker(Marker);
+  void sigDistributeProperty(Canvas::property_t);
 
  private slots:
   void slotNewWindowAction();
@@ -41,6 +42,7 @@ class Window  : public QMainWindow {
   void slotUpdateConnectedViews( Canvas* buf );
   void slotUpdateCoords(QPoint);
   void slotUpdateMarkers(Marker);
+  void slotUpdateProperties(Canvas::property_t);
 
  private:
   Slides* _slides;

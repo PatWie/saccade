@@ -73,17 +73,17 @@ void GUI::Canvas::addLayer(Layer *layer) {
 }
 
 void GUI::Canvas::slotUpdateCanvas() {
-  qDebug() << "GUI::Canvas::slotUpdateCanvas";
+  // qDebug() << "GUI::Canvas::slotUpdateCanvas";
   emit sigUpdateTitle(this);
   emit sigUpdateScrollBars(this);
   update();
 }
 
-
 void GUI::Canvas::slotSetZoomAction(double zoom) {
   _property.zoom_factor = zoom;
   slotUpdateCanvas();
   askSynchronization();
+  emit sigPropertyToImagewindow(_property);
 }
 void GUI::Canvas::slotZoomInAction() {
   zoom(_focus, 1);
@@ -222,6 +222,7 @@ void GUI::Canvas::zoom(QPoint q, int delta) {
   // emit sigUpdateScrollBars(this);
   slotUpdateCanvas();
   // emit sigCoordToImageWindow(p);
+  emit sigPropertyToImagewindow(_property);
 
 }
 

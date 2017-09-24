@@ -55,11 +55,17 @@ void GUI::Window::slotNewWindowAction() {
   connect( tmpWindow, SIGNAL(sigMarkerToMainwindow( Marker)),
            this, SLOT( slotUpdateMarkers( Marker)));
 
-  connect( this, SIGNAL(sigDistributeCoords(QPoint)),
+  connect( tmpWindow, SIGNAL(sigPropertyToMainwindow( Canvas::property_t)),
+           this, SLOT( slotUpdateProperties( Canvas::property_t)));
+
+  connect( this, SIGNAL(sigDistributeCoord(QPoint)),
            tmpWindow, SLOT(slotShowCoords(QPoint)));
 
-  connect( this, SIGNAL(sigDistributeMarkers(Marker)),
+  connect( this, SIGNAL(sigDistributeMarker(Marker)),
            tmpWindow, SLOT(slotShowMarkers(Marker)));
+
+  connect( this, SIGNAL(sigDistributeProperty(Canvas::property_t)),
+           tmpWindow, SLOT(slotShowProperty(Canvas::property_t)));
 
   tmpWindow->synchronize(true);
   _windows.push_back(tmpWindow);
@@ -96,9 +102,13 @@ void GUI::Window::slotUpdateConnectedViews( Canvas* buf ) {
 }
 
 void GUI::Window::slotUpdateCoords(QPoint p) {
-  emit sigDistributeCoords(p);
+  emit sigDistributeCoord(p);
 }
 
 void GUI::Window::slotUpdateMarkers(Marker m) {
-  emit sigDistributeMarkers(m);
+  emit sigDistributeMarker(m);
+}
+
+void GUI::Window::slotUpdateProperties(Canvas::property_t m) {
+  emit sigDistributeProperty(m);
 }

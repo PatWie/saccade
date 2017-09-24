@@ -87,6 +87,7 @@ class Canvas  : public QOpenGLWidget {
 
   void sigCoordToImageWindow(QPoint);
   void sigMarkerToImageWindow(Marker);
+  void sigPropertyToImagewindow(Canvas::property_t);
 
  public slots:
   void slotPrevLayer();
