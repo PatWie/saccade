@@ -1,5 +1,6 @@
 #include "slides.h"
 #include "layer.h"
+#include <iostream>
 
 
 GUI::Slides::Slides() {
@@ -36,6 +37,25 @@ void GUI::Slides::backward() {
   }
 
 }
+
+void GUI::Slides::remove() {
+  if (_slides.size() > 0) {
+    current()->clear();
+    std::cout << "_id " << _id << std::endl;
+    _slides.erase(_slides.begin() + _id);
+  }
+  // case only one left --> jump to first
+  if (_slides.size() == 1) {
+    _id = 0;
+  }
+  // case no layer left --> disable
+  if (_slides.size() == 0) {
+    _id = -1;
+  }
+  // case: there are at least two layers --> automatically jumps to next
+
+}
+
 void GUI::Slides::forward() {
   if (_slides.size() > 0) {
     _id++;

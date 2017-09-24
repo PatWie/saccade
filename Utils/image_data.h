@@ -28,6 +28,7 @@ class ImageData {
   int height() const;
   // only 3 or 4 is supported
   int channels() const;
+  void clear(bool remove = true);
 
   RGBQUAD operator()(int h, int w) const;
 

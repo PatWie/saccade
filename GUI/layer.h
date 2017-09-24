@@ -64,6 +64,7 @@ class Layer  : public QObject {
             double zoom);
 
   void loadImage(std::string fn);
+  void clear();
   bool available() const;
   std::string path() const;
 

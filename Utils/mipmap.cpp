@@ -66,6 +66,7 @@ void Utils::Mipmap::setData(float *ptr,
                              &working_height, &working_width, channels);
     delete[] old_ptr;
 
+
     std::cout << "create level " << d
               << " " << working_height
               << " " << working_width
@@ -77,6 +78,7 @@ void Utils::Mipmap::setData(float *ptr,
                         tileSize);
   }
   delete [] working_ptr;
+
 
   std::cout << "Utils::Mipmap::set_image END" << std::endl;
   _empty = false;

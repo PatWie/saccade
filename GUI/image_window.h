@@ -42,6 +42,7 @@ class ImageWindow  : public QMainWindow {
 
   void sigPrevLayer();
   void sigNextLayer();
+  void sigRemoveCurrentLayer();
 
   void sigCoordToMainwindow(QPoint);
   void sigMarkerToMainwindow(Marker);
@@ -57,8 +58,8 @@ class ImageWindow  : public QMainWindow {
   void slotNextLayer();
 
   void slotZoomStdAction();
-
   void slotOpenImageAction();
+  void slotRemoveImageAction();
 
   void slotUpdateScrollBars(Canvas*);
   void slotVertScrollChanged(int);
@@ -87,6 +88,7 @@ class ImageWindow  : public QMainWindow {
 
   QMenu* _fileMenu;
   QAction* _openImageAct;
+  QAction* _removeImageAct;
 
   QMenu* _windowMenu;
   QAction* _newWindowAct;

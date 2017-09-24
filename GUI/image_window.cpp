@@ -73,6 +73,8 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
           _canvas, SLOT(slotPrevLayer()));
   connect(this, SIGNAL(sigNextLayer()),
           _canvas, SLOT(slotNextLayer()));
+  connect( this, SIGNAL(sigRemoveCurrentLayer()),
+           _canvas, SLOT(slotRemoveCurrentLayer()));
 
   // menubar
   // ==========================================================
@@ -80,6 +82,13 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _openImageAct->setShortcut(tr("Ctrl+O"));
   _openImageAct->setStatusTip(tr("Open an existing image"));
   connect(_openImageAct, SIGNAL(triggered()), this, SLOT(slotOpenImageAction()));
+
+  _removeImageAct = new QAction(tr("&Remove"), this );
+  _removeImageAct->setShortcut(tr("Del"));
+  _removeImageAct->setStatusTip(tr("Remove the current image"));
+  connect(_removeImageAct, SIGNAL(triggered()), this, SLOT(slotRemoveImageAction()));
+
+  
 
   _newWindowAct = new QAction(tr("&New"), this );
   _newWindowAct->setShortcut(tr("Ctrl+N"));
@@ -98,6 +107,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 
   _fileMenu = menuBar()->addMenu(tr("&File"));
   _fileMenu->addAction(_openImageAct);
+  _fileMenu->addAction(_removeImageAct);
 
   _windowMenu = menuBar()->addMenu(tr("&Window"));
   _windowMenu->addAction(_newWindowAct);
@@ -165,6 +175,11 @@ void GUI::ImageWindow::slotOpenImageAction() {
     _parentWindow->_openPath = QFileInfo(filenames.at(0)).absolutePath();
   }
   _canvas->slotUpdateCanvas();
+}
+
+void GUI::ImageWindow::slotRemoveImageAction() {
+  qDebug() << "GUI::ImageWindow::slotRemoveImageAction";
+  emit sigRemoveCurrentLayer();
 }
 
 QSize GUI::ImageWindow::sizeHint() const {

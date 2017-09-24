@@ -41,6 +41,8 @@ Utils::ImageData::ImageData(std::string filename) {
     }
   }
 
+  FreeImage_Unload(_data);
+
 }
 
 
@@ -60,7 +62,8 @@ Utils::ImageData::ImageData(std::string filename) {
  */
 RGBQUAD Utils::ImageData::operator()(int h, int w) const {
   RGBQUAD color;
-  FreeImage_GetPixelColor(_data, w, _height - 1 - h, &color);
+  // FIXME: use _raw_buf instead;
+  // FreeImage_GetPixelColor(_data, w, _height - 1 - h, &color);
   return color;
 }
 
@@ -81,6 +84,16 @@ bool Utils::ImageData::is_ptr_Grey(FIBITMAP* data) {
          FreeImage_GetBPP(data) == 8;
 }
 
+
+void Utils::ImageData::clear(bool remove){
+  std::cout << "Utils::ImageData::clear" << std::endl;
+  // the _bud_data is already delete (so dont do it here again)
+  if(remove)
+    delete[] _raw_buf;
+  _height = 0;
+  _width = 0;
+  _channels = 0;
+}
 
 /*
 // calculate the number of bytes per pixel

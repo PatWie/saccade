@@ -32,6 +32,7 @@ class Slides {
   bool available() const;
 
   void backward();
+  void remove();
   void forward();
 
   Layer* current();

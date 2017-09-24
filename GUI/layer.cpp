@@ -75,6 +75,18 @@ bool GUI::Layer::available() const {
   return _available;
 }
 
+void GUI::Layer::clear() {
+  std::cout << "GUI::Layer::clear" << std::endl;
+    
+  _available = false;
+  _mipmap->clear();
+  std::cout << "_mipmap->clear();" << std::endl;
+  _imgdata->clear();
+  std::cout << "_imgdata->clear();" << std::endl;
+  _bufdata->clear(false);
+  std::cout << "_bufdata->clear();" << std::endl;
+
+}
 void GUI::Layer::loadImage(std::string fn) {
   _path = fn;
   _available = false;
