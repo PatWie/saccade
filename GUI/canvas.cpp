@@ -390,7 +390,13 @@ void GUI::Canvas::slotPrevLayer() {
   _slides->backward();
   slotUpdateCanvas();
 }
-
+void GUI::Canvas::slotRemoveCurrentLayer() {
+  if(_slides->available()){
+    _slides->remove();
+    slotUpdateCanvas();
+  }
+  qDebug() << "remove layer";
+}
 void GUI::Canvas::slotNextLayer() {
   _slides->forward();
   slotUpdateCanvas();

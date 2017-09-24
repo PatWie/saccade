@@ -92,6 +92,7 @@ class Canvas  : public QOpenGLWidget {
  public slots:
   void slotPrevLayer();
   void slotNextLayer();
+  void slotRemoveCurrentLayer();
 
   void slotUpdateCanvas();
 

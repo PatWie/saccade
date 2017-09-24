@@ -48,6 +48,7 @@ and you find the app in the Ubuntu searchbar.
 - key_up: previous image
 - key_left: previous image
 - Ctrl+O: open image
+- Del: remove current image
 - Ctrl+N: new canvas
 - Ctrl+W: quit canvas
 - Ctrl+plus: zoom in
