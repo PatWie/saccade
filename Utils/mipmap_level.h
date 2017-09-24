@@ -23,6 +23,8 @@ class MipmapLevel {
             int bottom, int right,
             double zoom);
 
+  void clear();
+
  protected:
   float* getTileData(const float *ptr,
                      uint height, uint width,

@@ -45,6 +45,7 @@ class ImageWindow  : public QMainWindow {
 
   void sigCoordToMainwindow(QPoint);
   void sigMarkerToMainwindow(Marker);
+  void sigSetZoomAction(double);
 
  public slots:
   void slotUpdateConnectedViews(Canvas*);
@@ -54,6 +55,8 @@ class ImageWindow  : public QMainWindow {
   void slotPrevLayer();
   void slotNextLayer();
 
+  void slotZoomStdAction();
+
   void slotOpenImageAction();
 
   void slotUpdateScrollBars(Canvas*);
@@ -62,7 +65,9 @@ class ImageWindow  : public QMainWindow {
 
   void slotCoordToMainWindow(QPoint);
   void slotMarkerToMainWindow(Marker);
+
   void slotShowCoords(QPoint);
+  void slotShowZoom(double p);
   void slotShowMarkers(Marker);
 
 
@@ -75,6 +80,7 @@ class ImageWindow  : public QMainWindow {
   QLabel* _statusLabelMouse;
   QLabel* _statusLabelPatch;
   QLabel* _statusLabelMarker;
+  QLabel* _statusLabelZoom;
 
   QMenu* _fileMenu;
   QAction* _openImageAct;
@@ -87,6 +93,7 @@ class ImageWindow  : public QMainWindow {
   Window* _parentWindow;
 
   QAction *_zoomInAct;
+  QAction *_zoomStdAct;
   QAction *_zoomOutAct;
 };
 }; // namespace GUI

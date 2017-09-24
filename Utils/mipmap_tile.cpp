@@ -18,6 +18,12 @@ Utils::MipmapTile::MipmapTile(float* ptr,
 }
 
 Utils::MipmapTile::~MipmapTile() {}
+
+void Utils::MipmapTile::clear() {
+  glDeleteTextures(1, &(_obj->texture_id) );
+  delete _obj;
+}
+
 const Utils::GlObject<float> *Utils::MipmapTile::obj() const {
   return _obj;
 }

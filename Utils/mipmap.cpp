@@ -6,9 +6,20 @@
 #include "gl_manager.h"
 
 
-
+void Utils::Mipmap::clear() {
+  _empty = true;
+  for(auto &&level : _levels){
+    level->clear();
+    delete level;
+  }
+  _levels.clear();
+}
+bool Utils::Mipmap::empty() {
+  return _empty;
+}
 
 Utils::Mipmap::Mipmap() {
+  _empty = true;
   std::cout << "Utils::Mipmap::Mipmap" << std::endl;
 
 }
@@ -68,6 +79,7 @@ void Utils::Mipmap::setData(float *ptr,
   delete [] working_ptr;
 
   std::cout << "Utils::Mipmap::set_image END" << std::endl;
+  _empty = false;
 }
 
 float* Utils::Mipmap::downsample(const float* ptr,

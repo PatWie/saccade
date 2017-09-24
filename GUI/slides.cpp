@@ -55,19 +55,19 @@ void GUI::Slides::draw(Utils::GlManager *gl,
 size_t GUI::Slides::width() const {
   if (_id == -1)
     return 0;
-  return hasImage() ? current()->width() : 0 ;
+  return available() ? current()->width() : 0 ;
 }
 
 size_t GUI::Slides::height() const {
   if (_id == -1)
     return 0;
-  return hasImage() ? current()->height() : 0 ;
+  return available() ? current()->height() : 0 ;
 }
 
-bool GUI::Slides::hasImage() const {
+bool GUI::Slides::available() const {
   if (_id == -1)
     return false;
-  return current()->hasImage();
+  return current()->available();
 }
 
 std::string GUI::Slides::path() const {

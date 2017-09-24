@@ -51,4 +51,5 @@ and you find the app in the Ubuntu searchbar.
 - Ctrl+N: new canvas
 - Ctrl+W: quit canvas
 - Ctrl+plus: zoom in
+- Ctrl+0: no zoom
 - Ctrl+minus: zoom out

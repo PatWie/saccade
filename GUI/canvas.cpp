@@ -53,7 +53,7 @@ GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
 }
 
 const GUI::Layer* GUI::Canvas::layer(int i) const {
-  if (!_slides->hasImage())
+  if (!_slides->available())
     return nullptr;
   if (i == -1)
     return _slides->current();
@@ -66,17 +66,25 @@ const GUI::Slides* GUI::Canvas::slides() const {
 }
 
 void GUI::Canvas::addLayer(Layer *layer) {
+  connect( layer, SIGNAL( sigRefresh() ),
+           this, SLOT( slotUpdateCanvas() ));
   _slides->add(layer);
-  updateCanvas();
+  slotUpdateCanvas();
 }
 
-void GUI::Canvas::updateCanvas() {
+void GUI::Canvas::slotUpdateCanvas() {
+  qDebug() << "GUI::Canvas::slotUpdateCanvas";
   emit sigUpdateTitle(this);
   emit sigUpdateScrollBars(this);
   update();
 }
 
 
+void GUI::Canvas::slotSetZoomAction(double zoom) {
+  _property.zoom_factor = zoom;
+  slotUpdateCanvas();
+  askSynchronization();
+}
 void GUI::Canvas::slotZoomInAction() {
   zoom(_focus, 1);
 }
@@ -163,7 +171,7 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent*) {
 
 
 void GUI::Canvas::wheelEvent( QWheelEvent * event) {
-  if (_slides->hasImage() > 0) {
+  if (_slides->available() > 0) {
     // QPoint q = QPoint(event->x(), event->y());
     zoom(event->pos(), event->delta());
   }
@@ -209,10 +217,11 @@ void GUI::Canvas::zoom(QPoint q, int delta) {
     _property.y -= ((double)winHeight * ((1.0 / zoom2) - (1.0 / zoom1)) * mpercY);
   }
 
-  update();
-  emit sigPropertyChanged(this);
-  emit sigUpdateScrollBars(this);
-  emit sigCoordToImageWindow(p);
+  // update();
+  // emit sigPropertyChanged(this);
+  // emit sigUpdateScrollBars(this);
+  slotUpdateCanvas();
+  // emit sigCoordToImageWindow(p);
 
 }
 
@@ -249,7 +258,7 @@ void checkerboard(unsigned char* data,
 }
 
 QPoint GUI::Canvas::screenToBuf( QPoint p ) const {
-  if (!_slides->hasImage())
+  if (!_slides->available())
     return QPoint(0, 0);
 
   const double image_width = _slides->width();
@@ -280,7 +289,7 @@ GUI::Canvas::property_t GUI::Canvas::getProperty() {
 }
 
 void GUI::Canvas::setProperty( property_t property ) {
-  if (_slides->hasImage()) {
+  if (_slides->available()) {
     _property = property;
     update();
   }
@@ -336,7 +345,7 @@ void GUI::Canvas::paintGL() {
   // draw background
   _gl->draw(_bg, -4000, 4000, 4000, -4000, 0);
 
-  if (_slides->hasImage()) {
+  if (_slides->available()) {
     // get corner points
     QPoint top_left = QPoint(0, 0);
     QPoint top_right = QPoint(width() - 1, 0);
@@ -378,12 +387,12 @@ void GUI::Canvas::paintGL() {
 
 void GUI::Canvas::slotPrevLayer() {
   _slides->backward();
-  updateCanvas();
+  slotUpdateCanvas();
 }
 
 void GUI::Canvas::slotNextLayer() {
   _slides->forward();
-  updateCanvas();
+  slotUpdateCanvas();
 }
 
 

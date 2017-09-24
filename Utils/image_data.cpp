@@ -1,10 +1,20 @@
 #include "image_data.h"
 #include <iostream>
 #include <string>
-
+#include <string.h>
 
 
 Utils::ImageData::~ImageData() {}
+Utils::ImageData::ImageData(float*d, int h, int w, int c)
+: _raw_buf(d), _height(h), _width(w), _channels(c) {}
+Utils::ImageData::ImageData(Utils::ImageData *i) {
+  _height = i->height();
+  _width = i->width();
+  _channels = i->channels();
+  _raw_buf = new float[i->elements()];
+  memcpy( _raw_buf, i->data(), sizeof(float) * i->elements() );
+    
+}
 
 Utils::ImageData::ImageData(std::string filename) {
   std::cout << "Utils::ImageData::ImageData()" << std::endl;
@@ -55,9 +65,11 @@ RGBQUAD Utils::ImageData::operator()(int h, int w) const {
 }
 
 float* Utils::ImageData::data() const {return _raw_buf;}
+size_t Utils::ImageData::elements() const {return _height * _width * _channels;}
 int Utils::ImageData::width() const {return _width;}
 int Utils::ImageData::height() const {return _height;}
 int Utils::ImageData::channels() const {return _channels;}
+
 
 bool Utils::ImageData::is_ptr_RGB(FIBITMAP* data) {
   return FreeImage_GetColorType(data) == FIC_RGB &&
