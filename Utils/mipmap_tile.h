@@ -17,6 +17,8 @@ class MipmapTile {
 
   void draw(Utils::GlManager *gl, double posH, double posW);
 
+  void clear();
+
   const Utils::GlObject<float> *obj() const;
 
  private:

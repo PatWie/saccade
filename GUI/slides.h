@@ -29,7 +29,7 @@ class Slides {
             uint bottom, uint right,
             double zoom);
 
-  bool hasImage() const;
+  bool available() const;
 
   void backward();
   void forward();

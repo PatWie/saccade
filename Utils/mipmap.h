@@ -29,8 +29,13 @@ class Mipmap {
 
   std::vector<MipmapLevel*> _levels;
 
+  void clear();
+  bool empty();
+
  private:
   ImageData *_img;
+
+  bool _empty;
 
 
 };

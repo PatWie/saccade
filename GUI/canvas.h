@@ -58,7 +58,6 @@ class Canvas  : public QOpenGLWidget {
   void resizeGL(int w, int h);
   void paintGL();
 
-  void updateCanvas();
   void addLayer(Layer* layer);
 
   const Layer* layer(int i = -1) const;
@@ -93,9 +92,12 @@ class Canvas  : public QOpenGLWidget {
   void slotPrevLayer();
   void slotNextLayer();
 
+  void slotUpdateCanvas();
 
   void slotZoomInAction();
   void slotZoomOutAction();
+
+  void slotSetZoomAction(double);
 
  protected:
   void zoom(QPoint q, int delta);

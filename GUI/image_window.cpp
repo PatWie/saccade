@@ -48,7 +48,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   connect( _canvas, SIGNAL(sigMarkerToImageWindow(Marker)),
            this, SLOT(slotMarkerToMainWindow(Marker)));
 
-  _canvas->updateCanvas();
+  _canvas->slotUpdateCanvas();
 
   // statusbar
   // ==========================================================
@@ -58,6 +58,8 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   statusBar()->addWidget(_statusLabelPatch, 1);
   _statusLabelMarker = new QLabel("Marker");
   statusBar()->addWidget(_statusLabelMarker, 1);
+  _statusLabelZoom = new QLabel("Zoom");
+  statusBar()->addWidget(_statusLabelZoom, 1);
   statusBar()->setSizeGripEnabled ( false );
 
 
@@ -102,16 +104,32 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _zoomInAct = new QAction(this);
   _zoomInAct->setShortcut(Qt::Key_Plus | Qt::CTRL);
 
+  _zoomStdAct = new QAction(this);
+  _zoomStdAct->setShortcut(Qt::Key_0 | Qt::CTRL);
+
   _zoomOutAct = new QAction(this);
   _zoomOutAct->setShortcut(Qt::Key_Minus | Qt::CTRL);
 
-  connect(_zoomInAct, SIGNAL(triggered()), _canvas, SLOT(slotZoomInAction()));
-  connect(_zoomOutAct, SIGNAL(triggered()), _canvas, SLOT(slotZoomOutAction()));
+  connect(_zoomInAct, SIGNAL(triggered()),
+          _canvas, SLOT(slotZoomInAction()));
+  connect(_zoomStdAct, SIGNAL(triggered()),
+          this, SLOT(slotZoomStdAction()));
+  connect(_zoomOutAct, SIGNAL(triggered()),
+          _canvas, SLOT(slotZoomOutAction()));
+
+  connect(this, SIGNAL(sigSetZoomAction(double)),
+          _canvas, SLOT(slotSetZoomAction(double)));
+
   this->addAction(_zoomInAct);
+  this->addAction(_zoomStdAct);
   this->addAction(_zoomOutAct);
 
   setAcceptDrops(true);
 
+}
+
+void GUI::ImageWindow::slotZoomStdAction() {
+  emit sigSetZoomAction(1.0);
 }
 
 void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
@@ -143,7 +161,7 @@ void GUI::ImageWindow::slotOpenImageAction() {
       loadImage(filenames.at(i).toStdString());
     _parentWindow->_openPath = QFileInfo(filenames.at(0)).absolutePath();
   }
-  _canvas->updateCanvas();
+  _canvas->slotUpdateCanvas();
 }
 
 QSize GUI::ImageWindow::sizeHint() const {
@@ -157,7 +175,9 @@ void GUI::ImageWindow::slotUpdateConnectedViews(Canvas* p) {
 
 void GUI::ImageWindow::slotSynchronizeConnectedViews(Canvas* canvas) {
   if ( _canvas != canvas ) {
-    _canvas->setProperty(canvas->getProperty());
+    auto p = canvas->getProperty();
+    _canvas->setProperty(p);
+    slotShowZoom(p.zoom_factor);
     slotUpdateScrollBars(_canvas);
   }
 }
@@ -262,7 +282,7 @@ void GUI::ImageWindow::slotShowCoords(QPoint p) {
     top_left = _canvas->screenToBuf(top_left);
     bottom_right = _canvas->screenToBuf(bottom_right);
 
-    stream << "patch "
+    stream << "Patch "
            << "(" << top_left.y() << " " << top_left.x() << ") "
            << "(" << bottom_right.y() << " " << bottom_right.x() << ") "
            << "";
@@ -270,16 +290,16 @@ void GUI::ImageWindow::slotShowCoords(QPoint p) {
     _statusLabelPatch->setText(stream.str().c_str());
 
   }
-
-
-
-
 }
 
+void GUI::ImageWindow::slotShowZoom(double p) {
+  std::string val = "Zoom " + std::to_string(p);
+  _statusLabelZoom->setText(val.c_str());
+}
 
 void GUI::ImageWindow::slotShowMarkers(Marker m) {
   _canvas->setMarker(m);
 
-  std::string marker = "Marker " + std::to_string((int)m.y) + " " + std::to_string((int)m.x);
-  _statusLabelMarker->setText(marker.c_str());
+  std::string val = "Marker " + std::to_string((int)m.y) + " " + std::to_string((int)m.x);
+  _statusLabelMarker->setText(val.c_str());
 }

@@ -5,6 +5,8 @@ HEADERS       = GUI/window.h\
                 GUI/canvas.h\
                 GUI/about_window.h\
                 GUI/image_window.h\
+                Utils/Ops/image_op.h\
+                Utils/Ops/gamma_op.h\
                 Utils/gl_manager.h\
                 Utils/mipmap_tile.h\
                 Utils/mipmap_level.h\
@@ -18,6 +20,7 @@ SOURCES       = main.cpp \
                 GUI/about_window.cpp\
                 GUI/image_window.cpp\
                 GUI/window.cpp\
+                Utils/Ops/gamma_op.cpp\
                 Utils/gl_manager.cpp\
                 Utils/mipmap_tile.cpp\
                 Utils/mipmap_level.cpp\

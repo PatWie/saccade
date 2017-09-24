@@ -9,6 +9,16 @@
 
 Utils::MipmapLevel::MipmapLevel() {}
 Utils::MipmapLevel::~MipmapLevel() {}
+void Utils::MipmapLevel::clear() {
+  for(auto &&tile_line : _tiles){
+    for(auto &&tile : tile_line){
+      tile->clear();
+      delete tile;
+    }
+    tile_line.clear();
+  }
+  _tiles.clear();
+}
 
 
 void Utils::MipmapLevel::setData(float *ptr,
