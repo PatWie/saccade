@@ -29,8 +29,8 @@ This is currently under development and lacks some of the original features. It 
     chmod +x qt-opensource-linux-x64-5.9.1.run
     ./qt-opensource-linux-x64-5.9.1.run
     # clone this repo
-    git clone git@github.com:PatWie/eagleeye.git
-    cd eagleeye
+    git clone https://github.com/PatWie/eagle_eye.git
+    cd eagle_eye
     mkdir build
     cd build
     qmake ..
