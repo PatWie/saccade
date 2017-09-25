@@ -9,10 +9,10 @@
 #include "slides.h"
 
 GUI::Window::Window(QApplication* app) : _app(app){
-  workspace = new QMdiArea(this);
-  workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  setCentralWidget(workspace);
+  // workspace = new QMdiArea(this);
+  // workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  // workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  // setCentralWidget(workspace);
 
   // as long as we have no toolbar here
   QPixmap icon_png(":Icon/256x256/eagleeye.png");
