@@ -19,15 +19,27 @@ This is currently under development and lacks some of the original features. It 
 - Qt5.9
 - FreeImage library
 
-## Install
+## Install from Source
 
-    # install dependencies
-    sudo apt-get install libfreeimage3 libfreeimage-dev
-    # install Qt5.9
+See also the [release-page](https://github.com/PatWie/eagle_eye/releases). To get Qt5 either use
+
+    # install Qt5
+    sudo apt-get install qt5-default qttools5-dev-tools
+
+or do
+
     cd /tmp
     wget http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
     chmod +x qt-opensource-linux-x64-5.9.1.run
     ./qt-opensource-linux-x64-5.9.1.run
+
+Then get FreeImage
+
+    # install dependencies
+    sudo apt-get install libfreeimage3 libfreeimage-dev
+
+and finally this repository
+
     # clone this repo
     git clone https://github.com/PatWie/eagle_eye.git
     cd eagle_eye
@@ -43,14 +55,16 @@ edit `eagle_eye.desktop` and adjust the paths. Then
 and you find the app in the Ubuntu searchbar.
 
 ## Keyboard Shortcuts
-- key_down: next image
-- key_right: next image
-- key_up: previous image
-- key_left: previous image
-- Ctrl+O: open image
-- Del: remove current image
-- Ctrl+N: new canvas
-- Ctrl+W: quit canvas
-- Ctrl+plus: zoom in
-- Ctrl+0: no zoom
-- Ctrl+minus: zoom out
+
+
+| Action         | Shortcut            |
+| ------         | ------              |
+| next image     | key_down, key_right |
+| delete image   | Del                 |
+| previous image | key_up, key_left    |
+| open image     | Ctrl+O              |
+| new canvas     | Ctrl+N              |
+| quit canvas    | Ctrl+W              |
+| zoom in        | Ctrl+plus           |
+| no zoom        | Ctrl+0              |
+| zoom out       | Ctrl+minus          |
