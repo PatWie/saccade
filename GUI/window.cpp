@@ -14,6 +14,13 @@ GUI::Window::Window(QApplication* app) : _app(app){
   workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   setCentralWidget(workspace);
 
+  // as long as we have no toolbar here
+  QPixmap icon_png(":Icon/256x256/eagleeye.png");
+  // icon_png = icon_png.scaled(this->size(), Qt::IgnoreAspectRatio);
+  QPalette palette;
+  palette.setBrush(QPalette::Background, icon_png);
+  this->setPalette(palette);
+
   _openPath = QDir::currentPath();
 
   _newWindowAct = new QAction(tr("&New"), this );
@@ -35,14 +42,14 @@ GUI::Window::Window(QApplication* app) : _app(app){
 }
 
 QSize GUI::Window::sizeHint() const {
-  return QSize(400, 200);
+  return QSize(256, 256);
 }
 
 
 void GUI::Window::slotNewWindowAction() {
   qDebug() << "GUI::Window::slotNewWindowAction()";
 
-  GUI::ImageWindow* tmpWindow = new GUI::ImageWindow(workspace, this);
+  GUI::ImageWindow* tmpWindow = new GUI::ImageWindow(this, this);
   tmpWindow->setMinimumSize(200, 200);
   tmpWindow->show();
 
