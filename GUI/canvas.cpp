@@ -175,6 +175,7 @@ void GUI::Canvas::wheelEvent( QWheelEvent * event) {
     // QPoint q = QPoint(event->x(), event->y());
     zoom(event->pos(), event->delta());
   }
+
 }
 
 void GUI::Canvas::zoom(QPoint q, int delta) {
@@ -222,6 +223,7 @@ void GUI::Canvas::zoom(QPoint q, int delta) {
   // emit sigUpdateScrollBars(this);
   slotUpdateCanvas();
   // emit sigCoordToImageWindow(p);
+  emit sigPropertyChanged(this);
   emit sigPropertyToImagewindow(_property);
 
 }
