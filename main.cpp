@@ -23,7 +23,8 @@ void set_style(QPalette *p){
   p->setColor(QPalette::Button, QColor(53, 53, 53));
   p->setColor(QPalette::ButtonText, white);
   p->setColor(QPalette::BrightText, red);
-  p->setColor(QPalette::Link, QColor(42, 130, 218));
+  // p->setColor(QPalette::Link, QColor(42, 130, 218));
+  p->setColor(QPalette::Link, QColor(255, 0, 0));
   p->setColor(QPalette::Highlight, QColor(42, 130, 218));
   p->setColor(QPalette::HighlightedText, black);
 }

@@ -96,7 +96,6 @@ void GUI::Window::slotDialogWindowAction() {
 
 void GUI::Window::slotActualizeSubwindowView( ImageWindow* window, bool set) {
   Q_UNUSED(set);
-  std::cout << "GUI::Window::slotActualizeSubwindowView" << std::endl;
 
   connect( window, SIGNAL(sigUpdateConnectedViews(Canvas*)),
            this, SLOT(slotUpdateConnectedViews(Canvas*)) );
