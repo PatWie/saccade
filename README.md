@@ -1,4 +1,4 @@
-# EagleEye
+ # EagleEye
 
 A scientific image viewer inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). It features an OpenGL-based canvas to display images with dragging and zooming. These actions are further synchronized across different windows.
 
@@ -13,6 +13,7 @@ This is currently under development and lacks some of the original features. It 
 - synchronize views when moving and zooming
 - mipmap based datastructure
 - set marker on pixels
+- filewatcher
 
 ## Requirements
 
@@ -32,7 +33,7 @@ To get Qt5
 Then get FreeImage
 
     # install dependencies
-    sudo apt-get install libfreeimage3 libfreeimage-dev
+    sudo apt-get install libfreeimage3 libfreeimage-dev libgflags-dev libgoogle-glog-dev
 
 and finally this repository
 

@@ -17,7 +17,7 @@ SET(CMAKE_AUTORCC ON)
 
 find_package(Qt5Widgets)
 find_package(OpenGL REQUIRED)
-find_package(Glew REQUIRED)
+#find_package(Glew REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
