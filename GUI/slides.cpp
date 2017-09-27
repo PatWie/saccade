@@ -1,6 +1,9 @@
+#include <iostream>
+
+#include <glog/logging.h>
+
 #include "slides.h"
 #include "layer.h"
-#include <iostream>
 
 
 GUI::Slides::Slides() {
@@ -41,8 +44,10 @@ void GUI::Slides::backward() {
 void GUI::Slides::remove() {
   if (_slides.size() > 0) {
     current()->clear();
-    std::cout << "_id " << _id << std::endl;
-    _slides.erase(_slides.begin() + _id);
+    LOG(INFO) << "_id " << _id;
+    int tid = _id;
+    _id = _id - 1;
+    _slides.erase(_slides.begin() + tid);
   }
   // case only one left --> jump to first
   if (_slides.size() == 1) {

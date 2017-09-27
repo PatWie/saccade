@@ -49,8 +49,6 @@ class ImageData {
 
   // rgb times height*width
 
-  static bool is_ptr_Grey(FIBITMAP* data);
-  static bool is_ptr_RGB(FIBITMAP* data);
 };
 }; // namespace Image
 

@@ -17,16 +17,12 @@ This is currently under development and lacks some of the original features. It 
 ## Requirements
 
 - Qt5.9
+- CMake
 - FreeImage library
 
 ## Install from Source
 
-See also the [release-page](https://github.com/PatWie/eagle_eye/releases). To get Qt5 either use
-
-    # install Qt5
-    sudo apt-get install qt5-default qttools5-dev-tools
-
-or do
+To get Qt5
 
     cd /tmp
     wget http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
@@ -45,7 +41,7 @@ and finally this repository
     cd eagle_eye
     mkdir build
     cd build
-    qmake ..
+    cmake ..
     make
 
 edit `eagle_eye.desktop` and adjust the paths. Then 

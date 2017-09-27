@@ -1,6 +1,9 @@
+#include <iostream>
+
+#include <glog/logging.h>
+
 #include <QtWidgets>
 #include <QDebug>
-#include <iostream>
 
 #include "window.h"
 #include "image_window.h"
@@ -14,12 +17,12 @@ GUI::Window::Window(QApplication* app) : _app(app){
   // workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   // setCentralWidget(workspace);
 
-  // as long as we have no toolbar here
-  QPixmap icon_png(":Icon/256x256/eagleeye.png");
-  // icon_png = icon_png.scaled(this->size(), Qt::IgnoreAspectRatio);
-  QPalette palette;
-  palette.setBrush(QPalette::Background, icon_png);
-  this->setPalette(palette);
+  // // as long as we have no toolbar here
+  // QPixmap icon_png(":Icon/256x256/eagleeye.png");
+  // // icon_png = icon_png.scaled(this->size(), Qt::IgnoreAspectRatio);
+  // QPalette palette;
+  // palette.setBrush(QPalette::Background, icon_png);
+  // this->setPalette(palette);
 
   _openPath = QDir::currentPath();
 
@@ -42,12 +45,12 @@ GUI::Window::Window(QApplication* app) : _app(app){
 }
 
 QSize GUI::Window::sizeHint() const {
-  return QSize(256, 256);
+  return QSize(64, 64);
 }
 
 
 void GUI::Window::slotNewWindowAction() {
-  qDebug() << "GUI::Window::slotNewWindowAction()";
+  LOG(INFO) << "GUI::Window::slotNewWindowAction()";
 
   GUI::ImageWindow* tmpWindow = new GUI::ImageWindow(this, this);
   tmpWindow->setMinimumSize(200, 200);
@@ -78,7 +81,7 @@ void GUI::Window::slotNewWindowAction() {
   _windows.push_back(tmpWindow);
 }
 void GUI::Window::slotDialogWindowAction() {
-  qDebug() << "GUI::Window::slotDialogWindowAction()";
+  LOG(INFO) << "GUI::Window::slotDialogWindowAction()";
   AboutWindow* dialog = new AboutWindow(this);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
 

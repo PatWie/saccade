@@ -55,7 +55,13 @@ class GlObject  : protected QOpenGLFunctions {
   }
 
   GLint internalformat() const {
-    return (channels == 4) ? GL_RGBA : GL_RGB;
+    if(channels == 1)
+      return GL_LUMINANCE;
+    if(channels == 3)
+      return GL_RGB;
+    if(channels == 4)
+      return GL_RGBA;
+    return GL_RGB;
   }
 
 };

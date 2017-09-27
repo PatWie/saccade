@@ -1,7 +1,9 @@
-#include <QtWidgets>
-#include <QDebug>
 #include <iomanip>
 #include <sstream>
+
+#include <glog/logging.h>
+
+#include <QtWidgets>
 
 #include "window.h"
 #include "image_window.h"
@@ -88,7 +90,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _removeImageAct->setStatusTip(tr("Remove the current image"));
   connect(_removeImageAct, SIGNAL(triggered()), this, SLOT(slotRemoveImageAction()));
 
-  
+
 
   _newWindowAct = new QAction(tr("&New"), this );
   _newWindowAct->setShortcut(tr("Ctrl+N"));
@@ -148,7 +150,7 @@ void GUI::ImageWindow::slotZoomStdAction() {
 void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
   QList<QUrl> urls = ev->mimeData()->urls();
   foreach (QUrl url, urls) {
-    qDebug() << url.toLocalFile();
+    LOG(INFO) << url.toLocalFile().toStdString();
     loadImage(url.toLocalFile().toStdString());
   }
 }
@@ -164,7 +166,7 @@ void GUI::ImageWindow::loadImage(std::string fn) {
 }
 
 void GUI::ImageWindow::slotOpenImageAction() {
-  qDebug() << "GUI::Window::slotOpenImageAction()";
+  LOG(INFO) << "GUI::Window::slotOpenImageAction()";
 
   QStringList filenames = QFileDialog::getOpenFileNames(this,
                           tr("Open Image"), _parentWindow->_openPath, tr("Image Files (*.png *.jpg *.bmp)"));
@@ -178,12 +180,12 @@ void GUI::ImageWindow::slotOpenImageAction() {
 }
 
 void GUI::ImageWindow::slotRemoveImageAction() {
-  qDebug() << "GUI::ImageWindow::slotRemoveImageAction";
+  LOG(INFO) << "GUI::ImageWindow::slotRemoveImageAction";
   emit sigRemoveCurrentLayer();
 }
 
 QSize GUI::ImageWindow::sizeHint() const {
-  return QSize(1024, 1024);
+  return QSize(512, 512);
 }
 
 void GUI::ImageWindow::slotUpdateConnectedViews(Canvas* p) {

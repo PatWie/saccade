@@ -1,5 +1,6 @@
+#include <glog/logging.h>
+
 #include "gl_manager.h"
-#include <QDebug>
 #include "../GUI/marker.h"
 #include "../GUI/slides.h"
 #include "../GUI/canvas.h"
@@ -63,13 +64,14 @@ void Utils::GlManager::printContextInformation() {
   }
 #undef CASE
 
-  // qPrintable() will print our QString w/o quotes around it.
-  qDebug() << qPrintable(glType) << qPrintable(glVersion) << "(" << qPrintable(glProfile) << ")";
+  QString info;
+  info = glType + glVersion + "(" + glProfile + ")";
+  LOG(INFO) << info.toStdString();
 }
 
 
 void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
-  
+
   if (!marker->active)
     return;
 
@@ -89,46 +91,38 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
   glBindTexture( GL_TEXTURE_2D, 0 );
   glBegin(GL_TRIANGLES);
   double x2, y2;
-  for ( unsigned int i = 0; i < 4; i++ ) {
-    switch ( i ) {
-    case 0:
-      x2 = x + 1.0;
-      y2 = y + 0.5;
-      glColor3d( 1.0, 1.0, 1.0 );
-      glVertex3f(x2, y2, -1.0);
-      glColor3d( 0.0, 0.0, 0.0 );
-      glVertex3f(x2 + ((double)10 / zoom), y2 - ((double)5 / zoom), -1.0);
-      glVertex3f(x2 + ((double)10 / zoom), y2 + ((double)5 / zoom), -1.0);
-      break;
-    case 1:
-      x2 = x + 0.5;
-      y2 = y + 1.0;
-      glColor3d( 1.0, 1.0, 1.0 );
-      glVertex3f(x2, y2, -1.0);
-      glColor3d( 0.0, 0.0, 0.0 );
-      glVertex3f(x2 + ((double)5 / zoom), y2 + ((double)10 / zoom), -1.0);
-      glVertex3f(x2 - ((double)5 / zoom), y2 + ((double)10 / zoom), -1.0);
-      break;
-    case 2:
-      x2 = x;
-      y2 = y + 0.5;
-      glColor3d( 1.0, 1.0, 1.0 );
-      glVertex3f(x2, y2, -1.0);
-      glColor3d( 0.0, 0.0, 0.0 );
-      glVertex3f(x2 - ((double)10 / zoom), y2 + ((double)5 / zoom), -1.0);
-      glVertex3f(x2 - ((double)10 / zoom), y2 - ((double)5 / zoom), -1.0);
-      break;
-    case 3:
-    default:
-      x2 = x + 0.5;
-      y2 = y;
-      glColor3d( 1.0, 1.0, 1.0 );
-      glVertex3f(x2, y2, -1.0);
-      glColor3d( 0.0, 0.0, 0.0 );
-      glVertex3f(x2 + ((double)5 / zoom), y2 - ((double)10 / zoom), -1.0);
-      glVertex3f(x2 - ((double)5 / zoom), y2 - ((double)10 / zoom), -1.0);
-      break;
-    }
-  }
+
+  x2 = x + 1.0;
+  y2 = y + 0.5;
+  glColor3d( 1.0, 1.0, 1.0 );
+  glVertex3f(x2, y2, -1.0);
+  glColor3d( 0.0, 0.0, 0.0 );
+  glVertex3f(x2 + ((double)10 / zoom), y2 - ((double)5 / zoom), -1.0);
+  glVertex3f(x2 + ((double)10 / zoom), y2 + ((double)5 / zoom), -1.0);
+
+  x2 = x + 0.5;
+  y2 = y + 1.0;
+  glColor3d( 1.0, 1.0, 1.0 );
+  glVertex3f(x2, y2, -1.0);
+  glColor3d( 0.0, 0.0, 0.0 );
+  glVertex3f(x2 + ((double)5 / zoom), y2 + ((double)10 / zoom), -1.0);
+  glVertex3f(x2 - ((double)5 / zoom), y2 + ((double)10 / zoom), -1.0);
+
+  x2 = x;
+  y2 = y + 0.5;
+  glColor3d( 1.0, 1.0, 1.0 );
+  glVertex3f(x2, y2, -1.0);
+  glColor3d( 0.0, 0.0, 0.0 );
+  glVertex3f(x2 - ((double)10 / zoom), y2 + ((double)5 / zoom), -1.0);
+  glVertex3f(x2 - ((double)10 / zoom), y2 - ((double)5 / zoom), -1.0);
+
+  x2 = x + 0.5;
+  y2 = y;
+  glColor3d( 1.0, 1.0, 1.0 );
+  glVertex3f(x2, y2, -1.0);
+  glColor3d( 0.0, 0.0, 0.0 );
+  glVertex3f(x2 + ((double)5 / zoom), y2 - ((double)10 / zoom), -1.0);
+  glVertex3f(x2 - ((double)5 / zoom), y2 - ((double)10 / zoom), -1.0);
+
   glEnd();
 }

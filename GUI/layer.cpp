@@ -1,11 +1,14 @@
+#include <iostream>
+#include <string>
+
+#include <glog/logging.h>
+
 #include "../Utils/image_data.h"
 #include "../Utils/mipmap.h"
 #include "../Utils/gl_manager.h"
 #include "../Utils/Ops/img_op.h"
-#include "layer.h"
-#include <iostream>
-#include <string>
 #include "../Utils/Ops/gamma_op.h"
+#include "layer.h"
 
 // threads
 GUI::threads::MipmapThread::MipmapThread() {}
@@ -31,7 +34,7 @@ void GUI::threads::OperationThread::notify(Utils::ImageData *dst,
 
 }
 void GUI::threads::OperationThread::run() {
-  std::cout << "GUI::threads::OperationThread::run(" << std::endl;
+  LOG(INFO) << "GUI::threads::OperationThread::run()";
   const float *src = _src->data();
   float *dst = _dst->data();
   for (size_t i = 0; i < _src->elements(); ++i)
@@ -52,7 +55,7 @@ GUI::Layer::Layer() {
   _thread_opWorker = new threads::OperationThread();
   connect( _thread_opWorker, SIGNAL( finished() ),
            this, SLOT( slotApplyOpFinished() ));
-  std::cout << "GUI::Layer::Layer()" << std::endl;
+  LOG(INFO) << "GUI::Layer::Layer()";
 }
 
 void GUI::Layer::draw(Utils::GlManager *gl,
@@ -76,15 +79,15 @@ bool GUI::Layer::available() const {
 }
 
 void GUI::Layer::clear() {
-  std::cout << "GUI::Layer::clear" << std::endl;
+  LOG(INFO) << "GUI::Layer::clear()";
     
   _available = false;
   _mipmap->clear();
-  std::cout << "_mipmap->clear();" << std::endl;
+  LOG(INFO) << "_mipmap->clear()";
   _imgdata->clear();
-  std::cout << "_imgdata->clear();" << std::endl;
+  LOG(INFO) << "_imgdata->clear()";
   _bufdata->clear(false);
-  std::cout << "_bufdata->clear();" << std::endl;
+  LOG(INFO) << "_bufdata->clear()";
 
 }
 void GUI::Layer::loadImage(std::string fn) {
@@ -109,13 +112,13 @@ void GUI::Layer::slotRebuildMipmap()  {
 
 }
 void GUI::Layer::slotLoadFinished()  {
-  std::cout << "GUI::Layer::slotLoadFinished()" << std::endl;
+  LOG(INFO) << "GUI::Layer::slotLoadFinished()";
   _available = true;
   emit sigRefresh();
 }
 
 void GUI::Layer::slotApplyOpFinished()  {
-  std::cout << "GUI::Layer::slotApplyOpFinished()" << std::endl;
+  LOG(INFO) << "GUI::Layer::slotApplyOpFinished()";
   // for zooming and tiling the image we use the mipmap data structure
   emit sigApplyOpFinished();
 }

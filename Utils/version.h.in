@@ -1,0 +1,20 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+#include <string>
+
+namespace Utils {
+
+const static std::string EAGLEEYE_VERSION = "${EAGLEEYE_VERSION}";
+const static std::string EAGLEEYE_BRANCH = "${GIT_BRANCH}";
+const static std::string EAGLEEYE_COMMIT_ID = "${GIT_COMMIT_ID}";
+const static std::string EAGLEEYE_COMMIT_DATE = "${GIT_COMMIT_DATE}";
+
+std::string GetVersionInfo();
+
+std::string GetBuildInfo();
+
+}  // namespace Utils
+
+
+#endif // VERSION_H

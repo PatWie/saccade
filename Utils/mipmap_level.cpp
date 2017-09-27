@@ -24,7 +24,7 @@ void Utils::MipmapLevel::clear() {
 void Utils::MipmapLevel::setData(float *ptr,
                                  uint height, uint width, uint channels,
                                  uint tileSize) {
-  // std::cout << "Utils::MipmapLevel::setData " << height << " " << width << " " << tileSize << std::endl;
+  // LOG(INFO) << "Utils::MipmapLevel::setData " << height << " " << width << " " << tileSize;
   _tileSize = tileSize;
 
   // generate enough tiles (like block and grid)

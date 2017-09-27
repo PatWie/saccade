@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include <glog/logging.h>
 #include "image_data.h"
 #include "mipmap.h"
 #include "mipmap_level.h"
@@ -8,7 +9,7 @@
 
 void Utils::Mipmap::clear() {
   _empty = true;
-  for(auto &&level : _levels){
+  for (auto && level : _levels) {
     level->clear();
     delete level;
   }
@@ -20,7 +21,7 @@ bool Utils::Mipmap::empty() {
 
 Utils::Mipmap::Mipmap() {
   _empty = true;
-  std::cout << "Utils::Mipmap::Mipmap" << std::endl;
+  LOG(INFO) << "Utils::Mipmap::Mipmap";
 
 }
 
@@ -28,7 +29,7 @@ void Utils::Mipmap::setData(float *ptr,
                             uint height, uint width, uint channels,
                             uint tileSize) {
 
-  std::cout << "Utils::Mipmap::set_image START" << std::endl;
+  LOG(INFO) << "Utils::Mipmap::set_image START";
 
 
   // unload old textures
@@ -54,10 +55,9 @@ void Utils::Mipmap::setData(float *ptr,
                       working_height, working_width, channels,
                       tileSize);
 
-  std::cout << "create level " << 0
+  LOG(INFO) << "create level " << 0
             << " " << working_height
-            << " " << working_width
-            << std::endl;
+            << " " << working_width;
 
   for (uint d = 1; d < depth; ++d) {
 
@@ -67,10 +67,9 @@ void Utils::Mipmap::setData(float *ptr,
     delete[] old_ptr;
 
 
-    std::cout << "create level " << d
+    LOG(INFO) << "create level " << d
               << " " << working_height
-              << " " << working_width
-              << std::endl;
+              << " " << working_width;
     MipmapLevel* level = new MipmapLevel();
     _levels.push_back(level);
     _levels[d]->setData(working_ptr,
@@ -80,7 +79,7 @@ void Utils::Mipmap::setData(float *ptr,
   delete [] working_ptr;
 
 
-  std::cout << "Utils::Mipmap::set_image END" << std::endl;
+  LOG(INFO) << "Utils::Mipmap::set_image END";
   _empty = false;
 }
 
@@ -182,12 +181,12 @@ void Utils::Mipmap::draw(Utils::GlManager *gl,
                          int top, int left,
                          int bottom, int right,
                          double zoom) {
-  // std::cout << "Utils::Mipmap::draw START" << std::endl;
-  // std::cout << "top " << top
+  // LOG(INFO) << "Utils::Mipmap::draw START";
+  // LOG(INFO) << "top " << top
   //           << "left " << left
   //           << "bottom " << bottom
   //           << "right " << right
-  //           << std::endl;
+  //          ;
 
   // find best level for given zoom_level
   int currentLevel = 0;
@@ -211,11 +210,11 @@ void Utils::Mipmap::draw(Utils::GlManager *gl,
   */
   zoom = pow( 2.0, -(double)currentLevel );
 
-  // std::cout << "Utils::Mipmap::draw LEVEL " << currentLevel << std::endl;
+  // LOG(INFO) << "Utils::Mipmap::draw LEVEL " << currentLevel;
 
 
   _levels[currentLevel]->draw(gl, top, left, bottom, right, zoom);
-  // std::cout << "Utils::Mipmap::draw END" << std::endl;
+  // LOG(INFO) << "Utils::Mipmap::draw END";
   // https://doc-snapshots.qt.io/qt5-dev/qopenglfunctions.html
 
 }

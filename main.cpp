@@ -2,11 +2,14 @@
 #include <QPalette>
 #include <QColor>
 #include <QSurfaceFormat>
+
+#include <glog/logging.h>
+#include <gflags/gflags.h>
+
 #include "GUI/window.h"
+#include "Utils/version.h"
 
-// based on https://sourceforge.net/p/shiver/idisplay
-
-void set_style(QPalette *p){
+void set_style(QPalette *p) {
 
   QColor white(255, 255, 255);
   QColor red(255, 0, 0);
@@ -29,17 +32,24 @@ void set_style(QPalette *p){
   p->setColor(QPalette::HighlightedText, black);
 }
 
+// call by ./eagle_eye --logtostderr=1
 int main(int argc, char *argv[]) {
 
+  // FLAGS_alsologtostderr = 1;
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
+
+  LOG(INFO) << Utils::GetVersionInfo();
+  LOG(INFO) << Utils::GetBuildInfo();
   QApplication app(argc, argv);
 
+  LOG(INFO) << "override style";
   QPalette p;
   set_style(&p);
   app.setStyle("Fusion");
   app.setPalette(p);
 
   GUI::Window window(&app);
-
   window.setWindowIcon(QIcon(":Icon/256x256/eagleeye.png"));
   window.setWindowTitle("EagleEye");
   window.show();

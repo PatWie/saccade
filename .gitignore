@@ -1,7 +1,5 @@
 build/
 
-# Created by https://www.gitignore.io/api/qt
-
 ### Qt ###
 # C++ objects and libs
 
@@ -43,4 +41,16 @@ Makefile*
 CMakeLists.txt.user*
 
 
-# End of https://www.gitignore.io/api/qt
+### CMake ###
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+build
+
+Utils/version.h

@@ -1,6 +1,8 @@
-#include <QDebug>
 #include <iostream>
+
 #include <QMouseEvent>
+
+#include <glog/logging.h>
 
 #include "canvas.h"
 #include "layer.h"
@@ -41,14 +43,10 @@ GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
   _dragging.start.setX(0.0);
   _dragging.start.setY(0.0);
 
-  qDebug() << "Canvas ctor";
-  // _slides = new Layer();
   _slides = new Slides();
-  qDebug() << "Canvas ctor2";
+  _marker = new Marker();
 
   emit sigUpdateScrollBars(this);
-
-  _marker = new Marker();
 
 }
 
@@ -73,7 +71,7 @@ void GUI::Canvas::addLayer(Layer *layer) {
 }
 
 void GUI::Canvas::slotUpdateCanvas() {
-  // qDebug() << "GUI::Canvas::slotUpdateCanvas";
+  // LOG(INFO) << "GUI::Canvas::slotUpdateCanvas";
   emit sigUpdateTitle(this);
   emit sigUpdateScrollBars(this);
   update();
@@ -94,7 +92,7 @@ void GUI::Canvas::slotZoomOutAction() {
 }
 
 QSize GUI::Canvas::sizeHint() const {
-  return QSize(1024, 1024);
+  return QSize(512, 512);
 }
 
 void GUI::Canvas::askSynchronization() {
@@ -190,7 +188,7 @@ void GUI::Canvas::zoom(QPoint q, int delta) {
   const unsigned int winWidth = width();
   const unsigned int winHeight = height();
 
-  const double zoom_delta = 1.4142135623;
+  const double zoom_delta = sqrt(2.0);
 
   double mpercX = ((q.x()) / ((double)winWidth)) - 0.5;
   double mpercY = ((q.y()) / ((double)winHeight)) - 0.5;
@@ -218,11 +216,8 @@ void GUI::Canvas::zoom(QPoint q, int delta) {
     _property.y -= ((double)winHeight * ((1.0 / zoom2) - (1.0 / zoom1)) * mpercY);
   }
 
-  // update();
-  // emit sigPropertyChanged(this);
-  // emit sigUpdateScrollBars(this);
   slotUpdateCanvas();
-  // emit sigCoordToImageWindow(p);
+
   emit sigPropertyChanged(this);
   emit sigPropertyToImagewindow(_property);
 
@@ -316,7 +311,7 @@ void GUI::Canvas::updatePropertyByScrollbar( property_t property ) {
 }
 
 void GUI::Canvas::initializeGL() {
-  qDebug() << "GUI::Canvas::initializeGL()";
+  LOG(INFO) << "GUI::Canvas::initializeGL()";
   _gl->initializeOpenGLFunctions();
   _gl->printContextInformation();
 
@@ -397,7 +392,7 @@ void GUI::Canvas::slotRemoveCurrentLayer() {
     _slides->remove();
     slotUpdateCanvas();
   }
-  qDebug() << "remove layer";
+  LOG(INFO) << "remove layer";
 }
 void GUI::Canvas::slotNextLayer() {
   _slides->forward();
