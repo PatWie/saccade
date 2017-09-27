@@ -19,6 +19,7 @@ bool Utils::Mipmap::empty() {
   return _empty;
 }
 
+Utils::Mipmap::~Mipmap() {}
 Utils::Mipmap::Mipmap() {
   _empty = true;
   LOG(INFO) << "Utils::Mipmap::Mipmap";
@@ -64,7 +65,8 @@ void Utils::Mipmap::setData(float *ptr,
     float* old_ptr = working_ptr;
     working_ptr = downsample(old_ptr,
                              &working_height, &working_width, channels);
-    delete[] old_ptr;
+    if(d>1)
+      delete[] old_ptr;
 
 
     LOG(INFO) << "create level " << d

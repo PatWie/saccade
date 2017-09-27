@@ -28,6 +28,7 @@ class GlObject  : protected QOpenGLFunctions {
       data(nullptr),
       texture_id(0), buffer_id(0),
       loaded(false), interpolation(GL_NEAREST) {
+
     if (std::is_same<Dtype, float>::value)
       _type = GL_FLOAT;
     if (std::is_same<Dtype, unsigned char>::value)

@@ -12,7 +12,7 @@
 
 // threads
 GUI::threads::MipmapThread::MipmapThread() {}
-void GUI::threads::MipmapThread::notify( Utils::Mipmap* mipmap,  Utils::ImageData *img) {
+void GUI::threads::MipmapThread::notify( Mipmap_ptr mipmap,  ImageData_ptr img) {
   _mipmap = mipmap;
   _img = img;
 }
@@ -25,8 +25,8 @@ void GUI::threads::MipmapThread::run() {
 }
 
 GUI::threads::OperationThread::OperationThread() {}
-void GUI::threads::OperationThread::notify(Utils::ImageData *dst,
-    Utils::ImageData *src,
+void GUI::threads::OperationThread::notify(ImageData_ptr dst,
+     ImageData_ptr src,
     Utils::Ops::ImgOp *op) {
   _src = src;
   _dst = dst;
@@ -50,12 +50,19 @@ GUI::Layer::Layer() {
 
   _thread_mipmapBuilder = new threads::MipmapThread();
   connect( _thread_mipmapBuilder, SIGNAL( finished() ),
-           this, SLOT( slotLoadFinished() ));
+           this, SLOT( slotMipmapFinished() ));
 
-  _thread_opWorker = new threads::OperationThread();
-  connect( _thread_opWorker, SIGNAL( finished() ),
-           this, SLOT( slotApplyOpFinished() ));
+  // _thread_opWorker = new threads::OperationThread();
+  // connect( _thread_opWorker, SIGNAL( finished() ),
+  //          this, SLOT( slotApplyOpFinished() ));
   LOG(INFO) << "GUI::Layer::Layer()";
+
+  _watcher = new QFileSystemWatcher();
+  connect(_watcher, SIGNAL(fileChanged(QString)),
+          this, SLOT(slotPathChanged(QString)));
+
+  _current_mipmap = std::make_shared<Utils::Mipmap>();
+
 }
 
 void GUI::Layer::draw(Utils::GlManager *gl,
@@ -63,7 +70,7 @@ void GUI::Layer::draw(Utils::GlManager *gl,
                       uint bottom, uint right,
                       double zoom) {
 
-  _mipmap->draw(gl, top, left, bottom, right, zoom);
+  _current_mipmap->draw(gl, top, left, bottom, right, zoom);
 
 }
 
@@ -80,9 +87,9 @@ bool GUI::Layer::available() const {
 
 void GUI::Layer::clear() {
   LOG(INFO) << "GUI::Layer::clear()";
-    
+
   _available = false;
-  _mipmap->clear();
+  _current_mipmap->clear();
   LOG(INFO) << "_mipmap->clear()";
   _imgdata->clear();
   LOG(INFO) << "_imgdata->clear()";
@@ -91,15 +98,17 @@ void GUI::Layer::clear() {
 
 }
 void GUI::Layer::loadImage(std::string fn) {
-  _path = fn;
   _available = false;
+  if (_path != "") {
+    _watcher->removePath(QString::fromStdString(_path));
+  }
+  _path = fn;
+
   // we keep the original data here
-  _imgdata = new Utils::ImageData(fn);
+  _imgdata = std::make_shared<Utils::ImageData>(fn);
 
   // and for diplaying purposes we use the buffer data
-  _bufdata = new Utils::ImageData(_imgdata);
-
-  _mipmap = new Utils::Mipmap();
+  _bufdata = std::make_shared<Utils::ImageData>(_imgdata.get());
 
   slotRebuildMipmap();
 }
@@ -107,29 +116,37 @@ void GUI::Layer::loadImage(std::string fn) {
 void GUI::Layer::slotRebuildMipmap()  {
   _available = false;
 
-  _thread_mipmapBuilder->notify(_mipmap, _bufdata);
+  _working_mipmap = std::make_shared<Utils::Mipmap>();
+  _thread_mipmapBuilder->notify(_working_mipmap, _bufdata);
   _thread_mipmapBuilder->start();
 
 }
-void GUI::Layer::slotLoadFinished()  {
-  LOG(INFO) << "GUI::Layer::slotLoadFinished()";
+void GUI::Layer::slotMipmapFinished()  {
+  LOG(INFO) << "GUI::Layer::slotMipmapFinished()";
+  _current_mipmap = _working_mipmap;
+   _watcher->addPath(QString::fromStdString(_path));
   _available = true;
   emit sigRefresh();
 }
 
-void GUI::Layer::slotApplyOpFinished()  {
-  LOG(INFO) << "GUI::Layer::slotApplyOpFinished()";
-  // for zooming and tiling the image we use the mipmap data structure
-  emit sigApplyOpFinished();
-}
+// void GUI::Layer::slotApplyOpFinished()  {
+//   LOG(INFO) << "GUI::Layer::slotApplyOpFinished()";
+//   emit sigApplyOpFinished();
+// }
 
 
 std::string GUI::Layer::path() const {
   return _path;
 }
 
-void GUI::Layer::slotApplyOp(Utils::Ops::ImgOp* op) {
-  _available = false;
-  _thread_opWorker->notify(_bufdata, _imgdata, op);
-  _thread_opWorker->start();
+// void GUI::Layer::slotApplyOp(Utils::Ops::ImgOp* op) {
+//   _available = false;
+//   _thread_opWorker->notify(_bufdata, _imgdata, op);
+//   _thread_opWorker->start();
+// }
+
+
+void GUI::Layer::slotPathChanged(QString s){
+  LOG(INFO) << "GUI::Layer::slotPathChanged() " << s.toStdString();
+  loadImage(s.toStdString());
 }

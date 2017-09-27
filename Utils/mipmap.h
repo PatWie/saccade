@@ -1,6 +1,7 @@
 #ifndef MIPMAP_H
 #define MIPMAP_H
 
+#include <memory>
 #include <vector>
 #include "misc.h"
 
@@ -10,13 +11,14 @@ class ImageData;
 class MipmapLevel;
 class GlManager;
 
+
 class Mipmap {
  public:
   Mipmap();
   ~Mipmap();
 
   // void set_image(ImageData *i);
-  void setData(float *ptr,
+  void setData(float* ptr,
                uint height, uint width, uint channels,
                uint tileSize = 512);
 

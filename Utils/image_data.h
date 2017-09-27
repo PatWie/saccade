@@ -14,6 +14,7 @@ namespace Ops{
  class ImgOp;
 }
 
+
 class ImageData {
 
  public:
@@ -50,6 +51,8 @@ class ImageData {
   // rgb times height*width
 
 };
-}; // namespace Image
+
+
+}; // namespace Utils
 
 #endif // IMAGE_DATA_H

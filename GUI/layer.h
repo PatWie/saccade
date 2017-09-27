@@ -1,7 +1,10 @@
 #ifndef LAYER_H
 #define LAYER_H
 
+
+#include <memory>
 #include <QtGui>
+#include <QFileSystemWatcher>
 // #include <QObject>
 #include <string>
 
@@ -9,12 +12,17 @@ namespace Utils {
 class Mipmap;
 class ImageData;
 class GlManager;
+
+
 namespace Ops {
 class ImgOp;
 } // namespace Ops
 }; // namespace Utils
 
 namespace GUI {
+
+typedef std::shared_ptr<Utils::ImageData> ImageData_ptr;
+typedef std::shared_ptr<Utils::Mipmap> Mipmap_ptr;
 class ImageWindow;
 
 namespace threads {
@@ -24,11 +32,11 @@ namespace threads {
 class MipmapThread : public QThread {
  public:
   MipmapThread();
-  void notify( Utils::Mipmap* mipmap,  Utils::ImageData *img);
+  void notify( Mipmap_ptr mipmap,  ImageData_ptr img);
   void run();
  private:
-  Utils::Mipmap *_mipmap;
-  Utils::ImageData *_img;
+  Mipmap_ptr _mipmap;
+  ImageData_ptr _img;
 };
 
 /**
@@ -37,12 +45,12 @@ class MipmapThread : public QThread {
 class OperationThread : public QThread {
  public:
   OperationThread();
-  void notify(Utils::ImageData *dst, Utils::ImageData *src, Utils::Ops::ImgOp *op);
+  void notify(ImageData_ptr dst, ImageData_ptr src, Utils::Ops::ImgOp *op);
   void run();
  private:
   Utils::Ops::ImgOp *_op;
-  Utils::ImageData *_dst;
-  Utils::ImageData *_src;
+  ImageData_ptr _dst;
+  ImageData_ptr _src;
 };
 
 } // namespace threads
@@ -77,21 +85,27 @@ class Layer  : public QObject {
 
  public slots:
   void slotRebuildMipmap();
-  void slotLoadFinished();
-  void slotApplyOpFinished();
-  void slotApplyOp(Utils::Ops::ImgOp*);
+  void slotMipmapFinished();
+  // void slotApplyOpFinished();
+  // void slotApplyOp(Utils::Ops::ImgOp*);
+
+ protected slots:
+  void slotPathChanged(QString);
  private slots:
 
  private:
 
+  QFileSystemWatcher* _watcher;
+
   std::string _path;
 
   // the image itself
-  Utils::ImageData *_imgdata;
+  ImageData_ptr _imgdata;
   // any modification to the image (gamma correction, range slider)
-  Utils::ImageData *_bufdata;
+  ImageData_ptr _bufdata;
   // mipmap datastructure of _bufdata
-  Utils::Mipmap *_mipmap;
+  Mipmap_ptr _working_mipmap;
+  Mipmap_ptr _current_mipmap;
 
   bool _available;
 

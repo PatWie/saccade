@@ -21,7 +21,7 @@ void Utils::MipmapLevel::clear() {
 }
 
 
-void Utils::MipmapLevel::setData(float *ptr,
+void Utils::MipmapLevel::setData(float* ptr,
                                  uint height, uint width, uint channels,
                                  uint tileSize) {
   // LOG(INFO) << "Utils::MipmapLevel::setData " << height << " " << width << " " << tileSize;
@@ -62,7 +62,7 @@ void Utils::MipmapLevel::setData(float *ptr,
 }
 
 
-float* Utils::MipmapLevel::getTileData(const float *ptr,
+float* Utils::MipmapLevel::getTileData(const float* ptr,
                                        uint height, uint width,
                                        uint minH, uint minW,
                                        uint maxH, uint maxW,

@@ -13,7 +13,7 @@ class MipmapLevel {
   MipmapLevel();
   ~MipmapLevel();
 
-  void setData(float *ptr,
+  void setData(float* ptr,
                uint height, uint width, uint channels,
                uint tileSize = 512);
 
@@ -26,7 +26,7 @@ class MipmapLevel {
   void clear();
 
  protected:
-  float* getTileData(const float *ptr,
+  float* getTileData(const float* ptr,
                      uint height, uint width,
                      uint minH, uint minW, uint maxH, uint maxW,
                      uint channels) const;

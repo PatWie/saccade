@@ -116,7 +116,8 @@ void Utils::ImageData::clear(bool remove) {
   LOG(INFO) << "Utils::ImageData::clear";
   // the _bud_data is already delete (so dont do it here again)
   if (remove)
-    delete[] _raw_buf;
+    if(_raw_buf != nullptr)
+      delete[] _raw_buf;
   _height = 0;
   _width = 0;
   _channels = 0;
