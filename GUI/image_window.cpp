@@ -106,6 +106,11 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _closeWindowAct->setStatusTip(tr("Close the window"));
   connect(_closeWindowAct, SIGNAL(triggered()), this, SLOT(close()));
 
+  _closeAppAct = new QAction(tr("E&xit"), this );
+  _closeAppAct->setShortcut(tr("Ctrl+Q"));
+  _closeAppAct->setStatusTip(tr("Close the app"));
+  connect(_closeAppAct, SIGNAL(triggered()), _parentWindow, SLOT(close()));
+
   _fileMenu = menuBar()->addMenu(tr("&File"));
   _fileMenu->addAction(_openImageAct);
   _fileMenu->addAction(_removeImageAct);
@@ -114,6 +119,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _windowMenu->addAction(_newWindowAct);
   _windowMenu->addAction(_dialogWindowAct);
   _windowMenu->addAction(_closeWindowAct);
+  _windowMenu->addAction(_closeAppAct);
 
   _zoomInAct = new QAction(this);
   _zoomInAct->setShortcut(Qt::Key_Plus | Qt::CTRL);

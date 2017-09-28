@@ -62,6 +62,7 @@ and you find the app in the Ubuntu searchbar.
 | open image     | Ctrl+O              |
 | new canvas     | Ctrl+N              |
 | quit canvas    | Ctrl+W              |
+| quit app       | Ctrl+Q              |
 | zoom in        | Ctrl+plus           |
 | no zoom        | Ctrl+0              |
 | fit to window  | Ctrl+9              |

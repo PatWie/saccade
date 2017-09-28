@@ -94,6 +94,7 @@ class ImageWindow  : public QMainWindow {
   QAction* _newWindowAct;
   QAction* _dialogWindowAct;
   QAction* _closeWindowAct;
+  QAction* _closeAppAct;
 
   Window* _parentWindow;
 
