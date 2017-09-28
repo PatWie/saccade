@@ -42,6 +42,8 @@ class Canvas  : public QOpenGLWidget {
 
   property_t _property;
 
+  int _width, _height;
+
   Slides* _slides;
   Utils::GlManager *_gl;
 
@@ -100,6 +102,7 @@ class Canvas  : public QOpenGLWidget {
   void slotZoomOutAction();
 
   void slotSetZoomAction(double);
+  void slotFitZoomToWindow();
 
  protected:
   void zoom(QPoint q, int delta);

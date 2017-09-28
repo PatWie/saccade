@@ -91,7 +91,6 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   connect(_removeImageAct, SIGNAL(triggered()), this, SLOT(slotRemoveImageAction()));
 
 
-
   _newWindowAct = new QAction(tr("&New"), this );
   _newWindowAct->setShortcut(tr("Ctrl+N"));
   _newWindowAct->setStatusTip(tr("Create a new Window"));
@@ -125,12 +124,17 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _zoomOutAct = new QAction(this);
   _zoomOutAct->setShortcut(Qt::Key_Minus | Qt::CTRL);
 
+  _zoomFitAct = new QAction(this);
+  _zoomFitAct->setShortcut(Qt::Key_9 | Qt::CTRL);
+
   connect(_zoomInAct, SIGNAL(triggered()),
           _canvas, SLOT(slotZoomInAction()));
   connect(_zoomStdAct, SIGNAL(triggered()),
           this, SLOT(slotZoomStdAction()));
   connect(_zoomOutAct, SIGNAL(triggered()),
           _canvas, SLOT(slotZoomOutAction()));
+  connect(_zoomFitAct, SIGNAL(triggered()),
+          _canvas, SLOT(slotFitZoomToWindow()));
 
   connect(this, SIGNAL(sigSetZoomAction(double)),
           _canvas, SLOT(slotSetZoomAction(double)));
@@ -138,6 +142,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   this->addAction(_zoomInAct);
   this->addAction(_zoomStdAct);
   this->addAction(_zoomOutAct);
+  this->addAction(_zoomFitAct);
 
   setAcceptDrops(true);
 

@@ -100,6 +100,7 @@ class ImageWindow  : public QMainWindow {
   QAction *_zoomInAct;
   QAction *_zoomStdAct;
   QAction *_zoomOutAct;
+  QAction *_zoomFitAct;
 };
 }; // namespace GUI
 

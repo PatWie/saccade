@@ -15,6 +15,10 @@ JPG:
 - rgb (24)
 */
 
+bool Utils::ImageData::validFile(std::string filename) {
+    const FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename.c_str(), 0);
+    return (format != FIF_UNKNOWN);
+}
 
 Utils::ImageData::~ImageData() {}
 Utils::ImageData::ImageData(float*d, int h, int w, int c)
@@ -33,8 +37,10 @@ Utils::ImageData::ImageData(std::string filename) {
   _filename = filename;
 
   const FREE_IMAGE_FORMAT format = FreeImage_GetFileType(_filename.c_str(), 0);
-  _data = FreeImage_Load(format, _filename.c_str());
+  CHECK(format != FIF_UNKNOWN) << "unkown fileformat";
 
+  _data = FreeImage_Load(format, _filename.c_str());
+  CHECK(_data != nullptr) << "cannot load image";
   CHECK_NOTNULL(_data);
 
   _width = FreeImage_GetWidth(_data);

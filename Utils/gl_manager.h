@@ -17,6 +17,7 @@ namespace Utils {
 
 class GlManager : public QOpenGLFunctions {
   QOpenGLContext* ctx;
+
  public:
   GlManager(QOpenGLContext* context);
   ~GlManager();

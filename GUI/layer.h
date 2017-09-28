@@ -53,6 +53,25 @@ class OperationThread : public QThread {
   ImageData_ptr _src;
 };
 
+/**
+ * @brief triggers loadImage when fileformat is not corrupted
+ * @details QFileWatcher is triggered when file changes. But there is no guarantee
+ *          that the writing process completed its operation
+ */
+class ReloadThread : public QThread {
+  Q_OBJECT
+ public:
+  ReloadThread();
+  void notify(std::string fn, int attempts = 3);
+  void run();
+ private:
+  std::string _fn;
+  int _attempts;
+ signals:
+  void sigFileIsValid(QString);
+
+};
+
 } // namespace threads
 
 
@@ -88,6 +107,7 @@ class Layer  : public QObject {
   void slotMipmapFinished();
   // void slotApplyOpFinished();
   // void slotApplyOp(Utils::Ops::ImgOp*);
+  void slotFileIsValid(QString);
 
  protected slots:
   void slotPathChanged(QString);
@@ -111,6 +131,7 @@ class Layer  : public QObject {
 
   threads::MipmapThread *_thread_mipmapBuilder;
   threads::OperationThread *_thread_opWorker;
+  threads::ReloadThread *_thread_Reloader;
 
 };
 }; // namespace GUI

@@ -56,6 +56,8 @@ class Window  : public QMainWindow {
 
   std::vector<GUI::ImageWindow*> _windows;
 
+  QAction* _closeAppAct;
+
   QApplication* _app;
 
 };

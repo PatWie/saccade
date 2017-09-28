@@ -38,6 +38,9 @@ GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
   _property.x = 0;
   _property.y = 0;
 
+  _width = 1;
+  _height = 1;
+
   // no dragging without clicking
   _dragging.active = false;
   _dragging.start.setX(0.0);
@@ -176,6 +179,18 @@ void GUI::Canvas::wheelEvent( QWheelEvent * event) {
 
 }
 
+void GUI::Canvas::slotFitZoomToWindow() {
+  LOG(INFO) << "GUI::Canvas::slotFitZoomToWindow";
+  const double zoom_width = ((double)_width / (double)_slides->width());
+  const double zoom_height = ((double)_height / (double)_slides->height());
+  _property.zoom_factor = std::min(zoom_width, zoom_height);
+
+  slotUpdateCanvas();
+
+  emit sigPropertyChanged(this);
+  emit sigPropertyToImagewindow(_property);
+}
+
 void GUI::Canvas::zoom(QPoint q, int delta) {
   QPoint p = screenToBuf(q);
   const double zoom1 = _property.zoom_factor;
@@ -224,6 +239,9 @@ void GUI::Canvas::zoom(QPoint q, int delta) {
 }
 
 void GUI::Canvas::resizeGL(int width, int height) {
+  _width = width;
+  _height = height;
+
   _gl->set_size(width, height);
   _gl->projection_identity();
   _gl->set_ortho(width, height);

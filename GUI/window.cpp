@@ -36,9 +36,15 @@ GUI::Window::Window(QApplication* app) : _app(app){
   _dialogWindowAct->setStatusTip(tr("Create a new Window"));
   connect(_dialogWindowAct, SIGNAL(triggered()), this, SLOT(slotDialogWindowAction()));
 
+  _closeAppAct = new QAction(tr("E&xit"), this );
+  _closeAppAct->setShortcut(tr("Ctrl+Q"));
+  _closeAppAct->setStatusTip(tr("Close the app"));
+  connect(_closeAppAct, SIGNAL(triggered()), this, SLOT(close()));
+
   _windowMenu = menuBar()->addMenu(tr("&Window"));
   _windowMenu->addAction(_newWindowAct);
   _windowMenu->addAction(_dialogWindowAct);
+  _windowMenu->addAction(_closeAppAct);
 
   slotNewWindowAction();
 

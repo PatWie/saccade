@@ -35,6 +35,8 @@ class ImageData {
 
   void copyTo(ImageData *dst) const;
 
+  static bool validFile(std::string filename);
+
 
  private:
 

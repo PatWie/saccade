@@ -2,6 +2,7 @@
 #include <string>
 
 #include <glog/logging.h>
+// #include <QTest>
 
 #include "../Utils/image_data.h"
 #include "../Utils/mipmap.h"
@@ -26,7 +27,7 @@ void GUI::threads::MipmapThread::run() {
 
 GUI::threads::OperationThread::OperationThread() {}
 void GUI::threads::OperationThread::notify(ImageData_ptr dst,
-     ImageData_ptr src,
+    ImageData_ptr src,
     Utils::Ops::ImgOp *op) {
   _src = src;
   _dst = dst;
@@ -41,6 +42,26 @@ void GUI::threads::OperationThread::run() {
     dst[i] = _op->apply(src[i]);
 }
 
+
+GUI::threads::ReloadThread::ReloadThread() {}
+void GUI::threads::ReloadThread::notify(std::string fn, int attempts) {
+  _fn = fn;
+  _attempts = attempts;
+
+}
+void GUI::threads::ReloadThread::run() {
+  LOG(INFO) << "GUI::threads::ReloadThread::run()";
+  for (int i = 0; i < _attempts; ++i)
+  {
+    if(Utils::ImageData::validFile(_fn)){
+      emit sigFileIsValid(QString::fromStdString(_fn));
+      break;
+    }
+    QThread::msleep(500);
+  }
+}
+
+
 // class
 
 GUI::Layer::~Layer() {}
@@ -51,6 +72,10 @@ GUI::Layer::Layer() {
   _thread_mipmapBuilder = new threads::MipmapThread();
   connect( _thread_mipmapBuilder, SIGNAL( finished() ),
            this, SLOT( slotMipmapFinished() ));
+
+  _thread_Reloader = new threads::ReloadThread();
+  connect( _thread_Reloader, SIGNAL( sigFileIsValid(QString) ),
+           this, SLOT( slotFileIsValid(QString) ));
 
   // _thread_opWorker = new threads::OperationThread();
   // connect( _thread_opWorker, SIGNAL( finished() ),
@@ -124,7 +149,7 @@ void GUI::Layer::slotRebuildMipmap()  {
 void GUI::Layer::slotMipmapFinished()  {
   LOG(INFO) << "GUI::Layer::slotMipmapFinished()";
   _current_mipmap = _working_mipmap;
-   _watcher->addPath(QString::fromStdString(_path));
+  _watcher->addPath(QString::fromStdString(_path));
   _available = true;
   emit sigRefresh();
 }
@@ -146,7 +171,17 @@ std::string GUI::Layer::path() const {
 // }
 
 
-void GUI::Layer::slotPathChanged(QString s){
+void GUI::Layer::slotPathChanged(QString s) {
+  // prevent to much reloads
+  _watcher->removePath(QString::fromStdString(s.toStdString()));
   LOG(INFO) << "GUI::Layer::slotPathChanged() " << s.toStdString();
+  // wait until file is written
+  _thread_Reloader->notify(s.toStdString());
+  _thread_Reloader->start();
+}
+
+void GUI::Layer::slotFileIsValid(QString s) {
+  // file seems to be a valid image file
+  LOG(INFO) << "GUI::Layer::slotFileIsValid(" << s.toStdString();
   loadImage(s.toStdString());
 }
