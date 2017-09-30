@@ -14,7 +14,10 @@ namespace GUI
 
 namespace Utils {
 
-
+/**
+ * @brief OpenGL and Qt seems to only work if there is a
+ *        dedicated class with an OpenGL context
+ */
 class GlManager : public QOpenGLFunctions {
   QOpenGLContext* ctx;
 

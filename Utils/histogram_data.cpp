@@ -8,18 +8,29 @@
 #include "image_data.h"
 
 
+void Utils::HistogramData::setScale(int k) {
+  _scale_mapping_id = k;
+}
+
+float Utils::HistogramData::scale_func(float k) {
+  return _scale_mappings[_scale_mapping_id](k);
+}
+
 Utils::HistogramData::HistogramData() :
   _nbins(0), _channels(0), _available(false) {
-    _bin_info.min = 0.;
-    _bin_info.max = 1.;
-  }
+  _bin_info.min = 0.;
+  _bin_info.max = 1.;
+
+  _scale_mappings.push_back([](float i)->float{ return i;});
+  _scale_mappings.push_back([](float i)->float{ return log(i);});
+  _scale_mapping_id = 0;
+}
 
 void Utils::HistogramData::setData(const ImageData *data, float scale) {
   _available = false;
 
   _nbins = 256;
   _channels = data->channels();
-
   _img = data;
 
   // TODO remove assumption of range [0, 1]
@@ -52,15 +63,15 @@ void Utils::HistogramData::setData(const ImageData *data, float scale) {
   _available = true;
 }
 
-const Utils::ImageData* Utils::HistogramData::image() const{
+const Utils::ImageData* Utils::HistogramData::image() const {
   return _img;
 }
 
-Utils::HistogramData::range_t* Utils::HistogramData::range(){
+Utils::HistogramData::range_t* Utils::HistogramData::range() {
   return &_range;
 }
 
-const Utils::HistogramData::range_t* Utils::HistogramData::range() const{
+const Utils::HistogramData::range_t* Utils::HistogramData::range() const {
   return &_range;
 }
 

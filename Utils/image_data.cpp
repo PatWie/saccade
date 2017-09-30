@@ -25,8 +25,10 @@ bool Utils::ImageData::validFile(std::string filename) {
 }
 
 Utils::ImageData::~ImageData() {}
+
 Utils::ImageData::ImageData(float*d, int h, int w, int c)
-  : _raw_buf(d), _height(h), _width(w), _channels(c) {}
+  : _raw_buf(d), _height(h), _width(w), _channels(c) {
+}
 
 Utils::ImageData::ImageData(Utils::ImageData *i) {
   _height = i->height();
@@ -128,7 +130,7 @@ Utils::ImageData::ImageData(std::string filename) {
   LOG(INFO) << "off:         " << off;
 
   // handle special case: we ignore the alpha channel
-  if(bpp == 32){
+  if (bpp == 32) {
     _channels = 3;
     off = 1;
     _max_value = std::pow(2, (float)24 / _channels);
@@ -298,15 +300,15 @@ std::string Utils::ImageData::color(int h, int w) const {
   if (0 <= w && w < cw)
     if (0 <= h && h < ch) {
       // within image
-      if(channels() == 1){
+      if (channels() == 1) {
         stream << "<font color=" << misc_theme_gray.name().toStdString() << ">"  << value(h, w, 0) << "</font>" << " ";
       }
-      if(channels() == 3){
+      if (channels() == 3) {
         stream << "<font color=" << misc_theme_red.name().toStdString() << ">"  << value(h, w, 0) << "</font>" << " ";
         stream << "<font color=" << misc_theme_green.name().toStdString() << ">"  << value(h, w, 1) << "</font>" << " ";
         stream << "<font color=" << misc_theme_blue.name().toStdString() << ">"  << value(h, w, 2) << "</font>" << " ";
       }
-      
+
     }
 
   return stream.str();

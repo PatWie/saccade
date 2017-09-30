@@ -15,9 +15,7 @@ void set_style(QPalette *p) {
   QColor red(255, 0, 0);
   QColor black(0, 0, 0);
   p->setBrush(QPalette::WindowText, QColor(255, 0, 0));
-
-  // p->setColor(QPalette::Window, QColor(39, 40, 34));
-  p->setColor(QPalette::Window, QColor(28, 28, 28));
+  p->setColor(QPalette::Window, QColor(37, 37, 37));
   p->setColor(QPalette::WindowText, white);
   p->setColor(QPalette::Base, QColor(25, 25, 25));
   p->setColor(QPalette::AlternateBase, QColor(39, 40, 34));
@@ -27,10 +25,9 @@ void set_style(QPalette *p) {
   p->setColor(QPalette::Button, QColor(39, 40, 34));
   p->setColor(QPalette::ButtonText, white);
   p->setColor(QPalette::BrightText, red);
-  // p->setColor(QPalette::Link, QColor(42, 130, 218));
-  p->setColor(QPalette::Link, QColor(255, 0, 0));
-  p->setColor(QPalette::Highlight, QColor(42, 130, 218));
-  p->setColor(QPalette::HighlightedText, black);
+  p->setColor(QPalette::Link, QColor(42, 130, 218));
+  p->setColor(QPalette::Highlight, QColor(39, 40, 34, 255));
+  p->setColor(QPalette::HighlightedText, QColor(251, 199, 99));
 }
 
 // call by ./saccade --logtostderr=1

@@ -1,6 +1,7 @@
 #ifndef HISTOGRAM_H
 #define HISTOGRAM_H
 
+
 #include <QtGui>
 #include <QFrame>
 #include <QAction>
@@ -12,13 +13,6 @@
 // }; // namespace Utils
 
 namespace GUI {
-  namespace hist_internal{
-    template<typename T>
-    inline T scale_func(T i){
-      return i;
-      // return log(i);
-    }
-  };
 /**
  * @brief Represent color histogram of an image
  */
@@ -63,7 +57,8 @@ class Histogram : public QFrame {
 
  public slots:
  // reset range to default of image
-  void slotResetRange();
+  void slotSetRange(float, float);
+  void slotSetMappingMode(int);
 
  private:
   // pointer to underlying data structure
@@ -84,12 +79,24 @@ class Histogram : public QFrame {
 
   } _dragging;
 
+  // total width of the painting area
   int _expected_width;
+  // margin on left and margin on right (not the sum)
   int _margin;
+  // minimal expected width, otherwise we do not paint anything
+  const int _min_width;
 
-  QAction* _resetRangeAct;
+  QAction* _resetRangeResetAct;
+  QAction* _resetRangeLdrAct;
+  QAction* _resetRange01Act;
+
+  QAction* _setMappingLinearAct;
+  QAction* _setMappingLogAct;
 
   QPainter::CompositionMode _composition_mode;
+
+
+  float scale_func(float) const;
 };
 }; // namespace GUI
 
