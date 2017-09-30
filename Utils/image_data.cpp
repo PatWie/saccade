@@ -6,6 +6,7 @@
 #include <cmath>
 #include <string.h>
 #include <glog/logging.h>
+#include "misc.h"
 
 /* This file is responsible to load the image data
 
@@ -88,7 +89,8 @@ Utils::ImageData::ImageData(std::string filename) {
   _width = FreeImage_GetWidth(_data);
   _height = FreeImage_GetHeight(_data);
 
-  LOG(INFO) << "FreeImage_GetBPP: " << (int) FreeImage_GetBPP(_data);
+  const int bpp = FreeImage_GetBPP(_data);
+  LOG(INFO) << "FreeImage_GetBPP: " << bpp;
 
   /*
   FIC_MINISWHITE  min value is white
@@ -122,6 +124,15 @@ Utils::ImageData::ImageData(std::string filename) {
 
   _max_value = std::pow(2, (float) FreeImage_GetBPP(_data) / _channels);
   LOG(INFO) << "max value is " << _max_value;
+  LOG(INFO) << "channels:    " << _channels;
+  LOG(INFO) << "off:         " << off;
+
+  // handle special case: we ignore the alpha channel
+  if(bpp == 32){
+    _channels = 3;
+    off = 1;
+    _max_value = std::pow(2, (float)24 / _channels);
+  }
 
   CHECK_GE(_channels, 0);
 
@@ -163,6 +174,19 @@ Utils::ImageData::ImageData(std::string filename) {
     break;
   case FIT_UINT16:
     LOG(INFO) << "case FIT_UINT16";
+    _channels = 1;
+    // _max_value = 1.0;
+    off = 0;
+
+    for (int c = 0; c < _channels; ++c) {
+      for (int h = 0; h < _height; ++h) {
+        const unsigned short* line = (unsigned short *)FreeImage_GetScanLine(_data, _height - 1 - h);
+        for (int w = 0; w < _width; ++w) {
+          float val = ((float) line[w * (_channels + off) + _channels - c - 1]);
+          _raw_buf[c * (_height * _width) + h * _width + w] = val;
+        }
+      }
+    }
     break;
   case FIT_INT16:
     LOG(INFO) << "case FIT_INT16";
@@ -269,12 +293,20 @@ std::string Utils::ImageData::color(int h, int w) const {
   const int ch = height();
   const int cw = width();
 
+  CHECK(channels() == 3 || channels() == 1) << "color string only for 1 or 3 channels";
+
   if (0 <= w && w < cw)
     if (0 <= h && h < ch) {
       // within image
-      for (int c = 0; c < channels(); ++c) {
-        stream << value(h, w, c) << " ";
+      if(channels() == 1){
+        stream << "<font color=" << misc_theme_gray.name().toStdString() << ">"  << value(h, w, 0) << "</font>" << " ";
       }
+      if(channels() == 3){
+        stream << "<font color=" << misc_theme_red.name().toStdString() << ">"  << value(h, w, 0) << "</font>" << " ";
+        stream << "<font color=" << misc_theme_green.name().toStdString() << ">"  << value(h, w, 1) << "</font>" << " ";
+        stream << "<font color=" << misc_theme_blue.name().toStdString() << ">"  << value(h, w, 2) << "</font>" << " ";
+      }
+      
     }
 
   return stream.str();
@@ -292,15 +324,3 @@ void Utils::ImageData::clear(bool remove) {
   _channels = 0;
 }
 
-/*
-// calculate the number of bytes per pixel
-unsigned bytespp = FreeImage_GetLine(src) / FreeImage_GetWidth(src);
-// calculate the number of samples per pixel
-unsigned samples = bytespp / sizeof(T);
-where 'T' is 'BYTE' for FIT_BITMAP, 'WORD' for FIT_UINT16, FIT_RGB16,
-FIT_RGBA16 and 'float' for FIT_FLOAT, FIT_RGBF, FIT_RGBAF.
-
-
-  // convert to float
-  int bpp = FreeImage_GetBPP(_data);
-*/

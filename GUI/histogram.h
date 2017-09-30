@@ -12,6 +12,13 @@
 // }; // namespace Utils
 
 namespace GUI {
+  namespace hist_internal{
+    template<typename T>
+    inline T scale_func(T i){
+      return i;
+      // return log(i);
+    }
+  };
 /**
  * @brief Represent color histogram of an image
  */
@@ -77,7 +84,12 @@ class Histogram : public QFrame {
 
   } _dragging;
 
+  int _expected_width;
+  int _margin;
+
   QAction* _resetRangeAct;
+
+  QPainter::CompositionMode _composition_mode;
 };
 }; // namespace GUI
 

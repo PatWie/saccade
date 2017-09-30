@@ -1,6 +1,8 @@
- # EagleEye
+ # Saccade
 
-The missing scientific image viewer inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). Compare muliple images by switching between them without loosing the pixel position. The viewer also synchronizes dragging and zooming across different viewports.
+ A **saccade** (*/səˈkɑːd/ sə-KAHD*) is a quick and simultaneous movement of both eyes in the same direction.
+
+This project is the missing scientific HDR image viewer inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). Compare muliple images by switching between them without loosing the pixel position. Drag and zoom within one canvas and the viewer automatically synchronizes the changes across different all viewports.
 
 The image viewer features an OpenGL-based canvas to display images with dragging and zooming. It uses the [FreeImage](freeimage.sourceforge.net) library to load images from different types.
 
@@ -42,16 +44,16 @@ Get Qt5:
 and finally get this repository
 
     # clone this repo
-    git clone https://github.com/PatWie/eagle_eye.git
-    cd eagle_eye
+    git clone https://github.com/PatWie/saccade.git
+    cd saccade
     mkdir build
     cd build
     cmake ..
     make
 
-Edit `eagle_eye.desktop` and adjust the paths. Then 
+Edit `saccade.desktop` and adjust the paths. Then 
 
-    cp eagle_eye.desktop $HOME/.local/share/applications/eagle_eye.desktop
+    cp saccade.desktop $HOME/.local/share/applications/saccade.desktop
 
 and you find the app in the Ubuntu searchbar.
 

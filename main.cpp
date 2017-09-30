@@ -16,7 +16,8 @@ void set_style(QPalette *p) {
   QColor black(0, 0, 0);
   p->setBrush(QPalette::WindowText, QColor(255, 0, 0));
 
-  p->setColor(QPalette::Window, QColor(39, 40, 34));
+  // p->setColor(QPalette::Window, QColor(39, 40, 34));
+  p->setColor(QPalette::Window, QColor(28, 28, 28));
   p->setColor(QPalette::WindowText, white);
   p->setColor(QPalette::Base, QColor(25, 25, 25));
   p->setColor(QPalette::AlternateBase, QColor(39, 40, 34));
@@ -32,7 +33,7 @@ void set_style(QPalette *p) {
   p->setColor(QPalette::HighlightedText, black);
 }
 
-// call by ./eagle_eye --logtostderr=1
+// call by ./saccade --logtostderr=1
 int main(int argc, char *argv[]) {
 
   // FLAGS_alsologtostderr = 1;
@@ -50,8 +51,8 @@ int main(int argc, char *argv[]) {
   app.setPalette(p);
 
   GUI::Window window(&app);
-  window.setWindowIcon(QIcon(":Icon/256x256/eagleeye.png"));
-  window.setWindowTitle("EagleEye");
+  window.setWindowIcon(QIcon(":Icon/256x256/saccade.png"));
+  window.setWindowTitle("Saccade");
   window.show();
 
   return app.exec();

@@ -93,6 +93,7 @@ void GUI::Canvas::addLayer(Layer *layer) {
 
 void GUI::Canvas::slotUpdateLayer() {
   emit sigUpdateLayer(this);
+  emit sigCoordToImageWindow(screenToBuf(_focus));
 }
 
 void GUI::Canvas::slotUpdateCanvas() {

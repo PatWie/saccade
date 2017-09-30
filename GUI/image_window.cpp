@@ -16,7 +16,7 @@
 GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   : QMainWindow(parent), _parentWindow(parentWindow) {
 
-  setWindowTitle("EagleEye - Canvas");
+  setWindowTitle("Saccade - Canvas");
 
   QGroupBox* centralWidget = new QGroupBox(this);
   _centerLayout = new QGridLayout(centralWidget);
@@ -289,7 +289,7 @@ void GUI::ImageWindow::slotSynchronizeConnectedViews(Canvas* canvas) {
 
 void GUI::ImageWindow::slotUpdateTitle(Canvas* canvas) {
   if (canvas->layer() != nullptr)
-    setWindowTitle(("EagleEye - " + canvas->layer()->path()).c_str());
+    setWindowTitle(("Saccade - " + canvas->layer()->path()).c_str());
 }
 
 void GUI::ImageWindow::synchronize(bool active) {

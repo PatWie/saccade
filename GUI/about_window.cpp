@@ -8,7 +8,7 @@ GUI::AboutWindow::AboutWindow(QWidget *parent) :
   ui(new Ui::AboutWindow) {
   ui->setupUi(this);
 
-  QPixmap icon_png(":Icon/256x256/eagleeye.png");
+  QPixmap icon_png(":Icon/256x256/saccade.png");
   icon_png = icon_png.scaled(QSize(128, 128), Qt::IgnoreAspectRatio);
   ui->lbl_icon->setPixmap(icon_png);
 
@@ -17,7 +17,7 @@ GUI::AboutWindow::AboutWindow(QWidget *parent) :
 
   QString labelText = "";
   labelText.append("<p>" + QString::fromStdString(Utils::GetBuildInfo()) + "</p>");
-  labelText.append("<p><a href=\"https://github.com/PatWie/eagle_eye\"><span style=\" text-decoration: underline; color:#ffffff;\">https://github.com/PatWie/eagle_eye</span></a></p>");
+  labelText.append("<p><a href=\"https://github.com/PatWie/saccade\"><span style=\" text-decoration: underline; color:#ffffff;\">https://github.com/PatWie/saccade</span></a></p>");
   labelText.append("<p><br/></p>");
   labelText.append("<p>Patrick Wieschollek<br/>mail@patwie.com</p>");
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(EagleEye)
+project(Saccade)
 
-set(EAGLEEYE_VERSION "0.1alpha1")
+set(SACCADE_VERSION "0.1alpha1")
 
 SET (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -27,7 +27,7 @@ find_package(Glog)
 
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCES
+set(SACCADE_SOURCES
     main.cpp
     GUI/marker.cpp
     GUI/layer.cpp
@@ -48,7 +48,7 @@ set(SOURCES
     Utils/version.cpp
 )
 
-set(EAGLEEYE_LIBRARIES
+set(SACCADE_LIBRARIES
     Qt5::Widgets 
     gflags 
     glog
@@ -62,5 +62,5 @@ include(GenerateVersionDefinitions)
 
 add_subdirectory(GUI)
 
-add_executable(eagle_eye main.cpp ${SOURCES})
-target_link_libraries(eagle_eye ${EAGLEEYE_LIBRARIES} ) 
+add_executable(saccade main.cpp ${SACCADE_SOURCES})
+target_link_libraries(saccade ${SACCADE_LIBRARIES} ) 

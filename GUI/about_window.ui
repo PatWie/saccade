@@ -32,7 +32,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>EagleEye About</string>
+   <string>Saccade About</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -68,14 +68,14 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/PatWie/eagle_eye&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffffff;&quot;&gt;https://github.com/PatWie/eagle_eye&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Patrick Wieschollek&lt;br/&gt;mail@patwie.com&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/PatWie/saccade&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#ffffff;&quot;&gt;https://github.com/PatWie/saccade&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Patrick Wieschollek&lt;br/&gt;mail@patwie.com&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;EagleEye&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Saccade&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
