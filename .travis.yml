@@ -27,6 +27,8 @@ addons:
             - qt5-default
             - libfreeimage3
             - libfreeimage-dev
+            - libgflags-dev
+            - libgoogle-glog-dev
 
 script:
     - mkdir build
