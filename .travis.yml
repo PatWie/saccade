@@ -30,5 +30,5 @@ addons:
 script:
     - mkdir build
     - pwd
-    - qmake --version
-    - cd build && CC=gcc-4.9 CXX=g++-4.9 qmake ..  && make
+    - cmake --version
+    - cd build && CC=gcc-4.9 CXX=g++-4.9 cmake ..  && make
