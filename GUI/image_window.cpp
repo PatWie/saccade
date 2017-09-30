@@ -6,7 +6,9 @@
 #include <QtWidgets>
 
 #include "window.h"
+#include "histogram.h"
 #include "image_window.h"
+#include "../Utils/image_data.h"
 #include "marker.h"
 #include "layer.h"
 #include "slides.h"
@@ -39,6 +41,9 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   connect(_canvas, SIGNAL(sigUpdateScrollBars(Canvas*)),
           this, SLOT(slotUpdateScrollBars(Canvas*)));
 
+  connect(_canvas, SIGNAL(sigUpdateLayer(Canvas*)),
+          this, SLOT(slotUpdateLayer(Canvas*)));
+
   connect( _vertScroll, SIGNAL(sliderMoved( int )),
            this, SLOT(slotVertScrollChanged( int )));
   connect( _horScroll, SIGNAL(sliderMoved( int )),
@@ -57,13 +62,13 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 
   // statusbar
   // ==========================================================
-  _statusLabelMouse = new QLabel("Coordinates");
+  _statusLabelMouse = new QLabel("pos:");
   statusBar()->addWidget(_statusLabelMouse, 1);
-  _statusLabelPatch = new QLabel("Patch");
+  _statusLabelPatch = new QLabel("rgb:");
   statusBar()->addWidget(_statusLabelPatch, 1);
-  _statusLabelMarker = new QLabel("Marker");
+  _statusLabelMarker = new QLabel("");
   statusBar()->addWidget(_statusLabelMarker, 1);
-  _statusLabelZoom = new QLabel("Zoom");
+  _statusLabelZoom = new QLabel("zoom: 1");
   statusBar()->addWidget(_statusLabelZoom, 1);
   statusBar()->setSizeGripEnabled ( false );
 
@@ -152,11 +157,42 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 
   setAcceptDrops(true);
 
+  // toolbar
+  _toolbar_histogram = new Histogram(this);
+  _toolbar = new QToolBar(tr("histogram"));
+  _toolbar->setMovable( false );
+  _toolbar->addWidget( _toolbar_histogram );
+  addToolBar(Qt::TopToolBarArea, _toolbar);
+
+  connect(_toolbar_histogram, SIGNAL(sigRefreshBuffer()),
+          this, SLOT(slotRefreshBuffer()));
+
+}
+
+
+bool GUI::ImageWindow::event(QEvent *e) {
+  if (e->type() == QEvent::WindowActivate) {
+    emit sigFocusChange(this);
+  }
+  return QWidget::event(e);
+}
+
+void GUI::ImageWindow::slotRefreshBuffer() {
+  LOG(INFO) << "GUI::Window::slotRefreshBuffer()";
+  LOG(INFO) << _toolbar_histogram->data()->range()->min << " "
+            <<  _toolbar_histogram->data()->range()->max;
+
+  Layer *layer = _canvas->layer();
+  if (layer != nullptr) {
+    layer->slotRefresh(_toolbar_histogram->data()->range()->min,
+                       _toolbar_histogram->data()->range()->max);
+  }
 }
 
 void GUI::ImageWindow::slotZoomStdAction() {
   emit sigSetZoomAction(1.0);
 }
+
 
 void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
   QList<QUrl> urls = ev->mimeData()->urls();
@@ -173,6 +209,8 @@ void GUI::ImageWindow::dragEnterEvent(QDragEnterEvent *ev) {
 void GUI::ImageWindow::loadImage(std::string fn) {
   Layer *layer = new Layer();
   layer->loadImage(fn);
+  connect(layer, SIGNAL(sigHistogramFinished()),
+          this, SLOT(slotUpdateLayer()));
   _canvas->addLayer(layer);
 }
 
@@ -185,9 +223,9 @@ void GUI::ImageWindow::slotOpenImageAction() {
   if ( !filenames.isEmpty() ) {
     for (int i = 0; i < filenames.count(); i++)
       loadImage(filenames.at(i).toStdString());
-    _parentWindow->_openPath = QFileInfo(filenames.at(0)).absolutePath();
+    // _parentWindow->_openPath = QFileInfo(filenames.at(0)).absolutePath();
   }
-  _canvas->slotUpdateCanvas();
+  // _canvas->slotUpdateCanvas();
 }
 
 void GUI::ImageWindow::slotRemoveImageAction() {
@@ -246,6 +284,15 @@ void GUI::ImageWindow::slotNextLayer() {
   emit sigNextLayer();
 }
 
+void GUI::ImageWindow::slotUpdateLayer(Canvas* canvas) {
+  LOG(INFO) << "GUI::ImageWindow::slotUpdateLayer()";
+  const GUI::Layer *current = canvas->slides()->current();
+  if (current != nullptr) {
+    _toolbar_histogram->setData(current->histogram());
+    _toolbar_histogram->update();
+  }
+
+}
 void GUI::ImageWindow::slotUpdateScrollBars(Canvas* canvas) {
   if (canvas->layer() == nullptr)
     return;
@@ -304,26 +351,29 @@ void GUI::ImageWindow::slotPropertyToMainwindow(Canvas::property_t p) {
 
 void GUI::ImageWindow::slotShowCoords(QPoint p) {
   std::stringstream stream;
-  stream << "Mouse: " << p.y() << ", " << p.x();
+  stream << "pos: " << p.y() << ", " << p.x();
 
   std::string str = stream.str();
   _statusLabelMouse->setText(str.c_str());
 
-  if (_canvas->slides() != nullptr) {
+  if (_canvas->layer() != nullptr) {
     std::stringstream stream;
-    QPoint top_left = QPoint(0, 0);
-    QPoint bottom_right = QPoint(width() - 1, height() - 1);
+    stream << std::setprecision(3);
+    stream << "rgb: ";
+    const int ch = _canvas->slides()->current()->height();
+    const int cw = _canvas->slides()->current()->width();
 
-    top_left = _canvas->screenToBuf(top_left);
-    bottom_right = _canvas->screenToBuf(bottom_right);
+    const int h = p.y();
+    const int w = p.x();
 
-    stream << "Patch "
-           << "(" << top_left.y() << " " << top_left.x() << ") "
-           << "(" << bottom_right.y() << " " << bottom_right.x() << ") "
-           << "";
-
+    if (0 <= w && w < cw)
+      if (0 <= h && h < ch) {
+        // within image
+        for (int c = 0; c < _canvas->slides()->current()->img()->channels(); ++c) {
+          stream << _canvas->slides()->current()->img()->value(h, w, c) << " ";
+        }
+      }
     _statusLabelPatch->setText(stream.str().c_str());
-
   }
 }
 
@@ -331,7 +381,7 @@ void GUI::ImageWindow::slotShowZoom(double p) {
   std::ostringstream out;
   out << std::setprecision(3) << p;
 
-  std::string val = "Zoom " + out.str();
+  std::string val = "zoom: " + out.str();
   _statusLabelZoom->setText(val.c_str());
 }
 
@@ -343,7 +393,8 @@ void GUI::ImageWindow::slotShowProperty(Canvas::property_t p) {
 
 void GUI::ImageWindow::slotShowMarkers(Marker m) {
   _canvas->setMarker(m);
-
-  std::string val = "Marker " + std::to_string((int)m.y) + " " + std::to_string((int)m.x);
+  std::string val = "";
+  if (m.active)
+    val = "marker: " + std::to_string((int)m.y) + " " + std::to_string((int)m.x);
   _statusLabelMarker->setText(val.c_str());
 }

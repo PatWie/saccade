@@ -5,13 +5,16 @@
 // #include <QTest>
 
 #include "../Utils/image_data.h"
+#include "../Utils/histogram_data.h"
 #include "../Utils/mipmap.h"
 #include "../Utils/gl_manager.h"
 #include "../Utils/Ops/img_op.h"
 #include "../Utils/Ops/gamma_op.h"
+#include "../Utils/Ops/histogram_op.h"
 #include "layer.h"
 
 // threads
+// ==========================================================================================
 GUI::threads::MipmapThread::MipmapThread() {}
 void GUI::threads::MipmapThread::notify( Mipmap_ptr mipmap,  ImageData_ptr img) {
   _mipmap = mipmap;
@@ -20,11 +23,25 @@ void GUI::threads::MipmapThread::notify( Mipmap_ptr mipmap,  ImageData_ptr img) 
 void GUI::threads::MipmapThread::run() {
   if (!_mipmap->empty())
     _mipmap->clear();
+
+  // apply image transformation
+
+
+  // build mipmap structure
   _mipmap->setData(_img->data(),
                    _img->height(), _img->width(), _img->channels());
 
 }
-
+// ------------------------------------------------------------------------------------------
+GUI::threads::HistogramThread::HistogramThread() {}
+void GUI::threads::HistogramThread::notify(ImageData_ptr img,  HistogramData_ptr hist) {
+  _img = img;
+  _hist = hist;
+}
+void GUI::threads::HistogramThread::run() {
+  _hist->setData(_img.get(), _img->max());
+}
+// ------------------------------------------------------------------------------------------
 GUI::threads::OperationThread::OperationThread() {}
 void GUI::threads::OperationThread::notify(ImageData_ptr dst,
     ImageData_ptr src,
@@ -37,12 +54,14 @@ void GUI::threads::OperationThread::notify(ImageData_ptr dst,
 void GUI::threads::OperationThread::run() {
   LOG(INFO) << "GUI::threads::OperationThread::run()";
   const float *src = _src->data();
+  LOG(INFO) << "alive01";
   float *dst = _dst->data();
+  LOG(INFO) << "alive02";
   for (size_t i = 0; i < _src->elements(); ++i)
     dst[i] = _op->apply(src[i]);
+  LOG(INFO) << "GUI::threads::OperationThread::run() done";
 }
-
-
+// ------------------------------------------------------------------------------------------
 GUI::threads::ReloadThread::ReloadThread() {}
 void GUI::threads::ReloadThread::notify(std::string fn, int attempts) {
   _fn = fn;
@@ -63,9 +82,11 @@ void GUI::threads::ReloadThread::run() {
 
 
 // class
+// ==========================================================================================
 
 GUI::Layer::~Layer() {}
 GUI::Layer::Layer() {
+  LOG(INFO) << "GUI::Layer::Layer()";
   _path = "";
   _available = false;
 
@@ -77,16 +98,27 @@ GUI::Layer::Layer() {
   connect( _thread_Reloader, SIGNAL( sigFileIsValid(QString) ),
            this, SLOT( slotFileIsValid(QString) ));
 
-  // _thread_opWorker = new threads::OperationThread();
-  // connect( _thread_opWorker, SIGNAL( finished() ),
-  //          this, SLOT( slotApplyOpFinished() ));
-  LOG(INFO) << "GUI::Layer::Layer()";
+  _thread_histogram = new threads::HistogramThread();
+  connect( _thread_histogram, SIGNAL( finished() ),
+           this, SLOT( slotHistogramFinished() ));
+
+  _thread_opWorker = new threads::OperationThread();
+  connect( _thread_opWorker, SIGNAL( finished() ),
+           this, SLOT( slotApplyOpFinished() ));
 
   _watcher = new QFileSystemWatcher();
   connect(_watcher, SIGNAL(fileChanged(QString)),
           this, SLOT(slotPathChanged(QString)));
 
   _current_mipmap = std::make_shared<Utils::Mipmap>();
+  _histdata = std::make_shared<Utils::HistogramData>();
+
+
+  Utils::Ops::HistogramOp *o = new Utils::Ops::HistogramOp();
+  o->_scaling.scale = 1.f;
+  o->_scaling.min = 0.f;
+  o->_scaling.max = 1.f;
+  _op = o;
 
 }
 
@@ -106,6 +138,10 @@ size_t GUI::Layer::height() const {
   return available() ? _imgdata->height() : 0 ;
 }
 
+const Utils::ImageData* GUI::Layer::img() const{
+  return _imgdata.get();
+}
+
 bool GUI::Layer::available() const {
   return _available;
 }
@@ -114,6 +150,7 @@ void GUI::Layer::clear() {
   LOG(INFO) << "GUI::Layer::clear()";
 
   _available = false;
+
   _current_mipmap->clear();
   LOG(INFO) << "_mipmap->clear()";
   _imgdata->clear();
@@ -122,30 +159,39 @@ void GUI::Layer::clear() {
   LOG(INFO) << "_bufdata->clear()";
 
 }
+
 void GUI::Layer::loadImage(std::string fn) {
+  LOG(INFO) << "GUI::Layer::loadImage()";
   _available = false;
   if (_path != "") {
     _watcher->removePath(QString::fromStdString(_path));
   }
   _path = fn;
 
-  // we keep the original data here
+  // we keep the original data here (unscaled)
   _imgdata = std::make_shared<Utils::ImageData>(fn);
-
-  // and for diplaying purposes we use the buffer data
+  // and for diplaying purposes we use the buffer data (scaled to be within [0, 1])
   _bufdata = std::make_shared<Utils::ImageData>(_imgdata.get());
 
-  slotRebuildMipmap();
+  // first build histogram
+  slotRebuildHistogram();
+  // the following actions are chained by slots
+  // scale, mipmap
 }
 
 void GUI::Layer::slotRebuildMipmap()  {
   _available = false;
-
+  // rebuild mipmap
   _working_mipmap = std::make_shared<Utils::Mipmap>();
   _thread_mipmapBuilder->notify(_working_mipmap, _bufdata);
   _thread_mipmapBuilder->start();
-
 }
+
+void GUI::Layer::slotRebuildHistogram()  {
+  _thread_histogram->notify(_imgdata, _histdata);
+  _thread_histogram->start();
+}
+
 void GUI::Layer::slotMipmapFinished()  {
   LOG(INFO) << "GUI::Layer::slotMipmapFinished()";
   _current_mipmap = _working_mipmap;
@@ -154,22 +200,45 @@ void GUI::Layer::slotMipmapFinished()  {
   emit sigRefresh();
 }
 
-// void GUI::Layer::slotApplyOpFinished()  {
-//   LOG(INFO) << "GUI::Layer::slotApplyOpFinished()";
-//   emit sigApplyOpFinished();
-// }
+void GUI::Layer::slotHistogramFinished()  {
+  LOG(INFO) << "GUI::Layer::slotHistogramFinished()";
+  slotRefresh(0.f, _imgdata->max());
+  emit sigHistogramFinished();
+}
 
+void GUI::Layer::slotRefresh(float min, float max)  {
+  _bufdata = std::make_shared<Utils::ImageData>(_imgdata.get());
+
+  // TODO: Multiple Operations?
+  Utils::Ops::HistogramOp *o = static_cast<Utils::Ops::HistogramOp*>(_op);
+  o->_scaling.scale = _imgdata->max();
+  o->_scaling.min = min;
+  o->_scaling.max = max;
+  _op = o;
+
+  slotApplyOp(_op);
+}
+
+void GUI::Layer::slotApplyOpFinished()  {
+  LOG(INFO) << "GUI::Layer::slotApplyOpFinished()";
+  slotRebuildMipmap();
+  emit sigApplyOpFinished();
+}
+
+
+Utils::HistogramData* GUI::Layer::histogram() const{
+  return _histdata.get();
+}
 
 std::string GUI::Layer::path() const {
   return _path;
 }
 
-// void GUI::Layer::slotApplyOp(Utils::Ops::ImgOp* op) {
-//   _available = false;
-//   _thread_opWorker->notify(_bufdata, _imgdata, op);
-//   _thread_opWorker->start();
-// }
-
+void GUI::Layer::slotApplyOp(Utils::Ops::ImgOp* op) {
+  _available = false;
+  _thread_opWorker->notify(_bufdata, _bufdata, op);
+  _thread_opWorker->start();
+}
 
 void GUI::Layer::slotPathChanged(QString s) {
   // prevent to much reloads

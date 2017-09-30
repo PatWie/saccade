@@ -15,7 +15,9 @@ const GUI::Layer* GUI::Slides::current() const {
 }
 
 GUI::Layer* GUI::Slides::current() {
-  return _slides[_id];
+  if (_slides.size() > 0)
+    return _slides[_id];
+  return nullptr;
 }
 
 const GUI::Layer* GUI::Slides::operator[](int i) const {

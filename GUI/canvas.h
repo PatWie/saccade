@@ -63,6 +63,7 @@ class Canvas  : public QOpenGLWidget {
   void addLayer(Layer* layer);
 
   const Layer* layer(int i = -1) const;
+  Layer* layer(int i = -1);
   const Slides* slides() const;
 
   void askSynchronization();
@@ -85,6 +86,7 @@ class Canvas  : public QOpenGLWidget {
  signals:
   void sigPropertyChanged(Canvas*);
   void sigUpdateTitle(Canvas*);
+  void sigUpdateLayer(Canvas*);
   void sigUpdateScrollBars(Canvas*);
 
   void sigCoordToImageWindow(QPoint);
@@ -96,6 +98,7 @@ class Canvas  : public QOpenGLWidget {
   void slotNextLayer();
   void slotRemoveCurrentLayer();
 
+  void slotUpdateLayer();
   void slotUpdateCanvas();
 
   void slotZoomInAction();

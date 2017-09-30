@@ -18,6 +18,7 @@ class ImageWindow;
 class Slides;
 
 
+
 class Window  : public QMainWindow {
   Q_OBJECT
 
@@ -43,6 +44,7 @@ class Window  : public QMainWindow {
   void slotUpdateCoords(QPoint);
   void slotUpdateMarkers(Marker);
   void slotUpdateProperties(Canvas::property_t);
+  void slotFocusChanged(ImageWindow*);
 
  private:
   Slides* _slides;
@@ -53,6 +55,8 @@ class Window  : public QMainWindow {
   QMenu* _windowMenu;
   QAction* _newWindowAct;
   QAction* _dialogWindowAct;
+
+  
 
   std::vector<GUI::ImageWindow*> _windows;
 

@@ -17,6 +17,7 @@ namespace GUI {
 class Slides;
 class Window;
 class AboutWindow;
+class Histogram;
 
 class ImageWindow  : public QMainWindow {
   Q_OBJECT
@@ -28,7 +29,9 @@ class ImageWindow  : public QMainWindow {
   void synchronize(bool active);
   void loadImage(std::string fn);
 
-  void keyPressEvent( QKeyEvent * event );
+  void keyPressEvent(QKeyEvent * event );
+
+  bool event(QEvent *e);
 
  protected:
   void dropEvent(QDropEvent *ev);
@@ -49,10 +52,13 @@ class ImageWindow  : public QMainWindow {
   void sigPropertyToMainwindow(Canvas::property_t);
   void sigSetZoomAction(double);
 
+  void sigFocusChange(ImageWindow*);
+
  public slots:
   void slotUpdateConnectedViews(Canvas*);
   void slotSynchronizeConnectedViews( Canvas*);
   void slotUpdateTitle(Canvas*);
+  void slotUpdateLayer(Canvas*);
 
   void slotPrevLayer();
   void slotNextLayer();
@@ -60,6 +66,8 @@ class ImageWindow  : public QMainWindow {
   void slotZoomStdAction();
   void slotOpenImageAction();
   void slotRemoveImageAction();
+
+  void slotRefreshBuffer();
 
   void slotUpdateScrollBars(Canvas*);
   void slotVertScrollChanged(int);
@@ -102,6 +110,10 @@ class ImageWindow  : public QMainWindow {
   QAction *_zoomStdAct;
   QAction *_zoomOutAct;
   QAction *_zoomFitAct;
+
+  // toolbar
+  QToolBar* _toolbar;
+  Histogram* _toolbar_histogram;
 };
 }; // namespace GUI
 

@@ -62,17 +62,32 @@ const GUI::Layer* GUI::Canvas::layer(int i) const {
     return _slides->operator[](i);
 }
 
+GUI::Layer* GUI::Canvas::layer(int i) {
+  if (!_slides->available())
+    return nullptr;
+  if (i == -1)
+    return _slides->current();
+  else
+    return _slides->operator[](i);
+}
+
 const GUI::Slides* GUI::Canvas::slides() const {
   return _slides;
 }
 
 void GUI::Canvas::addLayer(Layer *layer) {
-  connect( layer, SIGNAL( sigRefresh() ),
-           this, SLOT( slotUpdateCanvas() ));
+  connect( layer, SIGNAL(sigRefresh()),
+           this, SLOT(slotUpdateCanvas()));
+  connect( layer, SIGNAL(sigHistogramFinished()),
+           this, SLOT(slotUpdateLayer()));
   _slides->add(layer);
   slotUpdateCanvas();
+  slotUpdateLayer();
 }
 
+void GUI::Canvas::slotUpdateLayer() {
+  emit sigUpdateLayer(this);
+}
 void GUI::Canvas::slotUpdateCanvas() {
   // LOG(INFO) << "GUI::Canvas::slotUpdateCanvas";
   emit sigUpdateTitle(this);
@@ -403,6 +418,7 @@ void GUI::Canvas::paintGL() {
 
 void GUI::Canvas::slotPrevLayer() {
   _slides->backward();
+  slotUpdateLayer();
   slotUpdateCanvas();
 }
 void GUI::Canvas::slotRemoveCurrentLayer() {
@@ -414,6 +430,7 @@ void GUI::Canvas::slotRemoveCurrentLayer() {
 }
 void GUI::Canvas::slotNextLayer() {
   _slides->forward();
+  slotUpdateLayer();
   slotUpdateCanvas();
 }
 

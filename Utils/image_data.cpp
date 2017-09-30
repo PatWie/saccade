@@ -23,13 +23,13 @@ bool Utils::ImageData::validFile(std::string filename) {
 Utils::ImageData::~ImageData() {}
 Utils::ImageData::ImageData(float*d, int h, int w, int c)
   : _raw_buf(d), _height(h), _width(w), _channels(c) {}
+
 Utils::ImageData::ImageData(Utils::ImageData *i) {
   _height = i->height();
   _width = i->width();
   _channels = i->channels();
   _raw_buf = new float[i->elements()];
   memcpy( _raw_buf, i->data(), sizeof(float) * i->elements() );
-
 }
 
 Utils::ImageData::ImageData(std::string filename) {
@@ -78,7 +78,7 @@ Utils::ImageData::ImageData(std::string filename) {
       // bgr
       const uint8_t* line = FreeImage_GetScanLine(_data, _height - 1 - h);
       for (int w = 0; w < _width; ++w) {
-        float val = ((float) line[w * (_channels + off) + _channels - c - 1]) / 255.0f;
+        float val = ((float) line[w * (_channels + off) + _channels - c - 1]);
         _raw_buf[c * (_height * _width) + h * _width + w] = val;
       }
     }
@@ -89,25 +89,15 @@ Utils::ImageData::ImageData(std::string filename) {
 }
 
 
-/**
- * @brief Get RGB value
- * @details [long description]
- *
- *   RGBQUAD color = (*this)(0, 0);
-*    std::cout << (int)color.rgbRed << std::endl;
-*    std::cout << (int)color.rgbGreen << std::endl;
-*    std::cout << (int)color.rgbBlue << std::endl;
- *
- * @param h vertical position (from top)
- * @param w horizontal position (from left)
- *
- * @return struct with (r, b, g)
- */
-RGBQUAD Utils::ImageData::operator()(int h, int w) const {
-  RGBQUAD color;
-  // FIXME: use _raw_buf instead;
-  // FreeImage_GetPixelColor(_data, w, _height - 1 - h, &color);
-  return color;
+float Utils::ImageData::operator()(int h, int w, int c) const {
+  return value(h, w, c);
+}
+float Utils::ImageData::value(int h, int w, int c) const {
+  return _raw_buf[c * (_height * _width) + h * _width + w];
+}
+
+float Utils::ImageData::value(int t, int c) const {
+  return _raw_buf[c * (_height * _width) + t];
 }
 
 float* Utils::ImageData::data() const {return _raw_buf;}
@@ -115,6 +105,8 @@ size_t Utils::ImageData::elements() const {return _height * _width * _channels;}
 int Utils::ImageData::width() const {return _width;}
 int Utils::ImageData::height() const {return _height;}
 int Utils::ImageData::channels() const {return _channels;}
+int Utils::ImageData::area() const {return _height * _width;}
+float Utils::ImageData::max() const {return 255.;}
 
 
 

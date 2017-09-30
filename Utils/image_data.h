@@ -27,11 +27,16 @@ class ImageData {
   size_t elements() const;
   int width() const;
   int height() const;
+  int area() const;
   // only 3 or 4 is supported
   int channels() const;
   void clear(bool remove = true);
 
-  RGBQUAD operator()(int h, int w) const;
+  float max() const;
+
+  float value(int h, int w, int c) const;
+  float value(int t, int c) const;
+  float operator()(int h, int w, int c) const;
 
   void copyTo(ImageData *dst) const;
 

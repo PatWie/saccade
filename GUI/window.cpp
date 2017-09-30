@@ -8,35 +8,31 @@
 #include "window.h"
 #include "image_window.h"
 #include "about_window.h"
+#include "histogram.h"
 #include "canvas.h"
 #include "slides.h"
+#include "Utils/histogram_data.h"
 
-GUI::Window::Window(QApplication* app) : _app(app){
+GUI::Window::Window(QApplication* app) : _app(app) {
   // workspace = new QMdiArea(this);
   // workspace->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   // workspace->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   // setCentralWidget(workspace);
 
-  // // as long as we have no toolbar here
-  // QPixmap icon_png(":Icon/256x256/eagleeye.png");
-  // // icon_png = icon_png.scaled(this->size(), Qt::IgnoreAspectRatio);
-  // QPalette palette;
-  // palette.setBrush(QPalette::Background, icon_png);
-  // this->setPalette(palette);
-
   _openPath = QDir::currentPath();
 
-  _newWindowAct = new QAction(tr("&New"), this );
+  // menu
+  _newWindowAct = new QAction(tr("&New"), this);
   _newWindowAct->setShortcut(tr("Ctrl+N"));
   _newWindowAct->setStatusTip(tr("Create a new Window"));
   connect(_newWindowAct, SIGNAL(triggered()), this, SLOT(slotNewWindowAction()));
 
-  _dialogWindowAct = new QAction(tr("&About"), this );
+  _dialogWindowAct = new QAction(tr("&About"), this);
   _dialogWindowAct->setShortcut(tr("F1"));
   _dialogWindowAct->setStatusTip(tr("Create a new Window"));
   connect(_dialogWindowAct, SIGNAL(triggered()), this, SLOT(slotDialogWindowAction()));
 
-  _closeAppAct = new QAction(tr("E&xit"), this );
+  _closeAppAct = new QAction(tr("E&xit"), this);
   _closeAppAct->setShortcut(tr("Ctrl+Q"));
   _closeAppAct->setStatusTip(tr("Close the app"));
   connect(_closeAppAct, SIGNAL(triggered()), this, SLOT(close()));
@@ -46,12 +42,18 @@ GUI::Window::Window(QApplication* app) : _app(app){
   _windowMenu->addAction(_dialogWindowAct);
   _windowMenu->addAction(_closeAppAct);
 
+  // fire up
   slotNewWindowAction();
-
 }
 
 QSize GUI::Window::sizeHint() const {
   return QSize(64, 64);
+}
+
+void GUI::Window::slotFocusChanged(ImageWindow* obj) {
+  LOG(INFO) << "GUI::Window::slotFocusChanged()";
+  LOG(INFO) << obj->metaObject()->className();
+
 }
 
 
@@ -63,16 +65,19 @@ void GUI::Window::slotNewWindowAction() {
   tmpWindow->show();
 
   connect( tmpWindow, SIGNAL(sigToggleChained(ImageWindow*, bool)),
-           this, SLOT(slotActualizeSubwindowView( ImageWindow*, bool )));
+           this, SLOT(slotActualizeSubwindowView(ImageWindow*, bool )));
 
-  connect( tmpWindow, SIGNAL(sigCoordToMainwindow( QPoint)),
-           this, SLOT( slotUpdateCoords( QPoint)));
+  connect( tmpWindow, SIGNAL(sigCoordToMainwindow(QPoint)),
+           this, SLOT( slotUpdateCoords(QPoint)));
 
-  connect( tmpWindow, SIGNAL(sigMarkerToMainwindow( Marker)),
-           this, SLOT( slotUpdateMarkers( Marker)));
+  connect( tmpWindow, SIGNAL(sigMarkerToMainwindow(Marker)),
+           this, SLOT( slotUpdateMarkers(Marker)));
 
-  connect( tmpWindow, SIGNAL(sigPropertyToMainwindow( Canvas::property_t)),
-           this, SLOT( slotUpdateProperties( Canvas::property_t)));
+  connect( tmpWindow, SIGNAL(sigPropertyToMainwindow(Canvas::property_t)),
+           this, SLOT( slotUpdateProperties(Canvas::property_t)));
+
+  connect( tmpWindow, SIGNAL(sigFocusChange(ImageWindow*)),
+           this, SLOT(slotFocusChanged(ImageWindow*)));
 
   connect( this, SIGNAL(sigDistributeCoord(QPoint)),
            tmpWindow, SLOT(slotShowCoords(QPoint)));
@@ -92,12 +97,12 @@ void GUI::Window::slotDialogWindowAction() {
   dialog->setAttribute(Qt::WA_DeleteOnClose);
 
   dialog->setGeometry(
-      QStyle::alignedRect(
-          Qt::LeftToRight,
-          Qt::AlignCenter,
-          dialog->size(),
-          _app->desktop()->availableGeometry()
-      )
+    QStyle::alignedRect(
+      Qt::LeftToRight,
+      Qt::AlignCenter,
+      dialog->size(),
+      _app->desktop()->availableGeometry()
+    )
   );
   dialog->show();
 }

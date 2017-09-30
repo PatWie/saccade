@@ -33,15 +33,18 @@ set(SOURCES
     GUI/layer.cpp
     GUI/slides.cpp
     GUI/canvas.cpp
+    GUI/histogram.cpp
     GUI/about_window.cpp
     GUI/image_window.cpp
     GUI/window.cpp
     Utils/Ops/gamma_op.cpp
+    Utils/Ops/histogram_op.cpp
     Utils/gl_manager.cpp
     Utils/mipmap_tile.cpp
     Utils/mipmap_level.cpp
     Utils/mipmap.cpp
     Utils/image_data.cpp
+    Utils/histogram_data.cpp
     Utils/version.cpp
 )
 

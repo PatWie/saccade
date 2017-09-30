@@ -16,14 +16,14 @@ void set_style(QPalette *p) {
   QColor black(0, 0, 0);
   p->setBrush(QPalette::WindowText, QColor(255, 0, 0));
 
-  p->setColor(QPalette::Window, QColor(53, 53, 53));
+  p->setColor(QPalette::Window, QColor(39, 40, 34));
   p->setColor(QPalette::WindowText, white);
   p->setColor(QPalette::Base, QColor(25, 25, 25));
-  p->setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+  p->setColor(QPalette::AlternateBase, QColor(39, 40, 34));
   p->setColor(QPalette::ToolTipBase, white);
   p->setColor(QPalette::ToolTipText, white);
   p->setColor(QPalette::Text, white);
-  p->setColor(QPalette::Button, QColor(53, 53, 53));
+  p->setColor(QPalette::Button, QColor(39, 40, 34));
   p->setColor(QPalette::ButtonText, white);
   p->setColor(QPalette::BrightText, red);
   // p->setColor(QPalette::Link, QColor(42, 130, 218));
@@ -53,5 +53,6 @@ int main(int argc, char *argv[]) {
   window.setWindowIcon(QIcon(":Icon/256x256/eagleeye.png"));
   window.setWindowTitle("EagleEye");
   window.show();
+
   return app.exec();
 }

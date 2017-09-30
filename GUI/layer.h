@@ -11,6 +11,7 @@
 namespace Utils {
 class Mipmap;
 class ImageData;
+class HistogramData;
 class GlManager;
 
 
@@ -22,6 +23,7 @@ class ImgOp;
 namespace GUI {
 
 typedef std::shared_ptr<Utils::ImageData> ImageData_ptr;
+typedef std::shared_ptr<Utils::HistogramData> HistogramData_ptr;
 typedef std::shared_ptr<Utils::Mipmap> Mipmap_ptr;
 class ImageWindow;
 
@@ -32,11 +34,21 @@ namespace threads {
 class MipmapThread : public QThread {
  public:
   MipmapThread();
-  void notify( Mipmap_ptr mipmap,  ImageData_ptr img);
+  void notify(Mipmap_ptr mipmap,  ImageData_ptr img);
   void run();
  private:
   Mipmap_ptr _mipmap;
   ImageData_ptr _img;
+};
+
+class HistogramThread : public QThread {
+ public:
+  HistogramThread();
+  void notify(ImageData_ptr img,  HistogramData_ptr hist);
+  void run();
+ private:
+  ImageData_ptr _img;
+  HistogramData_ptr _hist;
 };
 
 /**
@@ -78,12 +90,16 @@ class ReloadThread : public QThread {
 class Layer  : public QObject {
   Q_OBJECT
 
+
  public:
   Layer();
   ~Layer();
 
   size_t width() const;
   size_t height() const;
+  const Utils::ImageData* img() const;
+
+
 
   void draw(Utils::GlManager *gl,
             uint top, uint left,
@@ -95,22 +111,29 @@ class Layer  : public QObject {
   bool available() const;
   std::string path() const;
 
+  Utils::HistogramData* histogram() const;
+
 
  signals:
   void sigRefresh();
   void sigApplyOpFinished();
+  void sigHistogramFinished();
 
  protected:
 
  public slots:
   void slotRebuildMipmap();
+  void slotRebuildHistogram();
   void slotMipmapFinished();
-  // void slotApplyOpFinished();
-  // void slotApplyOp(Utils::Ops::ImgOp*);
+  void slotHistogramFinished();
+  void slotApplyOpFinished();
+  void slotApplyOp(Utils::Ops::ImgOp*);
   void slotFileIsValid(QString);
+  void slotRefresh(float, float);
 
  protected slots:
   void slotPathChanged(QString);
+
  private slots:
 
  private:
@@ -119,8 +142,12 @@ class Layer  : public QObject {
 
   std::string _path;
 
+  Utils::Ops::ImgOp* _op;
+
   // the image itself
   ImageData_ptr _imgdata;
+  // and its histogram
+  HistogramData_ptr _histdata;
   // any modification to the image (gamma correction, range slider)
   ImageData_ptr _bufdata;
   // mipmap datastructure of _bufdata
@@ -131,6 +158,7 @@ class Layer  : public QObject {
 
   threads::MipmapThread *_thread_mipmapBuilder;
   threads::OperationThread *_thread_opWorker;
+  threads::HistogramThread *_thread_histogram;
   threads::ReloadThread *_thread_Reloader;
 
 };
