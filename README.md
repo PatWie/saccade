@@ -6,7 +6,7 @@ This project is the missing scientific HDR image viewer inspired by [shiver/idis
 
 The image viewer features an OpenGL-based canvas to display images with dragging and zooming. It uses the [FreeImage](freeimage.sourceforge.net) library to load images from different types.
 
-<p align="center"> <img src="./screenshot.jpg"> </p>
+<p align="center"> <img src="https://github.com/patwie-stuff/img/blob/master/screenshot.gif?raw=true"> </p>
 
 ## Features
 
