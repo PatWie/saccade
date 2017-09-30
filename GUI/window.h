@@ -33,6 +33,7 @@ class Window  : public QMainWindow {
   void sigDistributeCoord(QPoint);
   void sigDistributeMarker(Marker);
   void sigDistributeProperty(Canvas::property_t);
+  void sigDistributeWindowGeometry(ImageWindow*);
 
  private slots:
   void slotNewWindowAction();
@@ -45,6 +46,7 @@ class Window  : public QMainWindow {
   void slotUpdateMarkers(Marker);
   void slotUpdateProperties(Canvas::property_t);
   void slotFocusChanged(ImageWindow*);
+  void slotPropagateWindowGeometry(ImageWindow*);
 
  private:
   Slides* _slides;

@@ -36,6 +36,9 @@ class ImageData {
 
   float value(int h, int w, int c) const;
   float value(int t, int c) const;
+
+  std::string color(int h, int w) const;
+
   float operator()(int h, int w, int c) const;
 
   void copyTo(ImageData *dst) const;
@@ -54,6 +57,7 @@ class ImageData {
   int _height;
   int _width;
   int _channels;
+  float _max_value;
 
   // rgb times height*width
 

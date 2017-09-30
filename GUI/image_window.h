@@ -53,6 +53,7 @@ class ImageWindow  : public QMainWindow {
   void sigSetZoomAction(double);
 
   void sigFocusChange(ImageWindow*);
+  void sigPropagateWindowGeometry(ImageWindow*);
 
  public slots:
   void slotUpdateConnectedViews(Canvas*);
@@ -82,6 +83,9 @@ class ImageWindow  : public QMainWindow {
   void slotShowMarkers(Marker);
   void slotShowProperty(Canvas::property_t);
 
+  void slotPropagateWindowGeometryAction();
+  void slotDistributeWindowGeometry(ImageWindow*);
+
 
  private:
   QGridLayout* _centerLayout;
@@ -106,10 +110,14 @@ class ImageWindow  : public QMainWindow {
 
   Window* _parentWindow;
 
+  QAction *_propagateWindowGeometryAct;
   QAction *_zoomInAct;
   QAction *_zoomStdAct;
   QAction *_zoomOutAct;
   QAction *_zoomFitAct;
+
+  QMenu* _imageMenu;
+  QAction *_resetHistogramAct;
 
   // toolbar
   QToolBar* _toolbar;

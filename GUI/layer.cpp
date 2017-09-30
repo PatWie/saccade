@@ -16,31 +16,30 @@
 // threads
 // ==========================================================================================
 GUI::threads::MipmapThread::MipmapThread() {}
+
 void GUI::threads::MipmapThread::notify( Mipmap_ptr mipmap,  ImageData_ptr img) {
   _mipmap = mipmap;
   _img = img;
 }
+
 void GUI::threads::MipmapThread::run() {
   if (!_mipmap->empty())
     _mipmap->clear();
-
-  // apply image transformation
-
-
-  // build mipmap structure
   _mipmap->setData(_img->data(),
                    _img->height(), _img->width(), _img->channels());
-
 }
+
 // ------------------------------------------------------------------------------------------
 GUI::threads::HistogramThread::HistogramThread() {}
 void GUI::threads::HistogramThread::notify(ImageData_ptr img,  HistogramData_ptr hist) {
   _img = img;
   _hist = hist;
 }
+
 void GUI::threads::HistogramThread::run() {
   _hist->setData(_img.get(), _img->max());
 }
+
 // ------------------------------------------------------------------------------------------
 GUI::threads::OperationThread::OperationThread() {}
 void GUI::threads::OperationThread::notify(ImageData_ptr dst,
@@ -49,25 +48,24 @@ void GUI::threads::OperationThread::notify(ImageData_ptr dst,
   _src = src;
   _dst = dst;
   _op = op;
-
 }
+
 void GUI::threads::OperationThread::run() {
   LOG(INFO) << "GUI::threads::OperationThread::run()";
   const float *src = _src->data();
-  LOG(INFO) << "alive01";
   float *dst = _dst->data();
-  LOG(INFO) << "alive02";
   for (size_t i = 0; i < _src->elements(); ++i)
     dst[i] = _op->apply(src[i]);
   LOG(INFO) << "GUI::threads::OperationThread::run() done";
 }
+
 // ------------------------------------------------------------------------------------------
 GUI::threads::ReloadThread::ReloadThread() {}
 void GUI::threads::ReloadThread::notify(std::string fn, int attempts) {
   _fn = fn;
   _attempts = attempts;
-
 }
+
 void GUI::threads::ReloadThread::run() {
   LOG(INFO) << "GUI::threads::ReloadThread::run()";
   for (int i = 0; i < _attempts; ++i)
@@ -80,16 +78,17 @@ void GUI::threads::ReloadThread::run() {
   }
 }
 
-
 // class
 // ==========================================================================================
 
 GUI::Layer::~Layer() {}
+
 GUI::Layer::Layer() {
   LOG(INFO) << "GUI::Layer::Layer()";
   _path = "";
   _available = false;
 
+  // connection to all threads
   _thread_mipmapBuilder = new threads::MipmapThread();
   connect( _thread_mipmapBuilder, SIGNAL( finished() ),
            this, SLOT( slotMipmapFinished() ));
@@ -110,10 +109,11 @@ GUI::Layer::Layer() {
   connect(_watcher, SIGNAL(fileChanged(QString)),
           this, SLOT(slotPathChanged(QString)));
 
+  // this needs to be available all time
   _current_mipmap = std::make_shared<Utils::Mipmap>();
   _histdata = std::make_shared<Utils::HistogramData>();
 
-
+  // we currently only use one operation to account for histogram changes
   Utils::Ops::HistogramOp *o = new Utils::Ops::HistogramOp();
   o->_scaling.scale = 1.f;
   o->_scaling.min = 0.f;
@@ -128,12 +128,12 @@ void GUI::Layer::draw(Utils::GlManager *gl,
                       double zoom) {
 
   _current_mipmap->draw(gl, top, left, bottom, right, zoom);
-
 }
 
 size_t GUI::Layer::width() const {
   return available() ? _imgdata->width() : 0 ;
 }
+
 size_t GUI::Layer::height() const {
   return available() ? _imgdata->height() : 0 ;
 }
@@ -152,22 +152,18 @@ void GUI::Layer::clear() {
   _available = false;
 
   _current_mipmap->clear();
-  LOG(INFO) << "_mipmap->clear()";
   _imgdata->clear();
-  LOG(INFO) << "_imgdata->clear()";
   _bufdata->clear(false);
-  LOG(INFO) << "_bufdata->clear()";
-
 }
 
 void GUI::Layer::loadImage(std::string fn) {
   LOG(INFO) << "GUI::Layer::loadImage()";
   _available = false;
-  if (_path != "") {
-    _watcher->removePath(QString::fromStdString(_path));
-  }
-  _path = fn;
 
+  if (_path != "")
+    _watcher->removePath(QString::fromStdString(_path));
+
+  _path = fn;
   // we keep the original data here (unscaled)
   _imgdata = std::make_shared<Utils::ImageData>(fn);
   // and for diplaying purposes we use the buffer data (scaled to be within [0, 1])
@@ -175,13 +171,12 @@ void GUI::Layer::loadImage(std::string fn) {
 
   // first build histogram
   slotRebuildHistogram();
-  // the following actions are chained by slots
+  // the following actions are chained when finished by slots
   // scale, mipmap
 }
 
 void GUI::Layer::slotRebuildMipmap()  {
   _available = false;
-  // rebuild mipmap
   _working_mipmap = std::make_shared<Utils::Mipmap>();
   _thread_mipmapBuilder->notify(_working_mipmap, _bufdata);
   _thread_mipmapBuilder->start();
@@ -194,9 +189,13 @@ void GUI::Layer::slotRebuildHistogram()  {
 
 void GUI::Layer::slotMipmapFinished()  {
   LOG(INFO) << "GUI::Layer::slotMipmapFinished()";
+  // override mipmap with new one
   _current_mipmap = _working_mipmap;
+  // watch again for file changes
   _watcher->addPath(QString::fromStdString(_path));
+  // allow OpenGL to display
   _available = true;
+  //request to display new data
   emit sigRefresh();
 }
 
@@ -207,14 +206,17 @@ void GUI::Layer::slotHistogramFinished()  {
 }
 
 void GUI::Layer::slotRefresh(float min, float max)  {
-  _bufdata = std::make_shared<Utils::ImageData>(_imgdata.get());
 
-  // TODO: Multiple Operations?
   Utils::Ops::HistogramOp *o = static_cast<Utils::Ops::HistogramOp*>(_op);
   o->_scaling.scale = _imgdata->max();
   o->_scaling.min = min;
   o->_scaling.max = max;
   _op = o;
+
+  LOG(INFO) << "img max " << _imgdata->max();
+  LOG(INFO) << "scale " << o->_scaling.scale;
+  LOG(INFO) << "min " << o->_scaling.min;
+  LOG(INFO) << "max " << o->_scaling.max;
 
   slotApplyOp(_op);
 }
@@ -236,6 +238,7 @@ std::string GUI::Layer::path() const {
 
 void GUI::Layer::slotApplyOp(Utils::Ops::ImgOp* op) {
   _available = false;
+  _bufdata = std::make_shared<Utils::ImageData>(_imgdata.get());
   _thread_opWorker->notify(_bufdata, _bufdata, op);
   _thread_opWorker->start();
 }

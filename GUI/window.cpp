@@ -79,6 +79,9 @@ void GUI::Window::slotNewWindowAction() {
   connect( tmpWindow, SIGNAL(sigFocusChange(ImageWindow*)),
            this, SLOT(slotFocusChanged(ImageWindow*)));
 
+  connect( tmpWindow, SIGNAL(sigPropagateWindowGeometry(ImageWindow*)),
+           this, SLOT(slotPropagateWindowGeometry(ImageWindow*)));
+
   connect( this, SIGNAL(sigDistributeCoord(QPoint)),
            tmpWindow, SLOT(slotShowCoords(QPoint)));
 
@@ -87,6 +90,10 @@ void GUI::Window::slotNewWindowAction() {
 
   connect( this, SIGNAL(sigDistributeProperty(Canvas::property_t)),
            tmpWindow, SLOT(slotShowProperty(Canvas::property_t)));
+
+  connect( this, SIGNAL(sigDistributeWindowGeometry(ImageWindow*)),
+           tmpWindow, SLOT(slotDistributeWindowGeometry(ImageWindow*)));
+
 
   tmpWindow->synchronize(true);
   _windows.push_back(tmpWindow);
@@ -131,4 +138,8 @@ void GUI::Window::slotUpdateMarkers(Marker m) {
 
 void GUI::Window::slotUpdateProperties(Canvas::property_t m) {
   emit sigDistributeProperty(m);
+}
+
+void GUI::Window::slotPropagateWindowGeometry(ImageWindow* window){
+  emit sigDistributeWindowGeometry(window);
 }

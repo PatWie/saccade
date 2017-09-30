@@ -109,6 +109,10 @@ class Canvas  : public QOpenGLWidget {
 
  protected:
   void zoom(QPoint q, int delta);
+  void checkerboard(unsigned char* data,
+                    unsigned int width = 512,
+                    unsigned int height = 512,
+                    unsigned int channels = 4);
  private slots:
 
  public:

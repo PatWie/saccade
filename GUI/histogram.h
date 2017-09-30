@@ -40,20 +40,27 @@ class Histogram : public QFrame {
   void mouseMoveEvent(QMouseEvent * e);
   void mouseReleaseEvent(QMouseEvent * e);
 
+  /**
+   * @brief Return a description of painting area.
+   */
   QRect paintingArea() const;
+
+  /**
+ * @brief helper to avoid segfaults
+ */
   bool hasHistogram() const;
 
  signals:
+  // histogram-range changed -> request buffer change
   void sigRefreshBuffer();
 
  public slots:
+ // reset range to default of image
   void slotResetRange();
 
  private:
   // pointer to underlying data structure
   Utils::HistogramData *_histogram;
-
-
 
   // dragging information
   struct dragging_t {
@@ -69,7 +76,6 @@ class Histogram : public QFrame {
     mode_t mode;
 
   } _dragging;
-
 
   QAction* _resetRangeAct;
 };

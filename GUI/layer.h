@@ -41,10 +41,13 @@ class MipmapThread : public QThread {
   ImageData_ptr _img;
 };
 
+/**
+ * @brief Compute image histogram.
+ */
 class HistogramThread : public QThread {
  public:
   HistogramThread();
-  void notify(ImageData_ptr img,  HistogramData_ptr hist);
+  void notify(const ImageData_ptr img,  HistogramData_ptr hist);
   void run();
  private:
   ImageData_ptr _img;
@@ -52,12 +55,12 @@ class HistogramThread : public QThread {
 };
 
 /**
- * @brief apply a list of operations to image
+ * @brief Apply an operations to image.
  */
 class OperationThread : public QThread {
  public:
   OperationThread();
-  void notify(ImageData_ptr dst, ImageData_ptr src, Utils::Ops::ImgOp *op);
+  void notify(const ImageData_ptr dst, ImageData_ptr src, Utils::Ops::ImgOp *op);
   void run();
  private:
   Utils::Ops::ImgOp *_op;
@@ -69,6 +72,10 @@ class OperationThread : public QThread {
  * @brief triggers loadImage when fileformat is not corrupted
  * @details QFileWatcher is triggered when file changes. But there is no guarantee
  *          that the writing process completed its operation
+ * @todo this is currently an ugly workaround
+ *          
+ *          see: https://codereview.qt-project.org/#/c/19274/
+ *          see: https://bugreports.qt.io/browse/QTBUG-2264
  */
 class ReloadThread : public QThread {
   Q_OBJECT

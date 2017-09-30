@@ -18,7 +18,6 @@ public:
     float min;
     float max;
     float range(){ return max - min;}
-    void clear() { min = 0; max = 255;}
   };
  private:
 

@@ -10,8 +10,10 @@
 
 GUI::Histogram::Histogram(QWidget *parent)
   : _histogram(nullptr) {
+
   setFrameStyle(QFrame::Panel | QFrame::Sunken);
   setMouseTracking( true );
+
   _dragging.mode = dragging_t::NONE;
 
   _resetRangeAct = new QAction(tr("Reset Range"), this);
@@ -51,6 +53,7 @@ void GUI::Histogram::paintEvent( QPaintEvent *e) {
   QPainter p(this);
   QRect paint_rectangle = paintingArea();
 
+  // area is too small (makes no sense to draw widget)
   if (paint_rectangle.width() < min_width)
     return;
 
@@ -72,6 +75,8 @@ void GUI::Histogram::paintEvent( QPaintEvent *e) {
 
     const double scale = paint_rectangle.height();
     const int offset = 5;
+
+    // draw the actual bars
     for (int b = 0; b < _histogram->bins(); ++b) {
       for (int c = _histogram->channels() - 1; c >= 0; --c) {
         const int amount = _histogram->amount(c, b);
@@ -84,7 +89,7 @@ void GUI::Histogram::paintEvent( QPaintEvent *e) {
       }
     }
 
-    // draw selection
+    // draw range-selection
     const int x1 = _histogram->range()->min + paint_rectangle.left();
     const int x2 = _histogram->range()->max + paint_rectangle.left();
 
@@ -94,9 +99,6 @@ void GUI::Histogram::paintEvent( QPaintEvent *e) {
                QBrush(selectionColor));
 
   }
-
-
-
 }
 
 QRect GUI::Histogram::paintingArea() const {
@@ -152,24 +154,29 @@ void GUI::Histogram::mousePressEvent(QMouseEvent * e) {
 }
 
 void GUI::Histogram::mouseMoveEvent(QMouseEvent * e) {
-  const int x = e->x();
-  const QRect area = paintingArea();
   if (hasHistogram()) {
+    // if there is a histogram, we are interested in this event
+    const int x = e->x();
+    const QRect area = paintingArea();
 
+    // mouse moves only (prepare for action and just change cursor style)
     if (_dragging.mode == dragging_t::NONE) {
       const int dist_left = abs(x - _histogram->range()->min);
       const int dist_right = abs(x - _histogram->range()->max);
 
       if ((dist_left < 5) || (dist_right < 5)) {
+        // mouse hovers the range limits
         QCursor tmp;
         tmp.setShape(Qt::SplitHCursor);
         this->setCursor(tmp);
       } else {
+        // is mouse somewhere between limits
         if (_histogram->range()->min < x && x < _histogram->range()->max) {
           QCursor tmp;
           tmp.setShape(Qt::PointingHandCursor);
           this->setCursor(tmp);
         } else {
+          // reset cursor if none of the above cases occured
           QCursor tmp;
           tmp.setShape(Qt::ArrowCursor);
           this->setCursor(tmp);
@@ -177,10 +184,12 @@ void GUI::Histogram::mouseMoveEvent(QMouseEvent * e) {
 
       }
     } else if (_dragging.mode == dragging_t::SHIFT) {
+      // there is already an action in progress which moves the entire range
       _histogram->range()->min = std::max((float) area.left(), _dragging.start_range.min + (x - _dragging.start_x));
       _histogram->range()->max = std::min((float) area.right(), _dragging.start_range.max + (x - _dragging.start_x));
       update();
     } else {
+      // only shift a range-delimiter
       if (_dragging.mode == dragging_t::LEFT) {
         _histogram->range()->min = std::min((float) std::max(e->x(), area.left()), _histogram->range()->max - 1);
       }
@@ -194,9 +203,11 @@ void GUI::Histogram::mouseMoveEvent(QMouseEvent * e) {
 
 void GUI::Histogram::mouseReleaseEvent(QMouseEvent * e) {
   if (hasHistogram()) {
+    // stop clicking means reset cursor styl
     QCursor tmp;
     tmp.setShape(Qt::ArrowCursor);
     this->setCursor(tmp);
+    // if there was an action, this action will now take effect
     if (_dragging.mode != dragging_t::NONE) {
       emit sigRefreshBuffer();
       _dragging.mode = dragging_t::NONE;
@@ -204,8 +215,10 @@ void GUI::Histogram::mouseReleaseEvent(QMouseEvent * e) {
   }
 }
 
-void GUI::Histogram::slotResetRange(){
-  _histogram->range()->min = 0.;
-  _histogram->range()->max = _histogram->image()->max();
-  emit sigRefreshBuffer();
+void GUI::Histogram::slotResetRange() {
+  if (hasHistogram()) {
+    _histogram->range()->min = 0.;
+    _histogram->range()->max = _histogram->image()->max();
+    emit sigRefreshBuffer();
+  }
 }

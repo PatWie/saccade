@@ -3,6 +3,10 @@
 
 #include "img_op.h"
 
+/* Just a simple example on how to add operation.
+There won't be probably more operations as this should be an image viewer only.
+*/
+
 namespace Utils {
 namespace Ops {
 
