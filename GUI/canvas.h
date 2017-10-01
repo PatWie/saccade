@@ -23,8 +23,10 @@ class Canvas  : public QOpenGLWidget {
   Q_OBJECT
  public:
   struct property_t {
-    double zoom_factor = 1.43;
+    double zoom_factor = 1.;
+    // not supported yet (should be rotation)
     double angle = 0;
+    // center of image relative to canvas (0, 0) means centered
     double x, y;
   };
  private:

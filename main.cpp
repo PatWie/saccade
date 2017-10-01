@@ -5,6 +5,7 @@
 
 #include <glog/logging.h>
 #include <gflags/gflags.h>
+#include "omp.h"
 
 #include "GUI/window.h"
 #include "Utils/version.h"
@@ -39,6 +40,7 @@ int main(int argc, char *argv[]) {
 
   LOG(INFO) << Utils::GetVersionInfo();
   LOG(INFO) << Utils::GetBuildInfo();
+  LOG(INFO) << "omp_get_max_threads() " << omp_get_max_threads();
   QApplication app(argc, argv);
 
   LOG(INFO) << "override style";

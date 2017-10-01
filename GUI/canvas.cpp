@@ -213,6 +213,9 @@ void GUI::Canvas::slotFitZoomToWindow() {
   const double zoom_height = ((double)_height / (double)_slides->height());
   _property.zoom_factor = std::min(zoom_width, zoom_height);
 
+  _property.x = 0;
+  _property.y = 0;
+
   slotUpdateCanvas();
   emit sigPropertyChanged(this);
   emit sigPropertyToImagewindow(_property);

@@ -54,6 +54,7 @@ void GUI::threads::OperationThread::run() {
   LOG(INFO) << "GUI::threads::OperationThread::run()";
   const float *src = _src->data();
   float *dst = _dst->data();
+  #pragma omp parallel for
   for (size_t i = 0; i < _src->elements(); ++i)
     dst[i] = _op->apply(src[i]);
   LOG(INFO) << "GUI::threads::OperationThread::run() done";
@@ -171,8 +172,14 @@ void GUI::Layer::loadImage(std::string fn) {
 
   // first build histogram
   slotRebuildHistogram();
-  // the following actions are chained when finished by slots
-  // scale, mipmap
+
+  Utils::Ops::HistogramOp *o = static_cast<Utils::Ops::HistogramOp*>(_op);
+  o->_scaling.scale = _imgdata->max();
+  o->_scaling.min = 0;
+  o->_scaling.max = _imgdata->max();
+  _op = o;
+  slotApplyOp(_op);
+
 }
 
 void GUI::Layer::slotRebuildMipmap()  {
@@ -201,7 +208,7 @@ void GUI::Layer::slotMipmapFinished()  {
 
 void GUI::Layer::slotHistogramFinished()  {
   LOG(INFO) << "GUI::Layer::slotHistogramFinished()";
-  slotRefresh(0.f, _imgdata->max());
+  // slotRefresh(0.f, _imgdata->max());
   emit sigHistogramFinished();
 }
 

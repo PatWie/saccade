@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+
 #include "misc.h"
 #include "mipmap_tile.h"
 #include "mipmap_level.h"
@@ -37,9 +38,16 @@ void Utils::MipmapLevel::setData(float* ptr,
   _gridHeight = tileNumV + std::min(borderLower, 1u);
 
   for (uint h = 0; h < _gridHeight; ++h) {
-    _tiles.push_back(std::vector<MipmapTile*>() );
+    _tiles.push_back(std::vector<MipmapTile*>(_gridWidth) );
+  }
 
-    for (uint w = 0; w < _gridWidth; ++w) {
+  // n = h * width + w
+  #pragma omp parallel for
+  for(uint n = 0; n < _gridHeight * _gridWidth; n++ ){
+      uint h = n / _gridWidth;
+      uint w = n % _gridWidth;
+  // for (uint h = 0; h < _gridHeight; ++h) {
+  //   for (uint w = 0; w < _gridWidth; ++w) {
 
       const uint minH = h * tileSize;
       const uint minW = w * tileSize;
@@ -55,10 +63,10 @@ void Utils::MipmapLevel::setData(float* ptr,
                              channels);
 
       MipmapTile *tile = new MipmapTile(d, diffH, diffW, channels);
-      _tiles[h].push_back(tile);
+      _tiles[h][w] = tile;
 
     }
-  }
+  // }
 }
 
 
