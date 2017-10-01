@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(Saccade)
 
-set(SACCADE_VERSION "0.1alpha1")
+set(SACCADE_VERSION "0.1alpha2")
 
 SET (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
