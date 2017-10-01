@@ -47,6 +47,11 @@ class Window  : public QMainWindow {
   void slotUpdateProperties(Canvas::property_t);
   void slotFocusChanged(ImageWindow*);
   void slotPropagateWindowGeometry(ImageWindow*);
+  /**
+   * @brief Try to range the windows in an intelligent way.
+   * @details no propagation of geometry
+   */
+  void slotArangeWindows();
 
  private:
   Slides* _slides;

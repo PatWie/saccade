@@ -116,6 +116,25 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   connect(_propagateWindowGeometryAct, SIGNAL(triggered()),
           this, SLOT(slotPropagateWindowGeometryAction()));
 
+  _arangeWindowsAct = new QAction(tr("Arange &Windows"), this );
+  _arangeWindowsAct->setShortcut(tr("F3"));
+  _arangeWindowsAct->setStatusTip(tr("Try to arange all windows."));
+  connect(_arangeWindowsAct, SIGNAL(triggered()),
+          _parentWindow, SLOT(slotArangeWindows()));
+
+  _fitImageAct = new QAction(tr("Fit to image"), this );
+  _fitImageAct->setShortcut(tr("Ctrl+F"));
+  _fitImageAct->setStatusTip(tr("Fit window to image."));
+  connect(_fitImageAct, SIGNAL(triggered()),
+          _canvas, SLOT(slotFitToImage()));
+
+  _centerImageAct = new QAction(tr("center image"), this );
+  _centerImageAct->setShortcut(tr("Ctrl+C"));
+  _centerImageAct->setStatusTip(tr("Center image within canvas."));
+  connect(_centerImageAct, SIGNAL(triggered()),
+          _canvas, SLOT(slotFitToImage()));
+
+
   _resetHistogramAct = new QAction(tr("&Reset the histogram"), this );
   _resetHistogramAct->setShortcut(tr("Ctrl+H"));
   _resetHistogramAct->setStatusTip(tr("Reset the histogram range"));
@@ -147,6 +166,9 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _windowMenu = menuBar()->addMenu(tr("&Window"));
   _windowMenu->addAction(_newWindowAct);
   _windowMenu->addAction(_propagateWindowGeometryAct);
+  _windowMenu->addAction(_arangeWindowsAct);
+  _windowMenu->addAction(_fitImageAct);
+  _windowMenu->addAction(_centerImageAct);
   _windowMenu->addAction(_dialogWindowAct);
   _windowMenu->addAction(_closeWindowAct);
   _windowMenu->addAction(_closeAppAct);
@@ -232,9 +254,9 @@ void GUI::ImageWindow::slotZoomStdAction() {
 void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
   QList<QUrl> urls = ev->mimeData()->urls();
   foreach (QUrl url, urls) {
-    if(Utils::ImageData::validFile(url.toLocalFile().toStdString())){
+    if (Utils::ImageData::validFile(url.toLocalFile().toStdString())) {
       LOG(INFO) << "dropped " << url.toLocalFile().toStdString();
-      loadImage(url.toLocalFile().toStdString());   
+      loadImage(url.toLocalFile().toStdString());
     }
   }
 }

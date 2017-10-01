@@ -111,6 +111,9 @@ class ImageWindow  : public QMainWindow {
   Window* _parentWindow;
 
   QAction *_propagateWindowGeometryAct;
+  QAction *_arangeWindowsAct;
+  QAction *_fitImageAct;
+  QAction *_centerImageAct;
   QAction *_zoomInAct;
   QAction *_zoomStdAct;
   QAction *_zoomOutAct;

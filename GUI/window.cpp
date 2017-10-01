@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include <glog/logging.h>
 
@@ -140,6 +141,41 @@ void GUI::Window::slotUpdateProperties(Canvas::property_t m) {
   emit sigDistributeProperty(m);
 }
 
-void GUI::Window::slotPropagateWindowGeometry(ImageWindow* window){
+void GUI::Window::slotPropagateWindowGeometry(ImageWindow* window) {
   emit sigDistributeWindowGeometry(window);
+}
+
+void GUI::Window::slotArangeWindows() {
+  std::vector<GUI::ImageWindow*> sorted_windows = _windows;
+  std::sort(sorted_windows.begin(), sorted_windows.end(),
+  [](const GUI::ImageWindow * lhs, const GUI::ImageWindow * rhs) {
+    auto lhs_pos = lhs->mapToGlobal(lhs->pos());
+    auto rhs_pos = rhs->mapToGlobal(rhs->pos());
+
+    float lhs_dist = lhs_pos.x() * lhs_pos.x() + lhs_pos.y() * lhs_pos.y();
+    float rhs_dist = rhs_pos.x() * rhs_pos.x() + rhs_pos.y() * rhs_pos.y();
+    return lhs_dist < rhs_dist;
+  });
+
+  QRect rec = QApplication::desktop()->availableGeometry(sorted_windows[0]);
+  const int height = rec.height();
+  const int width = rec.width();
+  const int padding = 4;
+
+  int cur_x = sorted_windows[0]->pos().x();
+  int cur_y = sorted_windows[0]->pos().y();
+  const int start_x = cur_x;
+  int cur_line_height = sorted_windows[0]->height();
+
+  for (auto && wnd : sorted_windows) {
+    if(cur_x + padding > width){
+      cur_x = start_x;
+      cur_y += cur_line_height;
+      cur_line_height = 0;
+    }
+    wnd->move(cur_x, cur_y);
+    cur_x += wnd->width() + padding;
+    // cur_y += wnd->height();
+    cur_line_height = std::max(cur_line_height, wnd->height());
+  }
 }

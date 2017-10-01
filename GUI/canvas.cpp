@@ -5,6 +5,7 @@
 
 #include <glog/logging.h>
 
+#include "image_window.h"
 #include "canvas.h"
 #include "layer.h"
 #include "slides.h"
@@ -213,7 +214,32 @@ void GUI::Canvas::slotFitZoomToWindow() {
   _property.zoom_factor = std::min(zoom_width, zoom_height);
 
   slotUpdateCanvas();
+  emit sigPropertyChanged(this);
+  emit sigPropertyToImagewindow(_property);
+}
 
+void GUI::Canvas::slotCenterImage() {
+  _property.x = 0;
+  _property.y = 0;
+
+  slotUpdateCanvas();
+  emit sigPropertyChanged(this);
+  emit sigPropertyToImagewindow(_property);
+}
+
+void GUI::Canvas::slotFitToImage() {
+  const int img_width = _slides->width() * _property.zoom_factor;
+  const int img_height = _slides->height() * _property.zoom_factor;
+
+  const int padding_w = (_parentWin->width() - width());
+  const int padding_h = (_parentWin->height() - height());
+
+  _parentWin->resize(img_width + padding_w, img_height + padding_h);
+
+  _property.x = 0;
+  _property.y = 0;
+
+  slotUpdateCanvas();
   emit sigPropertyChanged(this);
   emit sigPropertyToImagewindow(_property);
 }

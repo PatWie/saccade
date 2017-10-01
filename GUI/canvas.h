@@ -106,6 +106,8 @@ class Canvas  : public QOpenGLWidget {
 
   void slotSetZoomAction(double);
   void slotFitZoomToWindow();
+  void slotFitToImage();
+  void slotCenterImage();
 
  protected:
   void zoom(QPoint q, int delta);

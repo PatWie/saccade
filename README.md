@@ -59,19 +59,28 @@ and you find the app in the Ubuntu searchbar.
 
 ## Keyboard Shortcuts
 
+general
 
-| Action                        | Shortcut            |
-| ------                        | ------              |
-| next image                    | key_down, key_right |
-| delete image                  | Del                 |
-| previous image                | key_up, key_left    |
-| open image                    | Ctrl+O              |
-| new canvas                    | Ctrl+N              |
-| quit canvas                   | Ctrl+W              |
-| quit app                      | Ctrl+Q              |
-| zoom in                       | Ctrl+plus           |
-| no zoom                       | Ctrl+0              |
-| fit to window                 | Ctrl+9              |
-| zoom out                      | Ctrl+minus          |
-| reset histogram               | Ctrl+H              |
-| distribute window geometry    | F2                  |
+| Action                       | Shortcut            |
+| ------                       | ------              |
+| quit entire app              | Ctrl + Q            |
+| distribute window geometry   | F2                  |
+| automatically arange windows | F3                  |
+
+per canvas
+
+| Action                       | Shortcut            |
+| ------                       | ------              |
+| new canvas                   | Ctrl + N            |
+| quit                         | Ctrl + W            |
+| next image                   | key_down, key_right |
+| delete image                 | Del                 |
+| previous image               | key_up, key_left    |
+| add new image                | Ctrl + O            |
+| zoom in                      | Ctrl + plus         |
+| zoom out                     | Ctrl + minus        |
+| no zoom                      | Ctrl + 0            |
+| fit to window                | Ctrl + 9            |
+| reset histogram              | Ctrl + H            |
+| center image                 | Ctrl + C            |
+| fit window to image          | Ctrl + F            |
