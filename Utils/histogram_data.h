@@ -3,21 +3,21 @@
 
 #include <vector>
 #include <algorithm>
+#include <functional>
 
-namespace GUI
-{
-  class Histogram;
+namespace GUI {
+class Histogram;
 }; // namespace GUI
 
 namespace Utils {
 class ImageData;
 
 class HistogramData {
-public:
+ public:
   struct range_t {
     float min;
     float max;
-    float range(){ return max - min;}
+    float range() { return max - min;}
   };
  private:
 
@@ -43,16 +43,19 @@ public:
   // bins of each channel
   std::vector<std::vector<double> > _data;
 
-
   int _nbins;
   int _channels;
   bool _available;
-
   const ImageData *_img;
 
+  std::vector<std::function<float(float)>> _scale_mappings;
+  int _scale_mapping_id;
 
  public:
   HistogramData();
+
+  float scale_func(float);
+  void setScale(int);
 
   const ImageData* image() const;
 
@@ -67,6 +70,8 @@ public:
   const bin_info_t bin_info() const;
 
   void setData(const ImageData *data, float max = 1.0f);
+
+
 };
 
 

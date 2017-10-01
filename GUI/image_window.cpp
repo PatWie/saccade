@@ -232,8 +232,10 @@ void GUI::ImageWindow::slotZoomStdAction() {
 void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
   QList<QUrl> urls = ev->mimeData()->urls();
   foreach (QUrl url, urls) {
-    LOG(INFO) << url.toLocalFile().toStdString();
-    loadImage(url.toLocalFile().toStdString());
+    if(Utils::ImageData::validFile(url.toLocalFile().toStdString())){
+      LOG(INFO) << "dropped " << url.toLocalFile().toStdString();
+      loadImage(url.toLocalFile().toStdString());   
+    }
   }
 }
 

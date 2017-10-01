@@ -7,7 +7,6 @@
 #include <vector>
 
 
-
 namespace Utils {
 
 namespace Ops{
@@ -40,14 +39,13 @@ class ImageData {
   std::string color(int h, int w) const;
 
   float operator()(int h, int w, int c) const;
-
   void copyTo(ImageData *dst) const;
 
   static bool validFile(std::string filename);
 
 
  private:
-
+  void buildScale();
   std::string _filename;
   // typedef std::unique_ptr<FIBITMAP, decltype(&FreeImage_Unload)> FIBitmapPtr;
   typedef FIBITMAP* FIBitmapPtr;
@@ -60,6 +58,7 @@ class ImageData {
   float _max_value;
 
   // rgb times height*width
+
 
 };
 
