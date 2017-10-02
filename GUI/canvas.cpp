@@ -36,7 +36,7 @@ GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
   setMouseTracking(true);
 
   // canvas properties
-  _property.zoom_factor = 1;
+  _property.pixel_size = 1;
   _property.x = 0;
   _property.y = 0;
 
@@ -98,7 +98,7 @@ void GUI::Canvas::addLayer(Layer *layer) {
 
 void GUI::Canvas::slotUpdateLayer() {
   emit sigUpdateLayer(this);
-  emit sigCoordToImageWindow(imgToCanvas(_focus));
+  emit sigCoordToImageWindow(canvasToImg(_focus));
 }
 
 void GUI::Canvas::slotUpdateCanvas() {
@@ -109,7 +109,7 @@ void GUI::Canvas::slotUpdateCanvas() {
 }
 
 void GUI::Canvas::slotSetZoomAction(double zoom) {
-  _property.zoom_factor = zoom;
+  _property.pixel_size = zoom;
   slotUpdateCanvas();
   askSynchronization();
   emit sigPropertyToImagewindow(_property);
@@ -135,7 +135,7 @@ void GUI::Canvas::askSynchronization() {
 
 void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   // get position within image coordinates
-  QPoint p = imgToCanvas( QPoint(event->x(), event->y()) );
+  QPoint p = canvasToImg(event->pos());
 
   Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
 
@@ -153,8 +153,8 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
       _dragging.active = true;
       const double ex = event->x();
       const double ey = -event->y();
-      _dragging.start.setX(ex / _property.zoom_factor - _property.x);
-      _dragging.start.setY(ey / _property.zoom_factor - _property.y);
+      _dragging.start.setX(ex / _property.pixel_size - _property.x);
+      _dragging.start.setY(ey / _property.pixel_size - _property.y);
     }
   }
 
@@ -177,7 +177,7 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
 }
 
 void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
-  QPoint p = imgToCanvas(event->pos());
+  QPoint p = canvasToImg(event->pos());
   Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
   // middle click active --> move marker
   if ( (event->buttons() & Qt::MidButton) ) {
@@ -198,8 +198,8 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
   } else if ( (event->buttons() & Qt::LeftButton) != 0 && _dragging.active) {
     const double dx = event->x();
     const double dy = event->y();
-    _property.x = (dx / _property.zoom_factor) - _dragging.start.x();
-    _property.y = -(dy / _property.zoom_factor) - _dragging.start.y();
+    _property.x = (dx / _property.pixel_size) - _dragging.start.x();
+    _property.y = -(dy / _property.pixel_size) - _dragging.start.y();
     update();
     emit sigPropertyChanged(this);
     emit sigUpdateScrollBars(this);
@@ -209,35 +209,59 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
   _focus = event->pos();
 }
 
+/**
+ * @brief move canvas such that pixel is in the center
+ * @details [long description]
+ *
+ * @param imgCoord coordinate in image (w, h)
+ * @return [description]
+ */
 void GUI::Canvas::focusOnPixel(QPoint imgCoord) {
-  const int img_width = _slides->width()  * _property.zoom_factor;
-  const int img_height = _slides->height()  * _property.zoom_factor;
 
-  const int ix = imgCoord.x() / _property.zoom_factor;
-  const int iy = imgCoord.y() / _property.zoom_factor;
+  // offset in image to the right
+  const double left_space = imgCoord.x();
+  const double top_space = imgCoord.y();
 
-  _property.x = img_width / 2 - ix;
-  _property.y = -img_height / 2 + iy;
+  //
+  const double scaled_img_width = _slides->width()  * _property.pixel_size;
+  const double scaled_img_height = _slides->height()  * _property.pixel_size;
+
+
+  const double percent_width = imgCoord.x() / scaled_img_width;
+  const double percent_height = imgCoord.y() / scaled_img_height;
+
+
+  _property.x = percent_width * scaled_img_width + scaled_img_width / 2;
+  _property.y = scaled_img_height * -scaled_img_height + scaled_img_height / 2;
 
 }
 
 
 void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
-  QPoint p = imgToCanvas(event->pos());
+  QPoint p = canvasToImg(event->pos());
+
   if (_selection.active) {
     _selection.active = false;
     _selection.rect.setBottomRight(p);
 
+    LOG(INFO) << "selection "
+              << _selection.rect.center().y() << " "
+              << _selection.rect.center().x() << " ";
+
+    const double nth_pixel_hor = _selection.rect.center().x();
+    const double nth_pixel_ver = _selection.rect.center().y();
+
+    const double visible_pixel_hor = width() / _property.pixel_size;
+    const double visible_pixel_ver = height() / _property.pixel_size;
+
+    const double hor_percent_offset = nth_pixel_hor / (double)_slides->width();
+    const double ver_percent_offset = nth_pixel_ver / (double)_slides->height();
+
     // TODO !!!
 
-    // focusOnPixel(_selection.rect.center());
-    // _marker->x = _selection.rect.center().x();
-    // _marker->y = _selection.rect.center().y();
-    // _marker->active = true;
-
-    // slotUpdateCanvas();
-    // emit sigPropertyChanged(this);
-    // emit sigPropertyToImagewindow(_property);
+    slotUpdateCanvas();
+    emit sigPropertyChanged(this);
+    emit sigPropertyToImagewindow(_property);
 
   } else if ( _dragging.active ) {
     QCursor tmp;
@@ -259,7 +283,7 @@ void GUI::Canvas::slotFitZoomToWindow() {
   LOG(INFO) << "GUI::Canvas::slotFitZoomToWindow";
   const double zoom_width = ((double)_width / (double)_slides->width());
   const double zoom_height = ((double)_height / (double)_slides->height());
-  _property.zoom_factor = std::min(zoom_width, zoom_height);
+  _property.pixel_size = std::min(zoom_width, zoom_height);
 
   _property.x = 0;
   _property.y = 0;
@@ -279,8 +303,8 @@ void GUI::Canvas::slotCenterImage() {
 }
 
 void GUI::Canvas::slotFitToImage() {
-  const int img_width = _slides->width() * _property.zoom_factor;
-  const int img_height = _slides->height() * _property.zoom_factor;
+  const int img_width = _slides->width() * _property.pixel_size;
+  const int img_height = _slides->height() * _property.pixel_size;
 
   const int padding_w = (_parentWin->width() - width());
   const int padding_h = (_parentWin->height() - height());
@@ -298,13 +322,13 @@ void GUI::Canvas::slotFitToImage() {
 void GUI::Canvas::zoom_rel(QPoint q, int delta) {
 
   const double zoom_delta = sqrt(2.0);
-  const double old_zoom =  _property.zoom_factor;
+  const double old_zoom =  _property.pixel_size;
 
   double new_zoom = 0;
   if ( delta > 0 )
-    new_zoom = _property.zoom_factor * zoom_delta;
+    new_zoom = _property.pixel_size * zoom_delta;
   else
-    new_zoom = _property.zoom_factor / zoom_delta;
+    new_zoom = _property.pixel_size / zoom_delta;
 
   const unsigned int winWidth = width();
   const unsigned int winHeight = height();
@@ -315,18 +339,18 @@ void GUI::Canvas::zoom_rel(QPoint q, int delta) {
   if (new_zoom <= 0.)
     new_zoom = 1.;
 
-  QPoint q_canvas = imgToCanvas(q);
-  if ( (q_canvas.x() < 0) ||
-       (q_canvas.y() < 0) ||
-       (q_canvas.x() >= (int)_slides->width()) ||
-       (q_canvas.y() >= (int)_slides->height())) {
+  QPoint q_img = canvasToImg(q);
+  if ( (q_img.x() < 0) ||
+       (q_img.y() < 0) ||
+       (q_img.x() >= (int)_slides->width()) ||
+       (q_img.y() >= (int)_slides->height())) {
     _property.x = 0;
     _property.y = 0;
-    _property.zoom_factor = new_zoom;
+    _property.pixel_size = new_zoom;
   } else {
     _property.x += ((double)winWidth * ((1.0 / new_zoom) - (1.0 / old_zoom)) * mpercX);
     _property.y -= ((double)winHeight * ((1.0 / new_zoom) - (1.0 / old_zoom)) * mpercY);
-    _property.zoom_factor = new_zoom;
+    _property.pixel_size = new_zoom;
   }
 
   slotUpdateCanvas();
@@ -363,62 +387,60 @@ void GUI::Canvas::checkerboard(unsigned char* data,
   }
 }
 
-QPoint GUI::Canvas::imgToCanvas( QPoint p ) const {
+/**
+ * @brief from global canvas position to coordinate within image
+ * @details [long description]
+ *
+ * @param p [description]
+ * @return [description]
+ */
+QPoint GUI::Canvas::canvasToImg( QPoint p ) const {
   if (!_slides->available())
     return QPoint(0, 0);
 
-  const double zoom = _property.zoom_factor;
+  const double pixel_size = _property.pixel_size;
   const double image_width = _slides->width();
   const double image_height = _slides->height();
   const double canvas_width = width() - 1.0;
   const double canvas_height = height() - 1.0;
-  const double padding_w = 0.5 * (image_width * zoom - canvas_width);
-  const double padding_h = 0.5 * (image_height * zoom - canvas_height);
+
+  const double padding_w = 0.5 * (image_width * pixel_size - canvas_width);
+  const double padding_h = 0.5 * (image_height * pixel_size - canvas_height);
 
   double px = p.x();
   double py = p.y() - 1.0;
 
   // with rotation
   // const double alpha = _property.angle * -(M_PI / 180.0);
-  // double x = (px + padding_w - _property.x * zoom) - 0.5 * image_width * zoom;
-  // double y = (py + padding_h + _property.y * zoom) - 0.5 * image_height * zoom;
-  // px = (x * cos(alpha) - y * sin(alpha)) / zoom + 0.5 * image_width;
-  // py = (y * cos(alpha) + x * sin(alpha)) / zoom + 0.5 * image_height;
+  // double x = (px + padding_w - _property.x * pixel_size) - 0.5 * image_width * pixel_size;
+  // double y = (py + padding_h + _property.y * pixel_size) - 0.5 * image_height * pixel_size;
+  // px = (x * cos(alpha) - y * sin(alpha)) / pixel_size + 0.5 * image_width;
+  // py = (y * cos(alpha) + x * sin(alpha)) / pixel_size + 0.5 * image_height;
 
-  px = (px + padding_w)  / zoom - _property.x;
-  py = (py + padding_h)  / zoom + _property.y;
+  px = (px + padding_w)  / pixel_size - _property.x;
+  py = (py + padding_h)  / pixel_size + _property.y;
 
   return QPoint( (int)px, (int)py);
 }
 
-QPoint GUI::Canvas::canvasToImg( QPoint p ) const {
+QPoint GUI::Canvas::imgToCanvas( QPoint p ) const {
   if (!_slides->available())
     return QPoint(0, 0);
 
-  const double zoom = _property.zoom_factor;
+  const double pixel_size = _property.pixel_size;
   const double image_width = _slides->width();
   const double image_height = _slides->height();
   const double canvas_width = width() - 1.0;
   const double canvas_height = height() - 1.0;
-  const double padding_w = 0.5 * (image_width * zoom - canvas_width);
-  const double padding_h = 0.5 * (image_height * zoom - canvas_height);
+
+  const double padding_w = 0.5 * (image_width * pixel_size - canvas_width);
+  const double padding_h = 0.5 * (image_height * pixel_size - canvas_height);
 
   double px = p.x();
   double py = p.y();
 
-  // with rotation
-  // const double alpha = _property.angle * -(M_PI / 180.0);
-  // double x = (px + padding_w - _property.x * zoom) - 0.5 * image_width * zoom;
-  // double y = (py + padding_h + _property.y * zoom) - 0.5 * image_height * zoom;
-  // px = (x * cos(alpha) - y * sin(alpha)) / zoom + 0.5 * image_width;
-  // py = (y * cos(alpha) + x * sin(alpha)) / zoom + 0.5 * image_height;
-
-  // px = (px + padding_w)  / zoom - _property.x;
-  // py = (py + padding_h)  / zoom + _property.y;
-
-
-  px = (px + _property.x) * zoom - padding_w;
-  py = (py - _property.y) * zoom - padding_h + 1;
+  px = (px + _property.x) * pixel_size - padding_w;
+  py = (py - _property.y) * pixel_size - padding_h + 1;
 
   return QPoint( (int)px, (int)py);
 }
@@ -479,8 +501,6 @@ void GUI::Canvas::initializeGL() {
 void GUI::Canvas::paintGL() {
   while ( !__sync_bool_compare_and_swap (&m_glBlock, false, true));
 
-
-  LOG(INFO) << "property " << _property.x << " " << _property.y;
   _gl->identity();
   _gl->clear();
 
@@ -494,10 +514,10 @@ void GUI::Canvas::paintGL() {
     QPoint bottom_left = QPoint(0, height() - 1);
     QPoint bottom_right = QPoint(width() - 1, height() - 1);
     // map to image
-    top_left = imgToCanvas(top_left);
-    top_right = imgToCanvas(top_right);
-    bottom_left = imgToCanvas(bottom_left);
-    bottom_right = imgToCanvas(bottom_right);
+    top_left = canvasToImg(top_left);
+    top_right = canvasToImg(top_right);
+    bottom_left = canvasToImg(bottom_left);
+    bottom_right = canvasToImg(bottom_right);
 
     int left, right, top, bottom;
     left = std::min( top_left.x(), std::min( top_right.x(), std::min( bottom_left.x(), bottom_right.x() )));
@@ -507,7 +527,7 @@ void GUI::Canvas::paintGL() {
 
 
     glColor3d( 1.0, 0.0, 0.0 );
-    glScaled(_property.zoom_factor, -_property.zoom_factor, 1.0);
+    glScaled(_property.pixel_size, -_property.pixel_size, 1.0);
     glTranslated(_property.x, -_property.y, 0.0);
     glRotatef(0, 0, 0, 1.0);
 
@@ -519,7 +539,7 @@ void GUI::Canvas::paintGL() {
 
     _slides->draw(_gl, top, left,
                   bottom, right,
-                  _property.zoom_factor);
+                  _property.pixel_size);
 
     _gl->drawMarker(this, _marker);
     if (_selection.active) {

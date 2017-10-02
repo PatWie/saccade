@@ -23,10 +23,10 @@ class Canvas  : public QOpenGLWidget {
   Q_OBJECT
  public:
   struct property_t {
-    double zoom_factor = 1.;
+    double pixel_size = 1.;
     // not supported yet (should be rotation)
     double angle = 0;
-    // shift canvas x to right and y to bottom
+    // shift canvas x to right and y to top
     double x, y;
   };
  private:
@@ -80,8 +80,8 @@ class Canvas  : public QOpenGLWidget {
   void mouseReleaseEvent(QMouseEvent* event);
   void wheelEvent( QWheelEvent * event);
 
-  QPoint imgToCanvas( QPoint p ) const;
   QPoint canvasToImg( QPoint p ) const;
+  QPoint imgToCanvas( QPoint p ) const;
   void focusOnPixel(QPoint imgCoord);
 
   void setProperty( property_t property );

@@ -76,10 +76,10 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
     return;
 
   GUI::Canvas::property_t prop = canvas->getProperty();
-  const double zoom = prop.zoom_factor;
+  const double zoom = prop.pixel_size;
 
   glLoadIdentity();
-  glScaled(prop.zoom_factor, -prop.zoom_factor, 1.0);
+  glScaled(prop.pixel_size, -prop.pixel_size, 1.0);
   glTranslated(prop.x, -prop.y, 0.0);
   glRotatef(prop.angle, 0.0, 0.0, 1.0);
   glTranslated(-0.5 * (double)canvas->slides()->width(),
@@ -131,10 +131,10 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
 void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
 
   GUI::Canvas::property_t prop = canvas->getProperty();
-  const double zoom = prop.zoom_factor;
+  const double zoom = prop.pixel_size;
 
   glLoadIdentity();
-  glScaled(prop.zoom_factor, -prop.zoom_factor, 1.0);
+  glScaled(prop.pixel_size, -prop.pixel_size, 1.0);
   glTranslated(prop.x, -prop.y, 0.0);
   glRotatef(prop.angle, 0.0, 0.0, 1.0);
   glTranslated(-0.5 * (double)canvas->slides()->width(),

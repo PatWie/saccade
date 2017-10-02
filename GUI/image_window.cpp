@@ -306,7 +306,7 @@ void GUI::ImageWindow::slotSynchronizeConnectedViews(Canvas* canvas) {
   if ( _canvas != canvas ) {
     auto p = canvas->getProperty();
     _canvas->setProperty(p);
-    slotShowZoom(p.zoom_factor);
+    slotShowZoom(p.pixel_size);
     slotUpdateScrollBars(_canvas);
   }
 }
@@ -364,19 +364,19 @@ void GUI::ImageWindow::slotUpdateScrollBars(Canvas* canvas) {
 
   GUI::Canvas::property_t prop = canvas->getProperty();
 
-  if ( imgWidth * prop.zoom_factor < winWidth ) {
+  if ( imgWidth * prop.pixel_size < winWidth ) {
     _horScroll->setRange(0, 0);
     _horScroll->setValue(0);
   } else {
-    const int radius = (int) (0.5 * ((double)imgWidth - (double)winWidth / prop.zoom_factor));
+    const int radius = (int) (0.5 * ((double)imgWidth - (double)winWidth / prop.pixel_size));
     _horScroll->setRange(-radius - 1, radius + 1);
     _horScroll->setValue(-(int)prop.x);
   }
-  if ( imgHeight * prop.zoom_factor < winheight ) {
+  if ( imgHeight * prop.pixel_size < winheight ) {
     _vertScroll->setRange(0, 0);
     _vertScroll->setValue(0);
   } else {
-    const int radius = (int) (0.5 * ((double)imgHeight - (double)winheight / prop.zoom_factor));
+    const int radius = (int) (0.5 * ((double)imgHeight - (double)winheight / prop.pixel_size));
     _vertScroll->setRange(-radius - 1, radius + 1);
     _vertScroll->setValue((int)prop.y);
   }
@@ -431,7 +431,7 @@ void GUI::ImageWindow::slotShowZoom(double p) {
 }
 
 void GUI::ImageWindow::slotShowProperty(Canvas::property_t p) {
-  slotShowZoom(p.zoom_factor);
+  slotShowZoom(p.pixel_size);
 }
 
 void GUI::ImageWindow::slotShowMarkers(Marker m) {
