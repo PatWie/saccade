@@ -26,7 +26,7 @@ class Canvas  : public QOpenGLWidget {
     double zoom_factor = 1.;
     // not supported yet (should be rotation)
     double angle = 0;
-    // center of image relative to canvas (0, 0) means centered
+    // shift canvas x to right and y to bottom
     double x, y;
   };
  private:
