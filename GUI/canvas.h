@@ -42,6 +42,11 @@ class Canvas  : public QOpenGLWidget {
     bool active;
   } _dragging;
 
+  struct select_t {
+    QRect rect;
+    bool active;
+  } _selection;
+
   property_t _property;
 
   int _width, _height;
@@ -75,7 +80,9 @@ class Canvas  : public QOpenGLWidget {
   void mouseReleaseEvent(QMouseEvent* event);
   void wheelEvent( QWheelEvent * event);
 
-  QPoint screenToBuf( QPoint p ) const;
+  QPoint imgToCanvas( QPoint p ) const;
+  QPoint canvasToImg( QPoint p ) const;
+  void focusOnPixel(QPoint imgCoord);
 
   void setProperty( property_t property );
   property_t getProperty();
@@ -112,7 +119,8 @@ class Canvas  : public QOpenGLWidget {
   void slotCenterImage();
 
  protected:
-  void zoom(QPoint q, int delta);
+  void zoom_rel(QPoint q, int delta);
+  // void zoom(QPoint q, double fac, double zoom1);
   void checkerboard(unsigned char* data,
                     unsigned int width = 512,
                     unsigned int height = 512,

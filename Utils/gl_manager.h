@@ -108,6 +108,7 @@ class GlManager : public QOpenGLFunctions {
   }
 
   void drawMarker(GUI::Canvas* canvas, GUI::Marker* marker);
+  void drawSelection(GUI::Canvas* canvas, QRect marker);
 
 };
 

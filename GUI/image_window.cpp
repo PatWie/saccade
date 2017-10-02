@@ -132,7 +132,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _centerImageAct->setShortcut(tr("Ctrl+C"));
   _centerImageAct->setStatusTip(tr("Center image within canvas."));
   connect(_centerImageAct, SIGNAL(triggered()),
-          _canvas, SLOT(slotFitToImage()));
+          _canvas, SLOT(slotCenterImage()));
 
 
   _resetHistogramAct = new QAction(tr("&Reset the histogram"), this );
