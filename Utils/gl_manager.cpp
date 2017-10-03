@@ -140,10 +140,6 @@ void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
   glTranslated(-0.5 * (double)canvas->slides()->width(),
                -0.5 * (double)canvas->slides()->height(), 0.0);
 
-
-  // if (!marker->active)
-  //   return;
-
   glColor3d( 1.0, 1.0, 1.0 );
   glLineStipple( 1, 0x5555 );
   glLineWidth( 1.0 );
@@ -151,24 +147,12 @@ void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
   glEnable( GL_LINE_STIPPLE );
 
   glBindTexture( GL_TEXTURE_2D, 0 );
-  glBegin(GL_LINES);
+  glBegin( GL_LINE_LOOP );
   glVertex3f(rect.topLeft().x(),rect.topLeft().y(), 1);
   glVertex3f(rect.bottomLeft().x(),rect.bottomLeft().y(), 1);
-  glVertex3f(rect.bottomLeft().x(),rect.bottomLeft().y(), 1);
   glVertex3f(rect.bottomRight().x(),rect.bottomRight().y(), 1);
-  glVertex3f(rect.bottomRight().x(),rect.bottomRight().y(), 1);
-  glVertex3f(rect.topRight().x(),rect.topRight().y(), 1);
   glVertex3f(rect.topRight().x(),rect.topRight().y(), 1);
   glVertex3f(rect.topLeft().x(),rect.topLeft().y(), 1);
   glEnd();
 
-  // //
-  // glColor3d( 1.0, 0.0, 0.0 );
-  // // glPushAttrib(GL_ENABLE_BIT); 
-  // // top_left = screenToBuf(_selection.rect.topLeft());
-  // // bottom_left = screenToBuf(_selection.rect.bottomLeft());
-  // glLineStipple(4, 0xBBBB);
-  // glEnable(GL_LINE_STIPPLE);
-  // // glPopAttrib();
-  
 }

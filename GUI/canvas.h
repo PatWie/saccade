@@ -22,40 +22,57 @@ class Layer;
 class Canvas  : public QOpenGLWidget {
   Q_OBJECT
  public:
+  /**
+   * @brief internal coordinate system for OpenGL
+   */
   struct property_t {
+    // number of displayed pixel per real pixel
     double pixel_size = 1.;
     // not supported yet (should be rotation)
     double angle = 0;
     // shift canvas x to right and y to top
     double x, y;
   };
+
  private:
   QWidget* _parent;
   ImageWindow* _parentWin;
 
+  // current OpenGL context for the window
   QOpenGLContext _ctx;
 
+  // pointer to checkerboard background
   Utils::GlObject<unsigned char> *_bg;
 
+  // information for dragging image (shift image by left click)
   struct drag_t {
     QPointF start;
     bool active;
   } _dragging;
 
+  // information for zooming at particular area (SHIFT + left click)
   struct select_t {
     QRect rect;
     bool active;
   } _selection;
 
+  // coordinate system for current canvas
   property_t _property;
 
+  // geometry of current canvas
   int _width, _height;
 
+  // each canvas can have multiple layers collected as slides
+  // currently enhanced std::vector<layer*>
   Slides* _slides;
+
+  // wrapper for OpenGL functions
   Utils::GlManager *_gl;
 
+  // position for marker in image
   Marker* _marker;
 
+  // focus point in canvas for broadcasting to other views
   QPoint _focus;
 
  public:
@@ -63,64 +80,149 @@ class Canvas  : public QOpenGLWidget {
   Canvas(QWidget *parent, ImageWindow* parentWin);
   QSize sizeHint() const;
 
+  // methods required by OpenGL
   void initializeGL();
   void resizeGL(int w, int h);
   void paintGL();
 
+  /**
+   * @brief add a new image to current canvas as an additional layer
+   */
   void addLayer(Layer* layer);
 
+  /**
+   * @brief return current layer of specified layer
+   * @param i layer-id
+   */
   const Layer* layer(int i = -1) const;
   Layer* layer(int i = -1);
+
+  // will be removed probably
   const Slides* slides() const;
 
+  /**
+   * @brief broadcast synchronization signal
+   * @details something has changed in this view. The folowing information are broadcasted
+   *   - internal coordinate system (shift, zoom)
+   *   -> other views shift at same position
+   *   -> scrollbars for other views are updated
+   *   -> zoom-information (statusbar) is updated
+   */
   void askSynchronization();
 
+  // handle mouse actions
   void mousePressEvent(QMouseEvent* event);
   void mouseMoveEvent(QMouseEvent* event);
   void mouseReleaseEvent(QMouseEvent* event);
   void wheelEvent( QWheelEvent * event);
 
-  QPoint canvasToImg( QPoint p ) const;
-  QPoint imgToCanvas( QPoint p ) const;
-  void focusOnPixel(QPoint imgCoord);
+  /**
+   * @brief Convert from canvas-system to image-system
+   * @details useful for mapping mouse->pos() to image pixel
+   *
+   * @param p point relative to canvas: top-left of canvas is (0, 0)
+   * @return point in image coordinate (might be outside of image)
+   */
 
+  QPoint canvasToImg( QPoint p ) const;
+  /**
+   * @brief Convert from image-system to canvas-system
+   * @details not used yet
+   *
+   * @param p point relative to image: top-left of image is (0, 0), which might be invisible
+   * @return point in canvas coordinate (might be outside of window)
+   */
+  QPoint imgToCanvas( QPoint p ) const;
+
+  /**
+   * @brief zoom entire image but keeping center
+   * @details this is different to the scroll-wheel action
+   *
+   * @param  amount of zooming
+   */
+  void zoomOnCenter(double);
+
+  /**
+   * @brief set OpenGL coordinate system
+   */
   void setProperty( property_t property );
+
+  /**
+   * @brief get a copy of used OpenGL coordinate system
+   */
   property_t getProperty();
 
+  // handle markers
   void setMarker( Marker marker );
   Marker getMarker();
 
+  /**
+   * @brief set OpenGL coordinate system (without zooming)
+   * @details same as "setProperty" but ignores zoom and test if slide available
+   * @todo remove this duplicate
+   */
   void updatePropertyByScrollbar( property_t property );
 
  signals:
-  void sigPropertyChanged(Canvas*);
-  void sigUpdateTitle(Canvas*);
-  void sigUpdateLayer(Canvas*);
-  void sigUpdateScrollBars(Canvas*);
 
-  void sigCoordToImageWindow(QPoint);
+  void sigPropertyChanged(Canvas*);
+  // ask for title-refresh (remove layer, add layer, next layer, previous layer)
+  void sigUpdateTitle(Canvas*);
+  // visible layer has change -> might update histogram
+  void sigUpdateLayer(Canvas*);
+  // OpenGL coordinate system has changed --> adapt scrollbars
+  void sigUpdateScrollBars(Canvas*);
+  // marker has changed -> synchronize them accross views
   void sigMarkerToImageWindow(Marker);
+
+  // THIS should be replace by sigPropertyChanged
+  void sigCoordToImageWindow(QPoint);
+  // THIS should be replace by sigPropertyChanged
   void sigPropertyToImagewindow(Canvas::property_t);
 
- public slots:
-  void slotPrevLayer();
-  void slotNextLayer();
-  void slotRemoveCurrentLayer();
 
+ public slots:
+  // display previous image
+  void slotPrevLayer();
+  // display next image
+  void slotNextLayer();
+  // remove current image
+  void slotRemoveCurrentLayer();
+  // @todo: refactor them?
   void slotUpdateLayer();
   void slotUpdateCanvas();
 
+  // zoom in but keep center
   void slotZoomInAction();
+  // zoom out but keep center
   void slotZoomOutAction();
 
-  void slotSetZoomAction(double);
   void slotFitZoomToWindow();
   void slotFitToImage();
   void slotCenterImage();
 
+  // should be replace by sigPropertyChanged
+  void slotSetZoomAction(double);
+
  protected:
+  /**
+   * @brief zoom relative to point
+   * @details it tries to zoom around the point
+   * 
+   * @param QPoint q point on focus
+   * @param int delta zoom-direction
+   */
   void zoom_rel(QPoint q, int delta);
-  // void zoom(QPoint q, double fac, double zoom1);
+  
+  /**
+   * @brief generate checkerboard pattern
+   * @details background texture for canvas
+   * 
+   * @param char buffer
+   * @param int width
+   * @param int height
+   * @param int channels
+   */
   void checkerboard(unsigned char* data,
                     unsigned int width = 512,
                     unsigned int height = 512,
@@ -128,7 +230,7 @@ class Canvas  : public QOpenGLWidget {
  private slots:
 
  public:
-  static bool m_glBlock;
+  static bool _gl_block;
 };
 }; // namespace GUI
 

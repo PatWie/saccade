@@ -119,6 +119,9 @@ class ImageWindow  : public QMainWindow {
   QAction *_zoomOutAct;
   QAction *_zoomFitAct;
 
+  QAction *_zoomInTestAct;
+  QAction *_zoomOutTestAct;
+
   QMenu* _imageMenu;
   QAction *_resetHistogramAct;
 

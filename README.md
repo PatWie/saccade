@@ -40,7 +40,7 @@ Assuming you are on Ubuntu 16.04 getting all dependencies is done by
     # install dependencies
     sudo apt-get install libfreeimage3 libfreeimage-dev libgflags-dev libgoogle-glog-dev
 
-The Ubuntu-packages contain old versions of Qt5. To get recent Qt5 version use the following commands (you might need to register for Qt).
+The Ubuntu-packages contain old versions of Qt5. To get a recent Qt5 version use the following commands (you might need to register for Qt).
 
     cd /tmp
     wget http://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
@@ -67,27 +67,28 @@ and you find the app in the Ubuntu searchbar. When debugging the application it 
 
 General shortcuts
 
-| Action                       | Shortcut            |
-| ------                       | ------              |
-| quit entire app              | Ctrl + Q            |
-| about and version info       | F1                  |
-| distribute window geometry   | F2                  |
-| automatically arange windows | F3                  |
+| Action                       | Shortcut             |
+| ------                       | ------               |
+| quit entire app              | Ctrl + Q             |
+| about and version info       | F1                   |
+| distribute window geometry   | F2                   |
+| automatically arange windows | F3                   |
 
 shortcuts for a single canvas
 
-| Action                       | Shortcut            |
-| ------                       | ------              |
-| new canvas                   | Ctrl + N            |
-| quit                         | Ctrl + W            |
-| next image                   | key_down, key_right |
-| delete image                 | Del                 |
-| previous image               | key_up, key_left    |
-| add new image                | Ctrl + O            |
-| zoom in                      | Ctrl + plus         |
-| zoom out                     | Ctrl + minus        |
-| no zoom                      | Ctrl + 0            |
-| fit to window                | Ctrl + 9            |
-| reset histogram              | Ctrl + H            |
-| center image                 | Ctrl + C            |
-| fit window to image          | Ctrl + F            |
+| Action                       | Shortcut             |
+| ------                       | ------               |
+| new canvas                   | Ctrl + N             |
+| quit                         | Ctrl + W             |
+| next image                   | key_down, key_right  |
+| delete image                 | Del                  |
+| previous image               | key_up, key_left     |
+| add new image                | Ctrl + O             |
+| zoom in                      | Ctrl + plus          |
+| zoom out                     | Ctrl + minus         |
+| no zoom                      | Ctrl + 0             |
+| fit to window                | Ctrl + 9             |
+| reset histogram              | Ctrl + H             |
+| center image                 | Ctrl + C             |
+| fit window to image          | Ctrl + F             |
+| selection tool               | Shift + "left click" |

@@ -177,20 +177,29 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _imageMenu->addAction(_resetHistogramAct);
 
   _zoomInAct = new QAction(tr("Zoom in"), this);
-  _closeAppAct->setStatusTip(tr("Zoom one step into image"));
+  _zoomInAct->setStatusTip(tr("Zoom one step into image"));
   _zoomInAct->setShortcut(Qt::Key_Plus | Qt::CTRL);
 
   _zoomStdAct = new QAction(tr("Zoom default"), this);
-  _closeAppAct->setStatusTip(tr("Reset zoom to original resolution"));
+  _zoomStdAct->setStatusTip(tr("Reset zoom to original resolution"));
   _zoomStdAct->setShortcut(Qt::Key_0 | Qt::CTRL);
 
   _zoomOutAct = new QAction(tr("Zoom out"), this);
-  _closeAppAct->setStatusTip(tr("Zoom one step out of image"));
+  _zoomOutAct->setStatusTip(tr("Zoom one step out of image"));
   _zoomOutAct->setShortcut(Qt::Key_Minus | Qt::CTRL);
 
   _zoomFitAct = new QAction(tr("Zoom fit window"), this);
-  _closeAppAct->setStatusTip(tr("Resize image to match window"));
+  _zoomFitAct->setStatusTip(tr("Resize image to match window"));
   _zoomFitAct->setShortcut(Qt::Key_9 | Qt::CTRL);
+
+  // _zoomInTestAct = new QAction(tr("Zoom-in on position"), this);
+  // _zoomInTestAct->setStatusTip(tr("zoom in keeping position"));
+  // _zoomInTestAct->setShortcut(Qt::Key_5 | Qt::CTRL);
+
+  // _zoomOutTestAct = new QAction(tr("Zoom-out on position"), this);
+  // _zoomOutTestAct->setStatusTip(tr("zoom out keeping position"));
+  // _zoomOutTestAct->setShortcut(Qt::Key_6 | Qt::CTRL);
+
 
   connect(_zoomInAct, SIGNAL(triggered()),
           _canvas, SLOT(slotZoomInAction()));
@@ -200,6 +209,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
           _canvas, SLOT(slotZoomOutAction()));
   connect(_zoomFitAct, SIGNAL(triggered()),
           _canvas, SLOT(slotFitZoomToWindow()));
+
 
   connect(this, SIGNAL(sigSetZoomAction(double)),
           _canvas, SLOT(slotSetZoomAction(double)));
@@ -213,7 +223,6 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _imageMenu->addAction(_zoomStdAct);
   _imageMenu->addAction(_zoomOutAct);
   _imageMenu->addAction(_zoomFitAct);
-
   setAcceptDrops(true);
 
 

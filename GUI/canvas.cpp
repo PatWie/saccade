@@ -12,7 +12,7 @@
 #include "marker.h"
 #include "../Utils/gl_manager.h"
 
-bool GUI::Canvas::m_glBlock = false;
+bool GUI::Canvas::_gl_block = false;
 
 // http://blog.qt.io/blog/2014/09/10/qt-weekly-19-qopenglwidget/
 GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
@@ -114,14 +114,13 @@ void GUI::Canvas::slotSetZoomAction(double zoom) {
   askSynchronization();
   emit sigPropertyToImagewindow(_property);
 }
+
 void GUI::Canvas::slotZoomInAction() {
-  // zoom having delta>0
-  zoom_rel(_focus, 1);
+  zoomOnCenter(sqrt(2.0));
 }
 
 void GUI::Canvas::slotZoomOutAction() {
-  // zoom having delta<0
-  zoom_rel(_focus, -1);
+  zoomOnCenter(1.0 / sqrt(2.0));
 }
 
 QSize GUI::Canvas::sizeHint() const {
@@ -216,23 +215,18 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
  * @param imgCoord coordinate in image (w, h)
  * @return [description]
  */
-void GUI::Canvas::focusOnPixel(QPoint imgCoord) {
+void GUI::Canvas::zoomOnCenter(double amount) {
 
-  // offset in image to the right
-  const double left_space = imgCoord.x();
-  const double top_space = imgCoord.y();
+  const QPoint want = canvasToImg(QPoint(width() / 2., height() / 2.));
+  _property.pixel_size *= amount;
 
-  //
-  const double scaled_img_width = _slides->width()  * _property.pixel_size;
-  const double scaled_img_height = _slides->height()  * _property.pixel_size;
+  const QPoint actual = canvasToImg(QPoint(width() / 2., height() / 2.));
+  _property.x += actual.x() - want.x();
+  _property.y -= actual.y() - want.y();
 
-
-  const double percent_width = imgCoord.x() / scaled_img_width;
-  const double percent_height = imgCoord.y() / scaled_img_height;
-
-
-  _property.x = percent_width * scaled_img_width + scaled_img_width / 2;
-  _property.y = scaled_img_height * -scaled_img_height + scaled_img_height / 2;
+  slotUpdateCanvas();
+  emit sigPropertyChanged(this);
+  emit sigPropertyToImagewindow(_property);
 
 }
 
@@ -244,20 +238,15 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
     _selection.active = false;
     _selection.rect.setBottomRight(p);
 
-    LOG(INFO) << "selection "
-              << _selection.rect.center().y() << " "
-              << _selection.rect.center().x() << " ";
+    const QPoint want = _selection.rect.center();
+    const double zoom_width = ((double)_width / (double)_selection.rect.width());
+    const double zoom_height = ((double)_height / (double)_selection.rect.height());
+    _property.pixel_size = std::min(zoom_width, zoom_height);
+    // _property.pixel_size *= sqrt(2);
 
-    const double nth_pixel_hor = _selection.rect.center().x();
-    const double nth_pixel_ver = _selection.rect.center().y();
-
-    const double visible_pixel_hor = width() / _property.pixel_size;
-    const double visible_pixel_ver = height() / _property.pixel_size;
-
-    const double hor_percent_offset = nth_pixel_hor / (double)_slides->width();
-    const double ver_percent_offset = nth_pixel_ver / (double)_slides->height();
-
-    // TODO !!!
+    const QPoint actual = canvasToImg(QPoint(width() / 2., height() / 2.));
+    _property.x += actual.x() - want.x();
+    _property.y -= actual.y() - want.y();
 
     slotUpdateCanvas();
     emit sigPropertyChanged(this);
@@ -322,13 +311,13 @@ void GUI::Canvas::slotFitToImage() {
 void GUI::Canvas::zoom_rel(QPoint q, int delta) {
 
   const double zoom_delta = sqrt(2.0);
-  const double old_zoom =  _property.pixel_size;
+  const double old_Pixel_size =  _property.pixel_size;
 
-  double new_zoom = 0;
+  double new_pixelsize = 0;
   if ( delta > 0 )
-    new_zoom = _property.pixel_size * zoom_delta;
+    new_pixelsize = _property.pixel_size * zoom_delta;
   else
-    new_zoom = _property.pixel_size / zoom_delta;
+    new_pixelsize = _property.pixel_size / zoom_delta;
 
   const unsigned int winWidth = width();
   const unsigned int winHeight = height();
@@ -336,8 +325,8 @@ void GUI::Canvas::zoom_rel(QPoint q, int delta) {
   double mpercY = ((q.y()) / ((double)winHeight)) - 0.5;
 
   // change zoom value
-  if (new_zoom <= 0.)
-    new_zoom = 1.;
+  if (new_pixelsize <= 0.)
+    new_pixelsize = 1.;
 
   QPoint q_img = canvasToImg(q);
   if ( (q_img.x() < 0) ||
@@ -346,11 +335,11 @@ void GUI::Canvas::zoom_rel(QPoint q, int delta) {
        (q_img.y() >= (int)_slides->height())) {
     _property.x = 0;
     _property.y = 0;
-    _property.pixel_size = new_zoom;
+    _property.pixel_size = new_pixelsize;
   } else {
-    _property.x += ((double)winWidth * ((1.0 / new_zoom) - (1.0 / old_zoom)) * mpercX);
-    _property.y -= ((double)winHeight * ((1.0 / new_zoom) - (1.0 / old_zoom)) * mpercY);
-    _property.pixel_size = new_zoom;
+    _property.x += ((double)winWidth * ((1.0 / new_pixelsize) - (1.0 / old_Pixel_size)) * mpercX);
+    _property.y -= ((double)winHeight * ((1.0 / new_pixelsize) - (1.0 / old_Pixel_size)) * mpercY);
+    _property.pixel_size = new_pixelsize;
   }
 
   slotUpdateCanvas();
@@ -467,7 +456,6 @@ void GUI::Canvas::setMarker( GUI::Marker marker ) {
 }
 
 void GUI::Canvas::updatePropertyByScrollbar( property_t property ) {
-
   _property.x = property.x;
   _property.y = property.y;
   emit sigPropertyChanged(this);
@@ -499,7 +487,7 @@ void GUI::Canvas::initializeGL() {
 
 
 void GUI::Canvas::paintGL() {
-  while ( !__sync_bool_compare_and_swap (&m_glBlock, false, true));
+  while ( !__sync_bool_compare_and_swap (&_gl_block, false, true));
 
   _gl->identity();
   _gl->clear();
@@ -548,7 +536,7 @@ void GUI::Canvas::paintGL() {
   }
 
 
-  m_glBlock = false;
+  _gl_block = false;
 }
 
 
@@ -557,6 +545,7 @@ void GUI::Canvas::slotPrevLayer() {
   slotUpdateLayer();
   slotUpdateCanvas();
 }
+
 void GUI::Canvas::slotRemoveCurrentLayer() {
   if (_slides->available()) {
     _slides->remove();
@@ -564,13 +553,9 @@ void GUI::Canvas::slotRemoveCurrentLayer() {
   }
   LOG(INFO) << "remove layer";
 }
+
 void GUI::Canvas::slotNextLayer() {
   _slides->forward();
   slotUpdateLayer();
   slotUpdateCanvas();
 }
-
-
-/*
-QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
-*/
