@@ -1,0 +1,37 @@
+
+language: cpp
+sudo: false
+
+os:
+    - linux
+
+compiler:
+    - gcc
+
+addons:
+    apt:
+        sources:
+            - ubuntu-sdk-team
+            - ubuntu-toolchain-r-test
+        packages:
+            - cmake
+            - g++-4.9
+            - libqt5opengl5
+            - libqt5gui5
+            - libqt5core5a
+            - libqt5widgets5
+            - qtbase5-dev
+            - qtbase5-private-dev
+            - libqt5opengl5-dev
+            - qt5-qmake
+            - qt5-default
+            - libfreeimage3
+            - libfreeimage-dev
+            - libgflags-dev
+            - libgoogle-glog-dev
+
+script:
+    - mkdir build
+    - pwd
+    - cmake --version
+    - cd build && CC=gcc-4.9 CXX=g++-4.9 cmake ..  && make
