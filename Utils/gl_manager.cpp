@@ -75,7 +75,7 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
   if (!marker->active)
     return;
 
-  GUI::Canvas::property_t prop = canvas->getProperty();
+  GUI::Canvas::property_t prop = canvas->property();
   const double zoom = prop.pixel_size;
 
   glLoadIdentity();
@@ -130,7 +130,7 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
 
 void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
 
-  GUI::Canvas::property_t prop = canvas->getProperty();
+  GUI::Canvas::property_t prop = canvas->property();
   const double zoom = prop.pixel_size;
 
   glLoadIdentity();
@@ -148,11 +148,11 @@ void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
 
   glBindTexture( GL_TEXTURE_2D, 0 );
   glBegin( GL_LINE_LOOP );
-  glVertex3f(rect.topLeft().x(),rect.topLeft().y(), 1);
-  glVertex3f(rect.bottomLeft().x(),rect.bottomLeft().y(), 1);
-  glVertex3f(rect.bottomRight().x(),rect.bottomRight().y(), 1);
-  glVertex3f(rect.topRight().x(),rect.topRight().y(), 1);
-  glVertex3f(rect.topLeft().x(),rect.topLeft().y(), 1);
+  glVertex3f(rect.topLeft().x(), rect.topLeft().y(), 1);
+  glVertex3f(rect.bottomLeft().x(), rect.bottomLeft().y(), 1);
+  glVertex3f(rect.bottomRight().x(), rect.bottomRight().y(), 1);
+  glVertex3f(rect.topRight().x(), rect.topRight().y(), 1);
+  glVertex3f(rect.topLeft().x(), rect.topLeft().y(), 1);
   glEnd();
 
 }

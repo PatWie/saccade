@@ -26,17 +26,18 @@ GUI::Window::Window(QApplication* app) : _app(app) {
   _newWindowAct = new QAction(tr("&New"), this);
   _newWindowAct->setShortcut(tr("Ctrl+N"));
   _newWindowAct->setStatusTip(tr("Create a new Window"));
-  connect(_newWindowAct, SIGNAL(triggered()), this, SLOT(slotNewWindowAction()));
 
   _dialogWindowAct = new QAction(tr("&About"), this);
   _dialogWindowAct->setShortcut(tr("F1"));
   _dialogWindowAct->setStatusTip(tr("Create a new Window"));
-  connect(_dialogWindowAct, SIGNAL(triggered()), this, SLOT(slotDialogWindowAction()));
 
   _closeAppAct = new QAction(tr("E&xit"), this);
   _closeAppAct->setShortcut(tr("Ctrl+Q"));
   _closeAppAct->setStatusTip(tr("Close the app"));
-  connect(_closeAppAct, SIGNAL(triggered()), this, SLOT(close()));
+
+  connect(_newWindowAct, &QAction::triggered, this, &GUI::Window::slotNewWindowAction);
+  connect(_dialogWindowAct, &QAction::triggered, this, &GUI::Window::slotDialogWindowAction);
+  connect(_closeAppAct, &QAction::triggered, this, &GUI::Window::close);
 
   _windowMenu = menuBar()->addMenu(tr("&Window"));
   _windowMenu->addAction(_newWindowAct);
@@ -65,39 +66,20 @@ void GUI::Window::slotNewWindowAction() {
   tmpWindow->setMinimumSize(200, 200);
   tmpWindow->show();
 
-  connect( tmpWindow, SIGNAL(sigToggleChained(ImageWindow*, bool)),
-           this, SLOT(slotActualizeSubwindowView(ImageWindow*, bool )));
+  // incoming messages
 
-  connect( tmpWindow, SIGNAL(sigCoordToMainwindow(QPoint)),
-           this, SLOT( slotUpdateCoords(QPoint)));
+  connect(tmpWindow, &GUI::ImageWindow::sigFocusChange,
+          this, &GUI::Window::slotFocusChanged);
 
-  connect( tmpWindow, SIGNAL(sigMarkerToMainwindow(Marker)),
-           this, SLOT( slotUpdateMarkers(Marker)));
+  connect(tmpWindow, &GUI::ImageWindow::sigCommunicateWindowGeometry,
+          this, &GUI::Window::slotCommunicateWindowGeometry);
 
-  connect( tmpWindow, SIGNAL(sigPropertyToMainwindow(Canvas::property_t)),
-           this, SLOT( slotUpdateProperties(Canvas::property_t)));
+  // outgoing messages
+  connect(this, &GUI::Window::sigReceiveWindowGeometry,
+          tmpWindow, &GUI::ImageWindow::slotReceiveWindowGeometry);
 
-  connect( tmpWindow, SIGNAL(sigFocusChange(ImageWindow*)),
-           this, SLOT(slotFocusChanged(ImageWindow*)));
-
-  connect( tmpWindow, SIGNAL(sigPropagateWindowGeometry(ImageWindow*)),
-           this, SLOT(slotPropagateWindowGeometry(ImageWindow*)));
-
-  connect( this, SIGNAL(sigDistributeCoord(QPoint)),
-           tmpWindow, SLOT(slotShowCoords(QPoint)));
-
-  connect( this, SIGNAL(sigDistributeMarker(Marker)),
-           tmpWindow, SLOT(slotShowMarkers(Marker)));
-
-  connect( this, SIGNAL(sigDistributeProperty(Canvas::property_t)),
-           tmpWindow, SLOT(slotShowProperty(Canvas::property_t)));
-
-  connect( this, SIGNAL(sigDistributeWindowGeometry(ImageWindow*)),
-           tmpWindow, SLOT(slotDistributeWindowGeometry(ImageWindow*)));
-
-
-  tmpWindow->synchronize(true);
   _windows.push_back(tmpWindow);
+
 }
 void GUI::Window::slotDialogWindowAction() {
   LOG(INFO) << "GUI::Window::slotDialogWindowAction()";
@@ -115,37 +97,15 @@ void GUI::Window::slotDialogWindowAction() {
   dialog->show();
 }
 
-
-void GUI::Window::slotActualizeSubwindowView( ImageWindow* window, bool set) {
-  Q_UNUSED(set);
-
-  connect( window, SIGNAL(sigUpdateConnectedViews(Canvas*)),
-           this, SLOT(slotUpdateConnectedViews(Canvas*)) );
-  connect( this, SIGNAL(sigUpdateConnectedViews(Canvas*)),
-           window, SLOT(slotSynchronizeConnectedViews(Canvas*)) );
+void GUI::Window::slotCommunicateCanvasChange(Canvas* sender) {
+  emit sigReceiveCanvasChange(sender);
 }
 
-void GUI::Window::slotUpdateConnectedViews( Canvas* buf ) {
-  emit sigUpdateConnectedViews(buf);
+void GUI::Window::slotCommunicateWindowGeometry(ImageWindow* sender) {
+  emit sigReceiveWindowGeometry(sender);
 }
 
-void GUI::Window::slotUpdateCoords(QPoint p) {
-  emit sigDistributeCoord(p);
-}
-
-void GUI::Window::slotUpdateMarkers(Marker m) {
-  emit sigDistributeMarker(m);
-}
-
-void GUI::Window::slotUpdateProperties(Canvas::property_t m) {
-  emit sigDistributeProperty(m);
-}
-
-void GUI::Window::slotPropagateWindowGeometry(ImageWindow* window) {
-  emit sigDistributeWindowGeometry(window);
-}
-
-void GUI::Window::slotArangeWindows() {
+void GUI::Window::slotReceiveArangeWindows() {
   std::vector<GUI::ImageWindow*> sorted_windows = _windows;
   std::sort(sorted_windows.begin(), sorted_windows.end(),
   [](const GUI::ImageWindow * lhs, const GUI::ImageWindow * rhs) {
@@ -168,7 +128,7 @@ void GUI::Window::slotArangeWindows() {
   int cur_line_height = sorted_windows[0]->height();
 
   for (auto && wnd : sorted_windows) {
-    if(cur_x + padding > width){
+    if (cur_x + padding > width) {
       cur_x = start_x;
       cur_y += cur_line_height;
       cur_line_height = 0;

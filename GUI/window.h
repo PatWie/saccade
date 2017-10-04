@@ -17,8 +17,6 @@ class AboutWindow;
 class ImageWindow;
 class Slides;
 
-
-
 class Window  : public QMainWindow {
   Q_OBJECT
 
@@ -29,29 +27,17 @@ class Window  : public QMainWindow {
   QString _openPath;
 
  signals:
-  void sigUpdateConnectedViews( Canvas*);
-  void sigDistributeCoord(QPoint);
-  void sigDistributeMarker(Marker);
-  void sigDistributeProperty(Canvas::property_t);
-  void sigDistributeWindowGeometry(ImageWindow*);
-
- private slots:
-  void slotNewWindowAction();
-  void slotDialogWindowAction();
+  void sigReceiveWindowGeometry(ImageWindow*);
+  void sigCommunicateWindowGeometry(ImageWindow*);
+  void sigReceiveCanvasChange(Canvas*);
 
  public slots:
-  void slotActualizeSubwindowView( ImageWindow*, bool);
-  void slotUpdateConnectedViews( Canvas* buf );
-  void slotUpdateCoords(QPoint);
-  void slotUpdateMarkers(Marker);
-  void slotUpdateProperties(Canvas::property_t);
+  void slotDialogWindowAction();
+  void slotNewWindowAction();
+  void slotCommunicateCanvasChange(Canvas*);
+  void slotCommunicateWindowGeometry(ImageWindow*);
   void slotFocusChanged(ImageWindow*);
-  void slotPropagateWindowGeometry(ImageWindow*);
-  /**
-   * @brief Try to range the windows in an intelligent way.
-   * @details no propagation of geometry
-   */
-  void slotArangeWindows();
+  void slotReceiveArangeWindows();
 
  private:
   Slides* _slides;
@@ -63,7 +49,7 @@ class Window  : public QMainWindow {
   QAction* _newWindowAct;
   QAction* _dialogWindowAct;
 
-  
+
 
   std::vector<GUI::ImageWindow*> _windows;
 

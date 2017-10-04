@@ -26,7 +26,7 @@ class ImageWindow  : public QMainWindow {
   ImageWindow(QWidget* parent, Window* parentWindow);
   QSize sizeHint() const;
 
-  void synchronize(bool active);
+
   void loadImage(std::string fn);
 
   void keyPressEvent(QKeyEvent * event );
@@ -40,59 +40,40 @@ class ImageWindow  : public QMainWindow {
  private slots:
 
  signals:
-  void sigUpdateConnectedViews(Canvas*);
-  void sigToggleChained(ImageWindow*, bool);
-
   void sigPrevLayer();
   void sigNextLayer();
   void sigRemoveCurrentLayer();
 
-  void sigCoordToMainwindow(QPoint);
-  void sigMarkerToMainwindow(Marker);
-  void sigPropertyToMainwindow(Canvas::property_t);
-  void sigSetZoomAction(double);
-
+  void sigCommunicateWindowGeometry(ImageWindow*);
   void sigFocusChange(ImageWindow*);
-  void sigPropagateWindowGeometry(ImageWindow*);
 
  public slots:
-  void slotUpdateConnectedViews(Canvas*);
-  void slotSynchronizeConnectedViews( Canvas*);
-  void slotUpdateTitle(Canvas*);
-  void slotUpdateLayer(Canvas*);
 
-  void slotPrevLayer();
-  void slotNextLayer();
+  // get change from other view
+  void slotReceiveCanvasChange(Canvas*);
+  void slotReceiveLayerChange();
 
-  void slotZoomStdAction();
-  void slotOpenImageAction();
-  void slotRemoveImageAction();
+  void slotOpenImage();
+  void slotCommunicateWindowGeometry();
 
   void slotRefreshBuffer();
+  void slotRepaint();
+  void slotRepaintStatusbar();
+  void slotRepaintTitle();
+  void slotRepaintSliders();
+  void slotRepaintHistogram();
+  void slotVertSliderMoved(int);
+  void slotHorSliderMoved(int);
 
-  void slotUpdateScrollBars(Canvas*);
-  void slotVertScrollChanged(int);
-  void slotHorScrollChanged(int);
-
-  void slotCoordToMainWindow(QPoint);
-  void slotMarkerToMainWindow(Marker);
-  void slotPropertyToMainwindow(Canvas::property_t);
-
-  void slotShowCoords(QPoint);
-  void slotShowZoom(double p);
-  void slotShowMarkers(Marker);
-  void slotShowProperty(Canvas::property_t);
-
-  void slotPropagateWindowGeometryAction();
-  void slotDistributeWindowGeometry(ImageWindow*);
+  void slotReceiveWindowGeometry(ImageWindow*);
 
 
  private:
   QGridLayout* _centerLayout;
   Canvas* _canvas;
 
-  QScrollBar* _vertScroll;
-  QScrollBar* _horScroll;
+  QScrollBar* _vertSlider;
+  QScrollBar* _horSlider;
   QLabel* _statusLabelMouse;
   QLabel* _statusLabelPatch;
   QLabel* _statusLabelMarker;

@@ -11,8 +11,8 @@
 Utils::MipmapLevel::MipmapLevel() {}
 Utils::MipmapLevel::~MipmapLevel() {}
 void Utils::MipmapLevel::clear() {
-  for(auto &&tile_line : _tiles){
-    for(auto &&tile : tile_line){
+  for (auto && tile_line : _tiles) {
+    for (auto && tile : tile_line) {
       tile->clear();
       delete tile;
     }
@@ -43,29 +43,29 @@ void Utils::MipmapLevel::setData(float* ptr,
 
   // n = h * width + w
   #pragma omp parallel for
-  for(uint n = 0; n < _gridHeight * _gridWidth; n++ ){
-      uint h = n / _gridWidth;
-      uint w = n % _gridWidth;
-  // for (uint h = 0; h < _gridHeight; ++h) {
-  //   for (uint w = 0; w < _gridWidth; ++w) {
+  for (uint n = 0; n < _gridHeight * _gridWidth; n++ ) {
+    uint h = n / _gridWidth;
+    uint w = n % _gridWidth;
+    // for (uint h = 0; h < _gridHeight; ++h) {
+    //   for (uint w = 0; w < _gridWidth; ++w) {
 
-      const uint minH = h * tileSize;
-      const uint minW = w * tileSize;
+    const uint minH = h * tileSize;
+    const uint minW = w * tileSize;
 
-      const uint maxH = std::min(((h + 1) * tileSize), height);
-      const uint maxW = std::min(((w + 1) * tileSize), width);
+    const uint maxH = std::min(((h + 1) * tileSize), height);
+    const uint maxW = std::min(((w + 1) * tileSize), width);
 
-      const uint diffH = maxH - minH;
-      const uint diffW = maxW - minW;
+    const uint diffH = maxH - minH;
+    const uint diffW = maxW - minW;
 
-      float* d = getTileData(ptr, height, width,
-                             minH, minW, maxH, maxW,
-                             channels);
+    float* d = getTileData(ptr, height, width,
+                           minH, minW, maxH, maxW,
+                           channels);
 
-      MipmapTile *tile = new MipmapTile(d, diffH, diffW, channels);
-      _tiles[h][w] = tile;
+    MipmapTile *tile = new MipmapTile(d, diffH, diffW, channels);
+    _tiles[h][w] = tile;
 
-    }
+  }
   // }
 }
 

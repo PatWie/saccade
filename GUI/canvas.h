@@ -142,67 +142,48 @@ class Canvas  : public QOpenGLWidget {
    */
   void zoomOnCenter(double);
 
-  /**
-   * @brief set OpenGL coordinate system
-   */
-  void setProperty( property_t property );
 
   /**
    * @brief get a copy of used OpenGL coordinate system
    */
-  property_t getProperty();
+  property_t property() const;
+  void setProperty(property_t);
 
   // handle markers
-  void setMarker( Marker marker );
-  Marker getMarker();
-
-  /**
-   * @brief set OpenGL coordinate system (without zooming)
-   * @details same as "setProperty" but ignores zoom and test if slide available
-   * @todo remove this duplicate
-   */
-  void updatePropertyByScrollbar( property_t property );
+  void setMarker(Marker marker);
+  Marker marker() const;
+  QPoint focusPixel() const;
+  void setFocusPixel(QPoint);
 
  signals:
-
-  void sigPropertyChanged(Canvas*);
-  // ask for title-refresh (remove layer, add layer, next layer, previous layer)
-  void sigUpdateTitle(Canvas*);
-  // visible layer has change -> might update histogram
-  void sigUpdateLayer(Canvas*);
-  // OpenGL coordinate system has changed --> adapt scrollbars
-  void sigUpdateScrollBars(Canvas*);
-  // marker has changed -> synchronize them accross views
-  void sigMarkerToImageWindow(Marker);
-
-  // THIS should be replace by sigPropertyChanged
-  void sigCoordToImageWindow(QPoint);
-  // THIS should be replace by sigPropertyChanged
-  void sigPropertyToImagewindow(Canvas::property_t);
+  void sigCommunicateCanvasChange(Canvas*);
+  void sigCommunicateLayerChange(Canvas*);
 
 
  public slots:
-  // display previous image
-  void slotPrevLayer();
-  // display next image
-  void slotNextLayer();
-  // remove current image
-  void slotRemoveCurrentLayer();
-  // @todo: refactor them?
-  void slotUpdateLayer();
-  void slotUpdateCanvas();
+  // request changes in other views
+  void slotCommunicateCanvasChange();
+  void slotCommunicateLayerChange();
 
-  // zoom in but keep center
-  void slotZoomInAction();
-  // zoom out but keep center
-  void slotZoomOutAction();
+  // get change from other view
+  // void slotReceiveCanvasChange(Canvas*);
+  void slotReceiveProperty(property_t property);
+
+  void slotRepaint();
+  void slotPrevLayer();
+  void slotNextLayer();
+  void slotRemoveCurrentLayer();
+
+  // zoom but keep center
+  void slotZoomIn();
+  void slotZoomOut();
+  void slotNoZoom();
 
   void slotFitZoomToWindow();
-  void slotFitToImage();
   void slotCenterImage();
+  void slotFitToImage();
+  // void slotSetZoom();
 
-  // should be replace by sigPropertyChanged
-  void slotSetZoomAction(double);
 
  protected:
   /**

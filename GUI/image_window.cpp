@@ -22,43 +22,31 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _centerLayout = new QGridLayout(centralWidget);
 
   _canvas = new GUI::Canvas(centralWidget, this);
-  _vertScroll = new QScrollBar(Qt::Vertical, centralWidget);
-  _horScroll = new QScrollBar(Qt::Horizontal, centralWidget);
+  _vertSlider = new QScrollBar(Qt::Vertical, centralWidget);
+  _horSlider = new QScrollBar(Qt::Horizontal, centralWidget);
 
   _centerLayout->addWidget(_canvas, 0, 0);
-  _centerLayout->addWidget(_vertScroll, 0, 1);
-  _centerLayout->addWidget(_horScroll, 1, 0);
+  _centerLayout->addWidget(_vertSlider, 0, 1);
+  _centerLayout->addWidget(_horSlider, 1, 0);
 
   centralWidget->setLayout(_centerLayout);
   setCentralWidget(centralWidget);
 
-  connect(_canvas, SIGNAL(sigPropertyChanged(Canvas*)),
-          this, SLOT(slotUpdateConnectedViews(Canvas*)));
+  connect(_canvas, &Canvas::sigCommunicateCanvasChange,
+          parentWindow, &GUI::Window::slotCommunicateCanvasChange);
 
-  connect(_canvas, SIGNAL(sigUpdateTitle(Canvas*)),
-          this, SLOT(slotUpdateTitle(Canvas*)));
+  connect(parentWindow, &GUI::Window::sigReceiveCanvasChange,
+          this, &GUI::ImageWindow::slotReceiveCanvasChange);
 
-  connect(_canvas, SIGNAL(sigUpdateScrollBars(Canvas*)),
-          this, SLOT(slotUpdateScrollBars(Canvas*)));
+  connect(_canvas, &Canvas::sigCommunicateLayerChange,
+          this, &GUI::ImageWindow::slotReceiveLayerChange);
 
-  connect(_canvas, SIGNAL(sigUpdateLayer(Canvas*)),
-          this, SLOT(slotUpdateLayer(Canvas*)));
+  connect( _vertSlider, &QScrollBar::sliderMoved,
+           this, &GUI::ImageWindow::slotVertSliderMoved);
+  connect( _horSlider, &QScrollBar::sliderMoved,
+           this, &GUI::ImageWindow::slotHorSliderMoved);
 
-  connect( _vertScroll, SIGNAL(sliderMoved( int )),
-           this, SLOT(slotVertScrollChanged( int )));
-  connect( _horScroll, SIGNAL(sliderMoved( int )),
-           this, SLOT(slotHorScrollChanged( int )));
-
-  connect( _canvas, SIGNAL(sigCoordToImageWindow(QPoint)),
-           this, SLOT(slotCoordToMainWindow(QPoint)));
-
-  connect( _canvas, SIGNAL(sigMarkerToImageWindow(Marker)),
-           this, SLOT(slotMarkerToMainWindow(Marker)));
-
-  connect( _canvas, SIGNAL(sigPropertyToImagewindow(Canvas::property_t)),
-           this, SLOT(slotPropertyToMainwindow(Canvas::property_t)));
-
-  _canvas->slotUpdateCanvas();
+  _canvas->slotRepaint();
 
   // toolbar
   _toolbar_histogram = new Histogram(this);
@@ -83,81 +71,71 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   // slides
   // ==========================================================
 
-  connect(this, SIGNAL(sigPrevLayer()),
-          _canvas, SLOT(slotPrevLayer()));
-  connect(this, SIGNAL(sigNextLayer()),
-          _canvas, SLOT(slotNextLayer()));
-  connect( this, SIGNAL(sigRemoveCurrentLayer()),
-           _canvas, SLOT(slotRemoveCurrentLayer()));
+  connect( this, &GUI::ImageWindow::sigPrevLayer,
+           _canvas, &GUI::Canvas::slotPrevLayer);
+  connect( this, &GUI::ImageWindow::sigNextLayer,
+           _canvas, &GUI::Canvas::slotNextLayer);
+  connect( this, &GUI::ImageWindow::sigRemoveCurrentLayer,
+           _canvas, &GUI::Canvas::slotRemoveCurrentLayer);
+
 
   // menubar
   // ==========================================================
   _openImageAct = new QAction(tr("&Open"), this );
   _openImageAct->setShortcut(tr("Ctrl+O"));
   _openImageAct->setStatusTip(tr("Open an existing image"));
-  connect(_openImageAct, SIGNAL(triggered()),
-          this, SLOT(slotOpenImageAction()));
+  connect(_openImageAct, &QAction::triggered, this, &GUI::ImageWindow::slotOpenImage);
 
   _removeImageAct = new QAction(tr("&Remove"), this );
   _removeImageAct->setShortcut(tr("Del"));
   _removeImageAct->setStatusTip(tr("Remove the current image"));
-  connect(_removeImageAct, SIGNAL(triggered()),
-          this, SLOT(slotRemoveImageAction()));
+  connect(_removeImageAct, &QAction::triggered, _canvas, &GUI::Canvas::slotRemoveCurrentLayer);
 
   _newWindowAct = new QAction(tr("&New"), this );
   _newWindowAct->setShortcut(tr("Ctrl+N"));
   _newWindowAct->setStatusTip(tr("Create a new Window"));
-  connect(_newWindowAct, SIGNAL(triggered()),
-          _parentWindow, SLOT(slotNewWindowAction()));
+  connect(_newWindowAct, &QAction::triggered, _parentWindow, &GUI::Window::slotNewWindowAction);
 
   _propagateWindowGeometryAct = new QAction(tr("Propagate &Geometry"), this );
   _propagateWindowGeometryAct->setShortcut(tr("F2"));
   _propagateWindowGeometryAct->setStatusTip(tr("Resize all other windows to the same size"));
-  connect(_propagateWindowGeometryAct, SIGNAL(triggered()),
-          this, SLOT(slotPropagateWindowGeometryAction()));
+  connect(_propagateWindowGeometryAct, &QAction::triggered, this, &GUI::ImageWindow::slotCommunicateWindowGeometry);
 
   _arangeWindowsAct = new QAction(tr("Arange &Windows"), this );
   _arangeWindowsAct->setShortcut(tr("F3"));
   _arangeWindowsAct->setStatusTip(tr("Try to arange all windows."));
-  connect(_arangeWindowsAct, SIGNAL(triggered()),
-          _parentWindow, SLOT(slotArangeWindows()));
-
-  _fitImageAct = new QAction(tr("Fit to image"), this );
-  _fitImageAct->setShortcut(tr("Ctrl+F"));
-  _fitImageAct->setStatusTip(tr("Fit window to image."));
-  connect(_fitImageAct, SIGNAL(triggered()),
-          _canvas, SLOT(slotFitToImage()));
+  connect(_arangeWindowsAct, &QAction::triggered, _parentWindow, &GUI::Window::slotReceiveArangeWindows);
 
   _centerImageAct = new QAction(tr("center image"), this );
   _centerImageAct->setShortcut(tr("Ctrl+C"));
   _centerImageAct->setStatusTip(tr("Center image within canvas."));
-  connect(_centerImageAct, SIGNAL(triggered()),
-          _canvas, SLOT(slotCenterImage()));
+  connect(_centerImageAct, &QAction::triggered, _canvas, &GUI::Canvas::slotCenterImage);
 
+  _fitImageAct = new QAction(tr("Fit to image"), this );
+  _fitImageAct->setShortcut(tr("Ctrl+F"));
+  _fitImageAct->setStatusTip(tr("Fit window to image."));
+  connect(_fitImageAct, &QAction::triggered, _canvas, &GUI::Canvas::slotFitToImage);
 
   _resetHistogramAct = new QAction(tr("&Reset the histogram"), this );
   _resetHistogramAct->setShortcut(tr("Ctrl+H"));
   _resetHistogramAct->setStatusTip(tr("Reset the histogram range"));
-  connect(_resetHistogramAct, SIGNAL(triggered()),
-          _toolbar_histogram, SLOT(slotResetRange()));
+  connect(_resetHistogramAct, &QAction::triggered, _toolbar_histogram, &GUI::Histogram::slotResetRange);
 
   _dialogWindowAct = new QAction(tr("&About"), this );
   _dialogWindowAct->setShortcut(tr("F1"));
   _dialogWindowAct->setStatusTip(tr("About"));
-  connect(_dialogWindowAct, SIGNAL(triggered()),
-          _parentWindow, SLOT(slotDialogWindowAction()));
+  connect(_dialogWindowAct, &QAction::triggered, _parentWindow, &GUI::Window::slotDialogWindowAction);
 
   _closeWindowAct = new QAction(tr("E&xit"), this );
   _closeWindowAct->setShortcut(tr("Ctrl+W"));
   _closeWindowAct->setStatusTip(tr("Close the window"));
-  connect(_closeWindowAct, SIGNAL(triggered()),
-          this, SLOT(close()));
+  connect(_closeWindowAct, &QAction::triggered, this, &GUI::ImageWindow::close);
 
   _closeAppAct = new QAction(tr("&Quit"), this );
   _closeAppAct->setShortcut(tr("Ctrl+Q"));
   _closeAppAct->setStatusTip(tr("Close the app"));
-  connect(_closeAppAct, SIGNAL(triggered()),
-          _parentWindow, SLOT(close()));
+  connect(_closeAppAct, &QAction::triggered, _parentWindow, &GUI::Window::close);
+
 
   _fileMenu = menuBar()->addMenu(tr("&File"));
   _fileMenu->addAction(_openImageAct);
@@ -192,27 +170,10 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _zoomFitAct->setStatusTip(tr("Resize image to match window"));
   _zoomFitAct->setShortcut(Qt::Key_9 | Qt::CTRL);
 
-  // _zoomInTestAct = new QAction(tr("Zoom-in on position"), this);
-  // _zoomInTestAct->setStatusTip(tr("zoom in keeping position"));
-  // _zoomInTestAct->setShortcut(Qt::Key_5 | Qt::CTRL);
-
-  // _zoomOutTestAct = new QAction(tr("Zoom-out on position"), this);
-  // _zoomOutTestAct->setStatusTip(tr("zoom out keeping position"));
-  // _zoomOutTestAct->setShortcut(Qt::Key_6 | Qt::CTRL);
-
-
-  connect(_zoomInAct, SIGNAL(triggered()),
-          _canvas, SLOT(slotZoomInAction()));
-  connect(_zoomStdAct, SIGNAL(triggered()),
-          this, SLOT(slotZoomStdAction()));
-  connect(_zoomOutAct, SIGNAL(triggered()),
-          _canvas, SLOT(slotZoomOutAction()));
-  connect(_zoomFitAct, SIGNAL(triggered()),
-          _canvas, SLOT(slotFitZoomToWindow()));
-
-
-  connect(this, SIGNAL(sigSetZoomAction(double)),
-          _canvas, SLOT(slotSetZoomAction(double)));
+  connect(_zoomInAct, &QAction::triggered, _canvas, &GUI::Canvas::slotZoomIn);
+  connect(_zoomStdAct, &QAction::triggered, _canvas, &GUI::Canvas::slotNoZoom);
+  connect(_zoomOutAct, &QAction::triggered, _canvas, &GUI::Canvas::slotZoomOut);
+  connect(_zoomFitAct, &QAction::triggered, _canvas, &GUI::Canvas::slotFitZoomToWindow);
 
   this->addAction(_zoomInAct);
   this->addAction(_zoomStdAct);
@@ -225,10 +186,8 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _imageMenu->addAction(_zoomFitAct);
   setAcceptDrops(true);
 
-
-
-  connect(_toolbar_histogram, SIGNAL(sigRefreshBuffer()),
-          this, SLOT(slotRefreshBuffer()));
+  connect(_toolbar_histogram, &Histogram::sigRefreshBuffer,
+          this, &GUI::ImageWindow::slotRefreshBuffer);
 
 }
 
@@ -255,10 +214,6 @@ void GUI::ImageWindow::slotRefreshBuffer() {
   }
 }
 
-void GUI::ImageWindow::slotZoomStdAction() {
-  emit sigSetZoomAction(1.0);
-}
-
 
 void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
   QList<QUrl> urls = ev->mimeData()->urls();
@@ -277,13 +232,15 @@ void GUI::ImageWindow::dragEnterEvent(QDragEnterEvent *ev) {
 void GUI::ImageWindow::loadImage(std::string fn) {
   Layer *layer = new Layer();
   layer->loadImage(fn);
-  connect(layer, SIGNAL(sigHistogramFinished()),
-          this, SLOT(slotUpdateLayer()));
+
+  connect(layer, &Layer::sigHistogramFinished,
+          this, &GUI::ImageWindow::slotRepaint);
+
   _canvas->addLayer(layer);
 }
 
-void GUI::ImageWindow::slotOpenImageAction() {
-  LOG(INFO) << "GUI::Window::slotOpenImageAction()";
+void GUI::ImageWindow::slotOpenImage() {
+  LOG(INFO) << "GUI::Window::slotOpenImage()";
 
   QStringList filenames = QFileDialog::getOpenFileNames(this,
                           tr("Open Image"), _parentWindow->_openPath,
@@ -292,53 +249,48 @@ void GUI::ImageWindow::slotOpenImageAction() {
   if ( !filenames.isEmpty() ) {
     for (int i = 0; i < filenames.count(); i++)
       loadImage(filenames.at(i).toStdString());
-    // _parentWindow->_openPath = QFileInfo(filenames.at(0)).absolutePath();
   }
-  // _canvas->slotUpdateCanvas();
 }
 
-void GUI::ImageWindow::slotRemoveImageAction() {
-  LOG(INFO) << "GUI::ImageWindow::slotRemoveImageAction";
-  emit sigRemoveCurrentLayer();
-}
 
 QSize GUI::ImageWindow::sizeHint() const {
   return QSize(512, 512);
 }
 
-void GUI::ImageWindow::slotUpdateConnectedViews(Canvas* p) {
-  emit sigUpdateConnectedViews(p);
-}
 
+void GUI::ImageWindow::slotReceiveCanvasChange(Canvas* sender) {
+  if ( _canvas != sender ) {
+    // update canvas
+    _canvas->setProperty(sender->property());
+    _canvas->setFocusPixel(sender->focusPixel());
+    _canvas->setMarker(sender->marker());
 
-void GUI::ImageWindow::slotSynchronizeConnectedViews(Canvas* canvas) {
-  if ( _canvas != canvas ) {
-    auto p = canvas->getProperty();
-    _canvas->setProperty(p);
-    slotShowZoom(p.pixel_size);
-    slotUpdateScrollBars(_canvas);
+    slotRepaint();
+
   }
+  slotRepaintStatusbar();
+  slotRepaintSliders();
 }
 
-void GUI::ImageWindow::slotUpdateTitle(Canvas* canvas) {
-  if (canvas->layer() != nullptr)
-    setWindowTitle(("Saccade - " + canvas->layer()->path()).c_str());
+void GUI::ImageWindow::slotReceiveLayerChange() {
+  LOG(INFO) << "GUI::ImageWindow::slotReceiveLayerChange()";
+  slotRepaintHistogram();
+  slotRepaintStatusbar();
+  slotRepaintTitle();
+  slotRepaintSliders();
 }
 
-void GUI::ImageWindow::synchronize(bool active) {
-  emit sigToggleChained(this, active);
-}
 
 void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
 
   switch (event->key()) {
   case Qt::Key_Left:
   case Qt::Key_Down:
-    slotPrevLayer();
+    emit sigPrevLayer();
     break;
   case Qt::Key_Right:
   case Qt::Key_Up:
-    slotNextLayer();
+    emit sigNextLayer();
     break;
   default:
     QMainWindow::keyPressEvent(event);
@@ -346,126 +298,133 @@ void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
   QMainWindow::keyPressEvent(event);
 }
 
-void GUI::ImageWindow::slotPrevLayer() {
-  emit sigPrevLayer();
-}
-void GUI::ImageWindow::slotNextLayer() {
-  emit sigNextLayer();
+
+// TODO: mirrored
+void GUI::ImageWindow::slotVertSliderMoved(int value) {
+  Canvas::property_t p = _canvas->property();
+  p.y = value;
+  _canvas->slotReceiveProperty(p);
 }
 
-void GUI::ImageWindow::slotUpdateLayer(Canvas* canvas) {
-  LOG(INFO) << "GUI::ImageWindow::slotUpdateLayer()";
-  const GUI::Layer *current = canvas->slides()->current();
+// TODO: mirrored
+void GUI::ImageWindow::slotHorSliderMoved(int value) {
+  Canvas::property_t p = _canvas->property();
+  p.x = -value;
+  _canvas->slotReceiveProperty(p);
+}
+
+void GUI::ImageWindow::slotRepaint() {
+  if (_canvas->layer() == nullptr)
+    return;
+  const GUI::Layer *current = _canvas->slides()->current();
   if (current != nullptr) {
+    _canvas->slotRepaint();
+  }
+}
+
+
+void GUI::ImageWindow::slotRepaintTitle() {
+  if (_canvas->layer() == nullptr)
+    return;
+
+  const GUI::Layer *current = _canvas->slides()->current();
+  if (current != nullptr) {
+    // update title
+    setWindowTitle(("Saccade - " + current->path()).c_str());
+  }
+}
+
+void GUI::ImageWindow::slotRepaintStatusbar() {
+  if (_canvas->layer() == nullptr){
+    _statusLabelMouse->setText("");
+    _statusLabelPatch->setText("");
+    _statusLabelMarker->setText("");
+    _statusLabelZoom->setText("");
+    return;
+  }
+
+  const GUI::Layer *current = _canvas->slides()->current();
+  if (current != nullptr) {
+
+    // update pixel
+    std::stringstream pixelPosText;
+    const QPoint p = _canvas->focusPixel();
+    pixelPosText << "(" << p.y() << ", " << p.x() << ")";
+    _statusLabelMouse->setText(pixelPosText.str().c_str());
+
+    std::string pixelColorText = "" + _canvas->slides()->current()->img()->color(p.y(), p.x());
+    _statusLabelPatch->setText(pixelColorText.c_str());
+
+    // update marker
+    Marker m = _canvas->marker();
+    std::string markerText = "";
+    if (m.active) {
+      markerText = "marker: (" + std::to_string((int)m.y) + ", " + std::to_string((int)m.x) + ")";
+      markerText = markerText + " " + _canvas->slides()->current()->img()->color(m.y, m.x);
+    }
+    _statusLabelMarker->setText(markerText.c_str());
+
+    // update zoom
+    std::ostringstream zoomText;
+    zoomText << "zoom: " << std::setprecision(3) << _canvas->property().pixel_size;
+    _statusLabelZoom->setText(zoomText.str().c_str());
+
+  }
+}
+
+void GUI::ImageWindow::slotRepaintSliders() {
+  if (_canvas->layer() == nullptr)
+    return;
+  const int imgWidth = _canvas->layer()->width();
+  const int imgHeight = _canvas->layer()->height();
+
+  const int winWidth = _canvas->width();
+  const int winheight = _canvas->height();
+
+  GUI::Canvas::property_t prop = _canvas->property();
+
+  if ( imgWidth * prop.pixel_size < winWidth ) {
+    _horSlider->setRange(0, 0);
+    _horSlider->setValue(0);
+  } else {
+    const int radius = (int) (0.5 * ((double)imgWidth - (double)winWidth / prop.pixel_size));
+    _horSlider->setRange(-radius - 1, radius + 1);
+    _horSlider->setValue(-(int)prop.x);
+  }
+  if ( imgHeight * prop.pixel_size < winheight ) {
+    _vertSlider->setRange(0, 0);
+    _vertSlider->setValue(0);
+  } else {
+    const int radius = (int) (0.5 * ((double)imgHeight - (double)winheight / prop.pixel_size));
+    _vertSlider->setRange(-radius - 1, radius + 1);
+    _vertSlider->setValue((int)prop.y);
+  }
+}
+
+void GUI::ImageWindow::slotRepaintHistogram() {
+  if (_canvas->layer() == nullptr){
+    _toolbar_histogram->setData(nullptr);
+    _toolbar_histogram->update();
+    return;
+  }
+
+  const GUI::Layer *current = _canvas->slides()->current();
+  if (current != nullptr) {
+    // update histogram
     _toolbar_histogram->setData(current->histogram());
     _toolbar_histogram->update();
   }
-
-}
-void GUI::ImageWindow::slotUpdateScrollBars(Canvas* canvas) {
-  if (canvas->layer() == nullptr)
-    return;
-  const int imgWidth = canvas->layer()->width();
-  const int imgHeight = canvas->layer()->height();
-
-  const int winWidth = canvas->width();
-  const int winheight = canvas->height();
-
-  GUI::Canvas::property_t prop = canvas->getProperty();
-
-  if ( imgWidth * prop.pixel_size < winWidth ) {
-    _horScroll->setRange(0, 0);
-    _horScroll->setValue(0);
-  } else {
-    const int radius = (int) (0.5 * ((double)imgWidth - (double)winWidth / prop.pixel_size));
-    _horScroll->setRange(-radius - 1, radius + 1);
-    _horScroll->setValue(-(int)prop.x);
-  }
-  if ( imgHeight * prop.pixel_size < winheight ) {
-    _vertScroll->setRange(0, 0);
-    _vertScroll->setValue(0);
-  } else {
-    const int radius = (int) (0.5 * ((double)imgHeight - (double)winheight / prop.pixel_size));
-    _vertScroll->setRange(-radius - 1, radius + 1);
-    _vertScroll->setValue((int)prop.y);
-  }
-}
-
-// TODO: mirrored
-void GUI::ImageWindow::slotVertScrollChanged( int value ) {
-  Canvas::property_t p = _canvas->getProperty();
-  p.y = value;
-  _canvas->updatePropertyByScrollbar(p);
-}
-
-// TODO: mirrored
-void GUI::ImageWindow::slotHorScrollChanged( int value ) {
-  Canvas::property_t p = _canvas->getProperty();
-  p.x = -value;
-  _canvas->updatePropertyByScrollbar(p);
-}
-
-void GUI::ImageWindow::slotCoordToMainWindow(QPoint p) {
-  emit sigCoordToMainwindow(p);
-}
-
-void GUI::ImageWindow::slotMarkerToMainWindow(Marker m) {
-  emit sigMarkerToMainwindow(m);
-}
-
-void GUI::ImageWindow::slotPropertyToMainwindow(Canvas::property_t p) {
-  emit sigPropertyToMainwindow(p);
 }
 
 
-void GUI::ImageWindow::slotShowCoords(QPoint p) {
-  std::stringstream stream;
-  stream << "(" << p.y() << ", " << p.x() << ")";
-
-  std::string str = stream.str();
-  _statusLabelMouse->setText(str.c_str());
-
-  if (_canvas->layer() != nullptr) {
-    std::string txt = "" + _canvas->slides()->current()->img()->color(p.y(), p.x());
-    _statusLabelPatch->setText(txt.c_str());
-  }
+void GUI::ImageWindow::slotCommunicateWindowGeometry() {
+  // LOG(INFO) << "GUI::ImageWindow::slotCommunicateWindowGeometry";
+  emit sigCommunicateWindowGeometry(this);
 }
 
-void GUI::ImageWindow::slotShowZoom(double p) {
-  std::ostringstream out;
-  out << std::setprecision(3) << p;
-
-  std::string val = "zoom: " + out.str();
-  _statusLabelZoom->setText(val.c_str());
-}
-
-void GUI::ImageWindow::slotShowProperty(Canvas::property_t p) {
-  slotShowZoom(p.pixel_size);
-}
-
-void GUI::ImageWindow::slotShowMarkers(Marker m) {
-  _canvas->setMarker(m);
-  std::string txt = "";
-
-  if (m.active) {
-    txt = "marker: (" + std::to_string((int)m.y) + ", " + std::to_string((int)m.x) + ")";
-
-    if (_canvas->layer() != nullptr) {
-      txt = txt + " " + _canvas->slides()->current()->img()->color(m.y, m.x);
-    }
-  }
-  _statusLabelMarker->setText(txt.c_str());
-}
-
-
-void GUI::ImageWindow::slotPropagateWindowGeometryAction() {
-  LOG(INFO) << "GUI::ImageWindow::slotPropagateWindowGeometryAction";
-  emit sigPropagateWindowGeometry(this);
-}
-
-void GUI::ImageWindow::slotDistributeWindowGeometry(ImageWindow* window) {
-  LOG(INFO) << "GUI::ImageWindow::slotDistributeWindowGeometry";
-  if ( this != window ) {
-    resize(window->width(), window->height());
+void GUI::ImageWindow::slotReceiveWindowGeometry(ImageWindow* sender) {
+  // LOG(INFO) << "GUI::ImageWindow::slotReceiveWindowGeometry";
+  if ( this != sender ) {
+    resize(sender->width(), sender->height());
   }
 }

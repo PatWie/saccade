@@ -55,8 +55,6 @@ GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
   _slides = new Slides();
   _marker = new Marker();
 
-  emit sigUpdateScrollBars(this);
-
 }
 
 const GUI::Layer* GUI::Canvas::layer(int i) const {
@@ -86,56 +84,89 @@ const GUI::Slides* GUI::Canvas::slides() const {
 }
 
 void GUI::Canvas::addLayer(Layer *layer) {
-  connect( layer, SIGNAL(sigRefresh()),
-           this, SLOT(slotUpdateCanvas()));
-  connect( layer, SIGNAL(sigHistogramFinished()),
-           this, SLOT(slotUpdateLayer()));
+
+  connect(layer, &Layer::sigRefresh, this, &Canvas::slotCommunicateLayerChange);
+  connect(layer, &Layer::sigHistogramFinished, this, &Canvas::slotCommunicateLayerChange);
+
   // canvas gets another image
   _slides->add(layer);
-  slotUpdateCanvas();
-  slotUpdateLayer();
+  slotCommunicateLayerChange();
 }
 
-void GUI::Canvas::slotUpdateLayer() {
-  emit sigUpdateLayer(this);
-  emit sigCoordToImageWindow(canvasToImg(_focus));
+QPoint GUI::Canvas::focusPixel() const {
+  return _focus;
 }
 
-void GUI::Canvas::slotUpdateCanvas() {
-  emit sigUpdateTitle(this);
-  emit sigUpdateScrollBars(this);
-  emit sigMarkerToImageWindow(*_marker);
-  update();
-}
-
-void GUI::Canvas::slotSetZoomAction(double zoom) {
-  _property.pixel_size = zoom;
-  slotUpdateCanvas();
-  askSynchronization();
-  emit sigPropertyToImagewindow(_property);
-}
-
-void GUI::Canvas::slotZoomInAction() {
-  zoomOnCenter(sqrt(2.0));
-}
-
-void GUI::Canvas::slotZoomOutAction() {
-  zoomOnCenter(1.0 / sqrt(2.0));
+void GUI::Canvas::setFocusPixel(QPoint p) {
+  _focus = p;
 }
 
 QSize GUI::Canvas::sizeHint() const {
   return QSize(512, 512);
 }
 
-void GUI::Canvas::askSynchronization() {
-  // something changed here, request synchronization signal to other canvases
-  emit sigPropertyChanged(this);
+void GUI::Canvas::slotRepaint() {
+  update();
 }
+
+void GUI::Canvas::slotCommunicateLayerChange() {
+  emit sigCommunicateLayerChange(this);
+  update();
+}
+
+void GUI::Canvas::slotCommunicateCanvasChange() {
+  emit sigCommunicateCanvasChange(this);
+  update();
+}
+
+
+void GUI::Canvas::slotZoomIn() {
+  const QPoint pos = this->mapFromGlobal(QCursor::pos());
+  if (this->rect().contains(pos)) {
+    zoom_rel(pos, 1);
+  } else {
+    zoomOnCenter(_property.pixel_size * sqrt(2.0));
+  }
+}
+
+void GUI::Canvas::slotZoomOut() {
+  const QPoint pos = this->mapFromGlobal(QCursor::pos());
+  if (this->rect().contains(pos)) {
+    zoom_rel(pos, -1);
+  } else {
+    zoomOnCenter(_property.pixel_size / sqrt(2.0));
+  }
+}
+
+void GUI::Canvas::slotNoZoom() {
+  zoomOnCenter(1.0);
+}
+
+
+/**
+ * @brief move canvas such that pixel is in the center
+ * @details [long description]
+ *
+ * @param imgCoord coordinate in image (w, h)
+ * @return [description]
+ */
+void GUI::Canvas::zoomOnCenter(double amount) {
+
+  const QPoint want = canvasToImg(QPoint(width() / 2., height() / 2.));
+  _property.pixel_size = amount;
+
+  const QPoint actual = canvasToImg(QPoint(width() / 2., height() / 2.));
+  _property.x += actual.x() - want.x();
+  _property.y -= actual.y() - want.y();
+
+  slotCommunicateCanvasChange();
+
+}
+
 
 void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   // get position within image coordinates
-  QPoint p = canvasToImg(event->pos());
-
+  _focus = canvasToImg(event->pos());
   Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
 
   // left click: enable dragging/shifting
@@ -143,7 +174,7 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
 
     if (keymod == Qt::ShiftModifier) {
       _selection.active = true;
-      _selection.rect = QRect(p, QSize(0, 0));
+      _selection.rect = QRect(_focus, QSize(0, 0));
     } else {
       QCursor tmp;
       tmp.setShape( Qt::SizeAllCursor );
@@ -160,36 +191,32 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   // middle click: set marker
   if ( (event->buttons() & Qt::MidButton) != 0 ) {
     _marker->active = true;
-    _marker->x = p.x();
-    _marker->y = p.y();
-    emit sigMarkerToImageWindow(*_marker);
+    _marker->x = _focus.x();
+    _marker->y = _focus.y();
   }
 
   // right click: remove marker
   if ( (event->buttons() & Qt::RightButton) != 0) {
     _marker->active = !_marker->active;
-    emit sigMarkerToImageWindow(*_marker);
   }
 
-  update();
-  emit sigPropertyChanged(this);
+  slotCommunicateCanvasChange();
 }
 
 void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
-  QPoint p = canvasToImg(event->pos());
+  _focus = canvasToImg(event->pos());
+
   Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
   // middle click active --> move marker
   if ( (event->buttons() & Qt::MidButton) ) {
     _marker->active = true;
-    _marker->x = p.x();
-    _marker->y = p.y();
-    update();
-    emit sigMarkerToImageWindow(*_marker);
+    _marker->x = _focus.x();
+    _marker->y = _focus.y();
   }
 
   if ( (event->buttons() & Qt::LeftButton) != 0 && _selection.active) {
     if (keymod == Qt::ShiftModifier) {
-      _selection.rect.setBottomRight(p);
+      _selection.rect.setBottomRight(_focus);
     } else {
       _selection.active = false;
     }
@@ -199,44 +226,26 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
     const double dy = event->y();
     _property.x = (dx / _property.pixel_size) - _dragging.start.x();
     _property.y = -(dy / _property.pixel_size) - _dragging.start.y();
-    update();
-    emit sigPropertyChanged(this);
-    emit sigUpdateScrollBars(this);
   }
-  emit sigCoordToImageWindow(p);
 
-  _focus = event->pos();
-}
-
-/**
- * @brief move canvas such that pixel is in the center
- * @details [long description]
- *
- * @param imgCoord coordinate in image (w, h)
- * @return [description]
- */
-void GUI::Canvas::zoomOnCenter(double amount) {
-
-  const QPoint want = canvasToImg(QPoint(width() / 2., height() / 2.));
-  _property.pixel_size *= amount;
-
-  const QPoint actual = canvasToImg(QPoint(width() / 2., height() / 2.));
-  _property.x += actual.x() - want.x();
-  _property.y -= actual.y() - want.y();
-
-  slotUpdateCanvas();
-  emit sigPropertyChanged(this);
-  emit sigPropertyToImagewindow(_property);
+  slotCommunicateCanvasChange();
+  update();
 
 }
 
 
 void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
-  QPoint p = canvasToImg(event->pos());
+  _focus = canvasToImg(event->pos());
 
   if (_selection.active) {
     _selection.active = false;
-    _selection.rect.setBottomRight(p);
+    _selection.rect.setBottomRight(_focus);
+
+    if (_selection.rect.topLeft().manhattanLength() > _selection.rect.bottomRight().manhattanLength()) {
+      QPoint tmp = _selection.rect.topLeft();
+      _selection.rect.setTopLeft(_selection.rect.bottomRight());
+      _selection.rect.setBottomRight(tmp);
+    }
 
     const QPoint want = _selection.rect.center();
     const double zoom_width = ((double)_width / (double)_selection.rect.width());
@@ -248,9 +257,7 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
     _property.x += actual.x() - want.x();
     _property.y -= actual.y() - want.y();
 
-    slotUpdateCanvas();
-    emit sigPropertyChanged(this);
-    emit sigPropertyToImagewindow(_property);
+    slotCommunicateCanvasChange();
 
   } else if ( _dragging.active ) {
     QCursor tmp;
@@ -265,47 +272,6 @@ void GUI::Canvas::wheelEvent( QWheelEvent * event) {
   if (_slides->available() > 0) {
     zoom_rel(event->pos(), event->delta());
   }
-
-}
-
-void GUI::Canvas::slotFitZoomToWindow() {
-  LOG(INFO) << "GUI::Canvas::slotFitZoomToWindow";
-  const double zoom_width = ((double)_width / (double)_slides->width());
-  const double zoom_height = ((double)_height / (double)_slides->height());
-  _property.pixel_size = std::min(zoom_width, zoom_height);
-
-  _property.x = 0;
-  _property.y = 0;
-
-  slotUpdateCanvas();
-  emit sigPropertyChanged(this);
-  emit sigPropertyToImagewindow(_property);
-}
-
-void GUI::Canvas::slotCenterImage() {
-  _property.x = 0;
-  _property.y = 0;
-
-  slotUpdateCanvas();
-  emit sigPropertyChanged(this);
-  emit sigPropertyToImagewindow(_property);
-}
-
-void GUI::Canvas::slotFitToImage() {
-  const int img_width = _slides->width() * _property.pixel_size;
-  const int img_height = _slides->height() * _property.pixel_size;
-
-  const int padding_w = (_parentWin->width() - width());
-  const int padding_h = (_parentWin->height() - height());
-
-  _parentWin->resize(img_width + padding_w + 1, img_height + padding_h + 1);
-
-  _property.x = 0;
-  _property.y = 0;
-
-  slotUpdateCanvas();
-  emit sigPropertyChanged(this);
-  emit sigPropertyToImagewindow(_property);
 }
 
 void GUI::Canvas::zoom_rel(QPoint q, int delta) {
@@ -342,12 +308,44 @@ void GUI::Canvas::zoom_rel(QPoint q, int delta) {
     _property.pixel_size = new_pixelsize;
   }
 
-  slotUpdateCanvas();
-
-  emit sigPropertyChanged(this);
-  emit sigPropertyToImagewindow(_property);
-
+  slotCommunicateCanvasChange();
 }
+
+void GUI::Canvas::slotFitZoomToWindow() {
+  LOG(INFO) << "GUI::Canvas::slotFitZoomToWindow";
+  const double zoom_width = ((double)_width / (double)_slides->width());
+  const double zoom_height = ((double)_height / (double)_slides->height());
+  _property.pixel_size = std::min(zoom_width, zoom_height);
+
+  _property.x = 0;
+  _property.y = 0;
+
+  slotCommunicateCanvasChange();
+}
+
+void GUI::Canvas::slotCenterImage() {
+  _property.x = 0;
+  _property.y = 0;
+
+  slotCommunicateCanvasChange();
+}
+
+void GUI::Canvas::slotFitToImage() {
+  const int img_width = _slides->width() * _property.pixel_size;
+  const int img_height = _slides->height() * _property.pixel_size;
+
+  const int padding_w = (_parentWin->width() - width());
+  const int padding_h = (_parentWin->height() - height());
+
+  _parentWin->resize(img_width + padding_w + 1, img_height + padding_h + 1);
+
+  _property.x = 0;
+  _property.y = 0;
+
+  slotCommunicateCanvasChange();
+}
+
+
 
 void GUI::Canvas::resizeGL(int width, int height) {
   _width = width;
@@ -435,31 +433,27 @@ QPoint GUI::Canvas::imgToCanvas( QPoint p ) const {
 }
 
 
-GUI::Canvas::property_t GUI::Canvas::getProperty() {
+GUI::Canvas::property_t GUI::Canvas::property() const {
   return _property;
 }
 
-void GUI::Canvas::setProperty( property_t property ) {
-  if (_slides->available()) {
-    _property = property;
-    update();
-  }
+void GUI::Canvas::setProperty(property_t p) {
+  _property = p;
 }
 
-GUI::Marker GUI::Canvas::getMarker() {
+GUI::Marker GUI::Canvas::marker() const {
   return *_marker;
 }
 
-void GUI::Canvas::setMarker( GUI::Marker marker ) {
-  *_marker = marker;
-  update();
+void GUI::Canvas::setMarker(Marker m) {
+  *_marker = m;
 }
 
-void GUI::Canvas::updatePropertyByScrollbar( property_t property ) {
+
+void GUI::Canvas::slotReceiveProperty(property_t property) {
   _property.x = property.x;
   _property.y = property.y;
-  emit sigPropertyChanged(this);
-  update();
+  slotCommunicateCanvasChange();
 }
 
 void GUI::Canvas::initializeGL() {
@@ -480,7 +474,6 @@ void GUI::Canvas::initializeGL() {
 
   _gl->prepare(_bg);
   _gl->draw(_bg, -4000, 4000, 4000, -4000, 0);
-
 
   delete[] _bg->data;
 }
@@ -542,20 +535,18 @@ void GUI::Canvas::paintGL() {
 
 void GUI::Canvas::slotPrevLayer() {
   _slides->backward();
-  slotUpdateLayer();
-  slotUpdateCanvas();
+  slotCommunicateLayerChange();
 }
 
 void GUI::Canvas::slotRemoveCurrentLayer() {
   if (_slides->available()) {
     _slides->remove();
-    slotUpdateCanvas();
+    slotCommunicateLayerChange();
   }
   LOG(INFO) << "remove layer";
 }
 
 void GUI::Canvas::slotNextLayer() {
   _slides->forward();
-  slotUpdateLayer();
-  slotUpdateCanvas();
+  slotCommunicateLayerChange();
 }

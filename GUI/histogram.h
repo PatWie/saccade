@@ -47,8 +47,8 @@ class Histogram : public QFrame {
   QRect paintingArea() const;
 
   /**
- * @brief helper to avoid segfaults
- */
+  * @brief helper to avoid segfaults
+  */
   bool hasHistogram() const;
 
  signals:
@@ -56,8 +56,9 @@ class Histogram : public QFrame {
   void sigRefreshBuffer();
 
  public slots:
- // reset range to default of image
+// reset range to default of image
   void slotSetRange(float, float);
+  void slotResetRange();
   void slotSetMappingMode(int);
 
  private:

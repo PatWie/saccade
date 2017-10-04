@@ -59,7 +59,8 @@ void GUI::Histogram::contextMenuEvent(QContextMenuEvent *event) {
 void GUI::Histogram::setData(Utils::HistogramData *h) {
   LOG(INFO) << "GUI::Histogram::setData";
   _histogram = h;
-  _expected_width = _histogram->bins();
+  if(_histogram != nullptr)
+    _expected_width = _histogram->bins();
   update();
 }
 
@@ -251,6 +252,9 @@ void GUI::Histogram::mouseReleaseEvent(QMouseEvent * e) {
   }
 }
 
+void GUI::Histogram::slotResetRange() {
+  slotSetRange(0, 0);
+}
 void GUI::Histogram::slotSetRange(float min, float max) {
   if (hasHistogram()) {
     if (min == 0 && max == 0) {
