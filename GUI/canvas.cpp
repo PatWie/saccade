@@ -142,6 +142,13 @@ void GUI::Canvas::slotNoZoom() {
   zoomOnCenter(1.0);
 }
 
+void GUI::Canvas::toggleMarkerAtCursor() {
+  _marker->active = !_marker->active;
+  _marker->x = _focus.x();
+  _marker->y = _focus.y();
+  slotCommunicateCanvasChange();
+}
+
 
 /**
  * @brief move canvas such that pixel is in the center

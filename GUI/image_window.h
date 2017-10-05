@@ -99,6 +99,7 @@ class ImageWindow  : public QMainWindow {
   QAction *_zoomStdAct;
   QAction *_zoomOutAct;
   QAction *_zoomFitAct;
+  QAction *_toggleMarkerAct;
 
   QAction *_zoomInTestAct;
   QAction *_zoomOutTestAct;

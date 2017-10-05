@@ -170,10 +170,16 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _zoomFitAct->setStatusTip(tr("Resize image to match window"));
   _zoomFitAct->setShortcut(Qt::Key_9 | Qt::CTRL);
 
+  _toggleMarkerAct = new QAction(tr("Toggle marker"), this);
+  _toggleMarkerAct->setStatusTip(tr("Toggle marker at current mouse position"));
+  _toggleMarkerAct->setShortcut(Qt::Key_M | Qt::CTRL);
+
+
   connect(_zoomInAct, &QAction::triggered, _canvas, &GUI::Canvas::slotZoomIn);
   connect(_zoomStdAct, &QAction::triggered, _canvas, &GUI::Canvas::slotNoZoom);
   connect(_zoomOutAct, &QAction::triggered, _canvas, &GUI::Canvas::slotZoomOut);
   connect(_zoomFitAct, &QAction::triggered, _canvas, &GUI::Canvas::slotFitZoomToWindow);
+  connect(_toggleMarkerAct, &QAction::triggered, _canvas, &GUI::Canvas::toggleMarkerAtCursor);
 
   this->addAction(_zoomInAct);
   this->addAction(_zoomStdAct);
@@ -184,6 +190,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _imageMenu->addAction(_zoomStdAct);
   _imageMenu->addAction(_zoomOutAct);
   _imageMenu->addAction(_zoomFitAct);
+  _imageMenu->addAction(_toggleMarkerAct);
   setAcceptDrops(true);
 
   connect(_toolbar_histogram, &Histogram::sigRefreshBuffer,

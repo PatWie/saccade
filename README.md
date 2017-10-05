@@ -91,4 +91,5 @@ shortcuts for a single canvas
 | reset histogram              | Ctrl + H             |
 | center image                 | Ctrl + C             |
 | fit window to image          | Ctrl + F             |
+| toggle marker                | Ctrl + M             |
 | selection tool               | Shift + "left click" |
