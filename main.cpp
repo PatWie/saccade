@@ -9,6 +9,7 @@
 
 #include "GUI/window.h"
 #include "Utils/version.h"
+#include "Utils/misc.h"
 
 void set_style(QPalette *p) {
 
@@ -28,7 +29,7 @@ void set_style(QPalette *p) {
   p->setColor(QPalette::BrightText, red);
   p->setColor(QPalette::Link, QColor(42, 130, 218));
   p->setColor(QPalette::Highlight, QColor(39, 40, 34, 255));
-  p->setColor(QPalette::HighlightedText, QColor(251, 199, 99));
+  p->setColor(QPalette::HighlightedText, misc_theme_yellow);
 }
 
 // call by ./saccade --logtostderr=1
@@ -48,11 +49,11 @@ int main(int argc, char *argv[]) {
   set_style(&p);
   app.setStyle("Fusion");
   app.setPalette(p);
+  app.setQuitOnLastWindowClosed(false);
 
   GUI::Window window(&app);
   window.setWindowIcon(QIcon(":Icon/256x256/saccade.png"));
   window.setWindowTitle("Saccade");
-  window.show();
 
   return app.exec();
 }

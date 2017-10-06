@@ -106,6 +106,11 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _arangeWindowsAct->setStatusTip(tr("Try to arange all windows."));
   connect(_arangeWindowsAct, &QAction::triggered, _parentWindow, &GUI::Window::slotReceiveArangeWindows);
 
+  _refreshAct = new QAction(tr("&Refresh Canvas"), this );
+  _refreshAct->setShortcut(tr("F5"));
+  _refreshAct->setStatusTip(tr("Repaint entire window and canvas"));
+  connect(_refreshAct, &QAction::triggered, this, &GUI::ImageWindow::slotRepaint);
+
   _centerImageAct = new QAction(tr("center image"), this );
   _centerImageAct->setShortcut(tr("Ctrl+C"));
   _centerImageAct->setStatusTip(tr("Center image within canvas."));
@@ -145,6 +150,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _windowMenu->addAction(_newWindowAct);
   _windowMenu->addAction(_propagateWindowGeometryAct);
   _windowMenu->addAction(_arangeWindowsAct);
+  _windowMenu->addAction(_refreshAct);
   _windowMenu->addAction(_fitImageAct);
   _windowMenu->addAction(_centerImageAct);
   _windowMenu->addAction(_dialogWindowAct);
@@ -321,11 +327,13 @@ void GUI::ImageWindow::slotHorSliderMoved(int value) {
 }
 
 void GUI::ImageWindow::slotRepaint() {
-  if (_canvas->layer() == nullptr)
-    return;
-  const GUI::Layer *current = _canvas->slides()->current();
-  if (current != nullptr) {
-    _canvas->slotRepaint();
+  if (_canvas->layer() == nullptr) {
+    _canvas->update();
+  } else {
+    const GUI::Layer *current = _canvas->slides()->current();
+    if (current != nullptr) {
+      _canvas->slotRepaint();
+    }
   }
 }
 
@@ -342,7 +350,7 @@ void GUI::ImageWindow::slotRepaintTitle() {
 }
 
 void GUI::ImageWindow::slotRepaintStatusbar() {
-  if (_canvas->layer() == nullptr){
+  if (_canvas->layer() == nullptr) {
     _statusLabelMouse->setText("");
     _statusLabelPatch->setText("");
     _statusLabelMarker->setText("");
@@ -409,7 +417,7 @@ void GUI::ImageWindow::slotRepaintSliders() {
 }
 
 void GUI::ImageWindow::slotRepaintHistogram() {
-  if (_canvas->layer() == nullptr){
+  if (_canvas->layer() == nullptr) {
     _toolbar_histogram->setData(nullptr);
     _toolbar_histogram->update();
     return;
@@ -435,3 +443,11 @@ void GUI::ImageWindow::slotReceiveWindowGeometry(ImageWindow* sender) {
     resize(sender->width(), sender->height());
   }
 }
+
+void GUI::ImageWindow::closeEvent(QCloseEvent * event) {
+  LOG(INFO) << "GUI::ImageWindow::closeEvent";
+  
+  event->ignore();
+  emit sigImageWindowCloses(this);
+  event->accept();
+};

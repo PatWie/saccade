@@ -75,8 +75,8 @@ QSize GUI::Histogram::sizeHint () const {
 void GUI::Histogram::paintEvent( QPaintEvent *e) {
   Q_UNUSED(e);
 
-  const QColor selectionColor = QColor(39, 40, 34, 100);
-  const QColor delimiterColor = QColor(251, 199, 99);
+  const QColor selectionColor = misc_theme_gray_selected;
+  const QColor delimiterColor = misc_theme_yellow;
 
   QPainter p(this);
   p.setRenderHint(QPainter::Antialiasing);

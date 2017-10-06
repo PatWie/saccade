@@ -39,6 +39,8 @@ class Window  : public QMainWindow {
   void slotFocusChanged(ImageWindow*);
   void slotReceiveArangeWindows();
 
+  void slotImageWindowCloses(ImageWindow*);
+
  private:
   Slides* _slides;
 

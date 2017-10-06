@@ -32,6 +32,7 @@ class ImageWindow  : public QMainWindow {
   void keyPressEvent(QKeyEvent * event );
 
   bool event(QEvent *e);
+  void closeEvent(QCloseEvent * event);
 
  protected:
   void dropEvent(QDropEvent *ev);
@@ -46,6 +47,7 @@ class ImageWindow  : public QMainWindow {
 
   void sigCommunicateWindowGeometry(ImageWindow*);
   void sigFocusChange(ImageWindow*);
+  void sigImageWindowCloses(ImageWindow*);
 
  public slots:
 
@@ -64,9 +66,7 @@ class ImageWindow  : public QMainWindow {
   void slotRepaintHistogram();
   void slotVertSliderMoved(int);
   void slotHorSliderMoved(int);
-
   void slotReceiveWindowGeometry(ImageWindow*);
-
 
  private:
   QGridLayout* _centerLayout;
@@ -100,6 +100,7 @@ class ImageWindow  : public QMainWindow {
   QAction *_zoomOutAct;
   QAction *_zoomFitAct;
   QAction *_toggleMarkerAct;
+  QAction *_refreshAct;
 
   QAction *_zoomInTestAct;
   QAction *_zoomOutTestAct;

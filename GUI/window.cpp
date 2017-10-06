@@ -29,7 +29,7 @@ GUI::Window::Window(QApplication* app) : _app(app) {
 
   _dialogWindowAct = new QAction(tr("&About"), this);
   _dialogWindowAct->setShortcut(tr("F1"));
-  _dialogWindowAct->setStatusTip(tr("Create a new Window"));
+  _dialogWindowAct->setStatusTip(tr("Information and Version"));
 
   _closeAppAct = new QAction(tr("E&xit"), this);
   _closeAppAct->setShortcut(tr("Ctrl+Q"));
@@ -58,6 +58,13 @@ void GUI::Window::slotFocusChanged(ImageWindow* obj) {
 
 }
 
+void GUI::Window::slotImageWindowCloses(ImageWindow* sender){
+  _windows.erase(std::remove(_windows.begin(), _windows.end(), sender), _windows.end());
+  if(_windows.size() == 0){
+    QCoreApplication::quit();
+  }
+}
+
 
 void GUI::Window::slotNewWindowAction() {
   LOG(INFO) << "GUI::Window::slotNewWindowAction()";
@@ -73,6 +80,9 @@ void GUI::Window::slotNewWindowAction() {
 
   connect(tmpWindow, &GUI::ImageWindow::sigCommunicateWindowGeometry,
           this, &GUI::Window::slotCommunicateWindowGeometry);
+
+  connect(tmpWindow, &GUI::ImageWindow::sigImageWindowCloses,
+          this, &GUI::Window::slotImageWindowCloses);
 
   // outgoing messages
   connect(this, &GUI::Window::sigReceiveWindowGeometry,
