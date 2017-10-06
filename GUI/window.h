@@ -40,6 +40,7 @@ class Window  : public QMainWindow {
   void slotReceiveArangeWindows();
 
   void slotImageWindowCloses(ImageWindow*);
+  void slotQuitApp();
 
  private:
   Slides* _slides;

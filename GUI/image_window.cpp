@@ -139,7 +139,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _closeAppAct = new QAction(tr("&Quit"), this );
   _closeAppAct->setShortcut(tr("Ctrl+Q"));
   _closeAppAct->setStatusTip(tr("Close the app"));
-  connect(_closeAppAct, &QAction::triggered, _parentWindow, &GUI::Window::close);
+  connect(_closeAppAct, &QAction::triggered, _parentWindow, &GUI::Window::slotQuitApp);
 
 
   _fileMenu = menuBar()->addMenu(tr("&File"));

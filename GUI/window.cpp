@@ -64,6 +64,9 @@ void GUI::Window::slotImageWindowCloses(ImageWindow* sender){
     QCoreApplication::quit();
   }
 }
+void GUI::Window::slotQuitApp(){
+  QCoreApplication::quit();
+}
 
 
 void GUI::Window::slotNewWindowAction() {
