@@ -1,0 +1,9 @@
+pipeline:
+  build:
+    image: patwie/saccade
+    pull: true
+    commands:
+      - mkdir build
+      - cd build
+      - cmake ..
+      - make
