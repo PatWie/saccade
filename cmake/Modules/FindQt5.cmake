@@ -1,8 +1,3 @@
-# Sets:
-#   Qt5_FOUND: TRUE if FreeImage is found.
-#   Qt5_INCLUDE_DIRS: Include directories for FreeImage.
-#   Qt5_LIBRARIES: Libraries required to link FreeImage.
-
 find_package(Qt5Core QUIET)
 find_package(Qt5OpenGL QUIET)
 

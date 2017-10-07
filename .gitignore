@@ -54,3 +54,6 @@ CTestTestfile.cmake
 build
 
 Utils/version.h
+
+deploy/
+.deploy/
