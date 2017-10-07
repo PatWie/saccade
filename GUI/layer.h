@@ -56,6 +56,7 @@ class HistogramThread : public QThread {
 
 /**
  * @brief Apply an operations to image.
+ * @details Can be scaling and clipping according to histogram limits.
  */
 class OperationThread : public QThread {
  public:
@@ -102,22 +103,68 @@ class Layer  : public QObject {
   Layer();
   ~Layer();
 
+  /**
+   * @brief width of image
+   */
   size_t width() const;
+
+  /**
+   * @brief height of image
+   */
   size_t height() const;
+
+  /**
+   * @brief pointer to underlying image data-struct
+   */
   const Utils::ImageData* img() const;
 
-
-
+  /**
+   * @brief Draw image content with OpenGL
+   * @details leverages the mip-mapping datastructure
+   * 
+   * @param gl wrapper for OpenGL
+   * @param top coordinate top of visible area
+   * @param left coordinate left of visible area
+   * @param bottom coordinate bottom of visible area
+   * @param right coordinate right of visible area
+   * @param zoom pixel size
+   */
   void draw(Utils::GlManager *gl,
             uint top, uint left,
             uint bottom, uint right,
             double zoom);
 
+  /**
+   * @brief override image data with image from given file
+   * @details might destroy old data
+   * 
+   * @param fn path to new image
+   */
   void loadImage(std::string fn);
+
+  /**
+   * @brief delete all data
+   * @details cleares image data, buffer data and mipmap
+   */
   void clear();
+
+  /**
+   * @brief indicates whether there are pending operations on the buffer
+   * @details might be false during scaling due to histogram-widget or reloading
+   * @return operation is pending and it is unsafe to use the data pointer
+   */
   bool available() const;
+
+  /**
+   * @brief path to file where image was read from
+   * @return image path
+   */
   std::string path() const;
 
+  /**
+   * @brief Pointer to underlying histogram information
+   * @return pointer to histogram data struct
+   */
   Utils::HistogramData* histogram() const;
 
 

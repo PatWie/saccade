@@ -12,7 +12,6 @@ template<typename Dtype>
 class GlObject  : protected QOpenGLFunctions {
  public:
 
-
   // requires to be H, W, C
   size_t height, width, channels;
   Dtype *data;

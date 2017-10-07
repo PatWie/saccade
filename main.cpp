@@ -39,12 +39,12 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  LOG(INFO) << Utils::GetVersionInfo();
-  LOG(INFO) << Utils::GetBuildInfo();
-  LOG(INFO) << "omp_get_max_threads() " << omp_get_max_threads();
+  DLOG(INFO) << Utils::versionInfo();
+  DLOG(INFO) << Utils::buildInfo();
+  DLOG(INFO) << "omp_get_max_threads() " << omp_get_max_threads();
   QApplication app(argc, argv);
 
-  LOG(INFO) << "override style";
+  DLOG(INFO) << "override style";
   QPalette p;
   set_style(&p);
   app.setStyle("Fusion");

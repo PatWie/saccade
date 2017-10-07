@@ -66,7 +66,7 @@ void Utils::GlManager::printContextInformation() {
 
   QString info;
   info = glType + glVersion + "(" + glProfile + ")";
-  LOG(INFO) << info.toStdString();
+  DLOG(INFO) << info.toStdString();
 }
 
 

@@ -26,15 +26,21 @@ class ImageWindow  : public QMainWindow {
   ImageWindow(QWidget* parent, Window* parentWindow);
   QSize sizeHint() const;
 
-
+  /**
+   * @brief add image as layer to current canvas
+   * @param fn path to new image
+   */
   void loadImage(std::string fn);
 
   void keyPressEvent(QKeyEvent * event );
-
-  bool event(QEvent *e);
   void closeEvent(QCloseEvent * event);
 
+  bool event(QEvent *e);
+
  protected:
+  /**
+   * @brief support drag and drop of images
+   */
   void dropEvent(QDropEvent *ev);
   void dragEnterEvent(QDragEnterEvent *ev);
 
@@ -43,7 +49,12 @@ class ImageWindow  : public QMainWindow {
  signals:
   void sigPrevLayer();
   void sigNextLayer();
+
+  void sigCommunicatePrevLayer();
+  void sigCommunicateNextLayer();
+
   void sigRemoveCurrentLayer();
+  void sigShiftCanvas(int, int, bool);
 
   void sigCommunicateWindowGeometry(ImageWindow*);
   void sigFocusChange(ImageWindow*);
@@ -51,29 +62,62 @@ class ImageWindow  : public QMainWindow {
 
  public slots:
 
-  // get change from other view
+  /**
+   * @brief update canvas to be in sync with the sender
+   * @details sender can be the canvas it contains itself
+   * 
+   * @param sender canvas which asks for synchronization
+   */
   void slotReceiveCanvasChange(Canvas*);
+
+  /**
+   * @brief receive request from canvas to update visible information
+   * @details repaint connected widgets as histogram, title, sliders, ...
+   * 
+   * @param sender canvas which asks for synchronization
+   */
   void slotReceiveLayerChange();
 
+  /**
+   * @brief Trigger "open file"dialog
+   */
   void slotOpenImage();
+
+  /**
+   * @brief request other windows to share same window geometry
+   */
   void slotCommunicateWindowGeometry();
 
+  /**
+   * @brief image content has changed and the buffer needs to update
+   */
   void slotRefreshBuffer();
+
   void slotRepaint();
+
   void slotRepaintStatusbar();
   void slotRepaintTitle();
   void slotRepaintSliders();
   void slotRepaintHistogram();
+
   void slotVertSliderMoved(int);
   void slotHorSliderMoved(int);
+
+  /**
+   * @brief Set own window geometry according sender
+   * @details This only affects height and width
+   */
   void slotReceiveWindowGeometry(ImageWindow*);
 
  private:
+  Window* _parentWindow;
+
   QGridLayout* _centerLayout;
   Canvas* _canvas;
 
   QScrollBar* _vertSlider;
   QScrollBar* _horSlider;
+
   QLabel* _statusLabelMouse;
   QLabel* _statusLabelPatch;
   QLabel* _statusLabelMarker;
@@ -89,8 +133,7 @@ class ImageWindow  : public QMainWindow {
   QAction* _closeWindowAct;
   QAction* _closeAppAct;
 
-  Window* _parentWindow;
-
+  QMenu* _imageMenu;
   QAction *_propagateWindowGeometryAct;
   QAction *_arangeWindowsAct;
   QAction *_fitImageAct;
@@ -105,7 +148,6 @@ class ImageWindow  : public QMainWindow {
   QAction *_zoomInTestAct;
   QAction *_zoomOutTestAct;
 
-  QMenu* _imageMenu;
   QAction *_resetHistogramAct;
 
   // toolbar

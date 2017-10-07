@@ -45,7 +45,7 @@ void Utils::HistogramData::setData(const ImageData *data, float scale) {
 
   // range
   const double bin_width = _range.range() / static_cast<double>(_nbins);
-  LOG(INFO) << "bin_width " << bin_width;
+  DLOG(INFO) << "bin_width " << bin_width;
 
   for (int c = 0; c < _channels; ++c) {
     std::vector<double> channelBins(_nbins, 0.);

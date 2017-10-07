@@ -71,9 +71,7 @@ class HistogramData {
 
   void setData(const ImageData *data, float max = 1.0f);
 
-
 };
-
 
 }; // namespace Utils
 

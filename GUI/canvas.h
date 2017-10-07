@@ -179,6 +179,8 @@ class Canvas  : public QOpenGLWidget {
   void slotZoomOut();
   void slotNoZoom();
 
+  void slotShiftCanvas(int, int, bool);
+
   void slotFitZoomToWindow();
   void slotCenterImage();
   void slotFitToImage();

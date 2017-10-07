@@ -11,13 +11,11 @@ class ImageData;
 class MipmapLevel;
 class GlManager;
 
-
 class Mipmap {
  public:
   Mipmap();
   ~Mipmap();
 
-  // void set_image(ImageData *i);
   void setData(float* ptr,
                uint height, uint width, uint channels,
                uint tileSize = 512);
@@ -38,7 +36,6 @@ class Mipmap {
   ImageData *_img;
 
   bool _empty;
-
 
 };
 

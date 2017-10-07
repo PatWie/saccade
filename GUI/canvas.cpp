@@ -149,6 +149,21 @@ void GUI::Canvas::toggleMarkerAtCursor() {
   slotCommunicateCanvasChange();
 }
 
+void GUI::Canvas::slotShiftCanvas(int v, int h, bool jump){
+
+  const int pixelPerLine = width() / _property.pixel_size;
+  const float jump_percent = 5;
+  if(jump){
+    h *= pixelPerLine / 100. * jump_percent;
+    v *= pixelPerLine / 100. * jump_percent;
+  }
+
+  _property.x += h;
+  _property.y += v;
+
+  slotCommunicateCanvasChange();
+}
+
 
 /**
  * @brief move canvas such that pixel is in the center
@@ -319,7 +334,7 @@ void GUI::Canvas::zoom_rel(QPoint q, int delta) {
 }
 
 void GUI::Canvas::slotFitZoomToWindow() {
-  LOG(INFO) << "GUI::Canvas::slotFitZoomToWindow";
+  DLOG(INFO) << "GUI::Canvas::slotFitZoomToWindow";
   const double zoom_width = ((double)_width / (double)_slides->width());
   const double zoom_height = ((double)_height / (double)_slides->height());
   _property.pixel_size = std::min(zoom_width, zoom_height);
@@ -464,7 +479,7 @@ void GUI::Canvas::slotReceiveProperty(property_t property) {
 }
 
 void GUI::Canvas::initializeGL() {
-  LOG(INFO) << "GUI::Canvas::initializeGL()";
+  DLOG(INFO) << "GUI::Canvas::initializeGL()";
   _gl->initializeOpenGLFunctions();
   _gl->printContextInformation();
 
@@ -550,7 +565,7 @@ void GUI::Canvas::slotRemoveCurrentLayer() {
     _slides->remove();
     slotCommunicateLayerChange();
   }
-  LOG(INFO) << "remove layer";
+  DLOG(INFO) << "remove layer";
 }
 
 void GUI::Canvas::slotNextLayer() {

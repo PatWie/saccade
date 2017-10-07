@@ -39,7 +39,7 @@ Utils::ImageData::ImageData(Utils::ImageData *i) {
 }
 
 Utils::ImageData::ImageData(std::string filename) {
-  LOG(INFO) << "Utils::ImageData::ImageData()";
+  DLOG(INFO) << "Utils::ImageData::ImageData()";
   _filename = filename;
 
   const FREE_IMAGE_FORMAT format = FreeImage_GetFileType(_filename.c_str(), 0);
@@ -92,7 +92,7 @@ Utils::ImageData::ImageData(std::string filename) {
   _height = FreeImage_GetHeight(_data);
 
   const int bpp = FreeImage_GetBPP(_data);
-  LOG(INFO) << "FreeImage_GetBPP: " << bpp;
+  DLOG(INFO) << "FreeImage_GetBPP: " << bpp;
 
   /*
   FIC_MINISWHITE  min value is white
@@ -103,31 +103,31 @@ Utils::ImageData::ImageData(std::string filename) {
   FIC_CMYK        CMYK color model
   */
   if (FreeImage_GetColorType(_data) == FIC_RGBALPHA) {
-    LOG(INFO) << "FreeImage_GetColorType: FIC_RGBALPHA";
+    DLOG(INFO) << "FreeImage_GetColorType: FIC_RGBALPHA";
     _channels = 4;
   }
   if (FreeImage_GetColorType(_data) == FIC_RGB) {
-    LOG(INFO) << "FreeImage_GetColorType: FIC_RGB";
+    DLOG(INFO) << "FreeImage_GetColorType: FIC_RGB";
     _channels = 3;
   }
   if (FreeImage_GetColorType(_data) == FIC_MINISBLACK) {
-    LOG(INFO) << "FreeImage_GetColorType: FIC_MINISBLACK";
+    DLOG(INFO) << "FreeImage_GetColorType: FIC_MINISBLACK";
     _channels = 1;
   }
 
   bool is_rgba = (_channels == 4);
   int off = 0;
   if (is_rgba) {
-    LOG(INFO) << "DETECTED RGBA";
+    DLOG(INFO) << "DETECTED RGBA";
     _channels = 3;
     // bgra (skip a)
     off = 1;
   }
 
   _max_value = std::pow(2, (float) FreeImage_GetBPP(_data) / _channels);
-  LOG(INFO) << "max value is " << _max_value;
-  LOG(INFO) << "channels:    " << _channels;
-  LOG(INFO) << "off:         " << off;
+  DLOG(INFO) << "max value is " << _max_value;
+  DLOG(INFO) << "channels:    " << _channels;
+  DLOG(INFO) << "off:         " << off;
 
   // handle special case: we ignore the alpha channel
   if (bpp == 32) {
@@ -163,7 +163,7 @@ Utils::ImageData::ImageData(std::string filename) {
   */
   switch (image_type) {
   case FIT_BITMAP:
-    LOG(INFO) << "case FIT_BITMAP";
+    DLOG(INFO) << "case FIT_BITMAP";
     for (int c = 0; c < _channels; ++c) {
       for (int h = 0; h < _height; ++h) {
         const uint8_t* line = FreeImage_GetScanLine(_data, _height - 1 - h);
@@ -175,7 +175,7 @@ Utils::ImageData::ImageData(std::string filename) {
     }
     break;
   case FIT_UINT16:
-    LOG(INFO) << "case FIT_UINT16";
+    DLOG(INFO) << "case FIT_UINT16";
     _channels = 1;
     // _max_value = 1.0;
     off = 0;
@@ -191,16 +191,16 @@ Utils::ImageData::ImageData(std::string filename) {
     }
     break;
   case FIT_INT16:
-    LOG(INFO) << "case FIT_INT16";
+    DLOG(INFO) << "case FIT_INT16";
     break;
   case FIT_UINT32:
-    LOG(INFO) << "case FIT_UINT32";
+    DLOG(INFO) << "case FIT_UINT32";
     break;
   case FIT_INT32:
-    LOG(INFO) << "case FIT_INT32";
+    DLOG(INFO) << "case FIT_INT32";
     break;
   case FIT_FLOAT:
-    LOG(INFO) << "case FIT_FLOAT";
+    DLOG(INFO) << "case FIT_FLOAT";
     for (int c = 0; c < _channels; ++c) {
       for (int h = 0; h < _height; ++h) {
         const float* line = (float *)FreeImage_GetScanLine(_data, _height - 1 - h);
@@ -212,7 +212,7 @@ Utils::ImageData::ImageData(std::string filename) {
     }
     break;
   case FIT_DOUBLE:
-    LOG(INFO) << "case FIT_DOUBLE";
+    DLOG(INFO) << "case FIT_DOUBLE";
     for (int c = 0; c < _channels; ++c) {
       for (int h = 0; h < _height; ++h) {
         const double* line = (double *)FreeImage_GetScanLine(_data, _height - 1 - h);
@@ -224,10 +224,10 @@ Utils::ImageData::ImageData(std::string filename) {
     }
     break;
   case FIT_COMPLEX:
-    LOG(INFO) << "case FIT_COMPLEX";
+    DLOG(INFO) << "case FIT_COMPLEX";
     break;
   case FIT_RGB16:
-    LOG(INFO) << "case FIT_RGB16";
+    DLOG(INFO) << "case FIT_RGB16";
     sc = 1.; // std::pow(2, (double) FreeImage_GetBPP(_data) / _channels);
     for (int c = 0; c < _channels; ++c) {
       for (int h = 0; h < _height; ++h) {
@@ -241,10 +241,10 @@ Utils::ImageData::ImageData(std::string filename) {
     }
     break;
   case FIT_RGBF:
-    LOG(INFO) << "case FIT_RGBF";
+    DLOG(INFO) << "case FIT_RGBF";
     break;
   case FIT_RGBA16:
-    LOG(INFO) << "case FIT_RGBA16";
+    DLOG(INFO) << "case FIT_RGBA16";
     // rescale to [0., 1.]
     sc = std::pow(2, (double) FreeImage_GetBPP(_data) / _channels);
     for (int c = 0; c < _channels; ++c) {
@@ -260,7 +260,7 @@ Utils::ImageData::ImageData(std::string filename) {
     _max_value = 1.0;
     break;
   case FIT_RGBAF:
-    LOG(INFO) << "case FIT_RGBAF";
+    DLOG(INFO) << "case FIT_RGBAF";
 
     break;
   }
@@ -316,7 +316,7 @@ std::string Utils::ImageData::color(int h, int w) const {
 
 
 void Utils::ImageData::clear(bool remove) {
-  LOG(INFO) << "Utils::ImageData::clear";
+  DLOG(INFO) << "Utils::ImageData::clear";
   // the _bud_data is already delete (so dont do it here again)
   if (remove)
     if (_raw_buf != nullptr)

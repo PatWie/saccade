@@ -57,7 +57,7 @@ void GUI::Histogram::contextMenuEvent(QContextMenuEvent *event) {
 }
 
 void GUI::Histogram::setData(Utils::HistogramData *h) {
-  LOG(INFO) << "GUI::Histogram::setData";
+  DLOG(INFO) << "GUI::Histogram::setData";
   _histogram = h;
   if(_histogram != nullptr)
     _expected_width = _histogram->bins();

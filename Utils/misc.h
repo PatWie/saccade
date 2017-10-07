@@ -7,8 +7,8 @@
 typedef unsigned int uint;
 
 template< typename T >
-struct always_false { 
-    enum { value = false };  
+struct always_false {
+    enum { value = false };
 };
 
 // color channels or gray channel
@@ -20,6 +20,5 @@ const static QColor misc_theme_gray(240, 240, 240, 255);
 // theming
 const static QColor misc_theme_yellow(251, 199, 99);
 const static QColor misc_theme_gray_selected(39, 40, 34, 100);
-
 
 #endif // MISC_H

@@ -53,8 +53,8 @@ QSize GUI::Window::sizeHint() const {
 }
 
 void GUI::Window::slotFocusChanged(ImageWindow* obj) {
-  LOG(INFO) << "GUI::Window::slotFocusChanged()";
-  LOG(INFO) << obj->metaObject()->className();
+  DLOG(INFO) << "GUI::Window::slotFocusChanged()";
+  DLOG(INFO) << obj->metaObject()->className();
 
 }
 
@@ -70,7 +70,7 @@ void GUI::Window::slotQuitApp(){
 
 
 void GUI::Window::slotNewWindowAction() {
-  LOG(INFO) << "GUI::Window::slotNewWindowAction()";
+  DLOG(INFO) << "GUI::Window::slotNewWindowAction()";
 
   GUI::ImageWindow* tmpWindow = new GUI::ImageWindow(this, this);
   tmpWindow->setMinimumSize(200, 200);
@@ -95,7 +95,7 @@ void GUI::Window::slotNewWindowAction() {
 
 }
 void GUI::Window::slotDialogWindowAction() {
-  LOG(INFO) << "GUI::Window::slotDialogWindowAction()";
+  DLOG(INFO) << "GUI::Window::slotDialogWindowAction()";
   AboutWindow* dialog = new AboutWindow(this);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -116,6 +116,13 @@ void GUI::Window::slotCommunicateCanvasChange(Canvas* sender) {
 
 void GUI::Window::slotCommunicateWindowGeometry(ImageWindow* sender) {
   emit sigReceiveWindowGeometry(sender);
+}
+
+void GUI::Window::slotCommunicatePrevLayer(){
+  emit sigReceivePrevLayer();
+}
+void GUI::Window::slotCommunicateNextLayer(){
+  emit sigReceiveNextLayer();
 }
 
 void GUI::Window::slotReceiveArangeWindows() {

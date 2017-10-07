@@ -51,13 +51,13 @@ void GUI::threads::OperationThread::notify(ImageData_ptr dst,
 }
 
 void GUI::threads::OperationThread::run() {
-  LOG(INFO) << "GUI::threads::OperationThread::run()";
+  DLOG(INFO) << "GUI::threads::OperationThread::run()";
   const float *src = _src->data();
   float *dst = _dst->data();
   #pragma omp parallel for
   for (size_t i = 0; i < _src->elements(); ++i)
     dst[i] = _op->apply(src[i]);
-  LOG(INFO) << "GUI::threads::OperationThread::run() done";
+  DLOG(INFO) << "GUI::threads::OperationThread::run() done";
 }
 
 // ------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void GUI::threads::ReloadThread::notify(std::string fn, int attempts) {
 }
 
 void GUI::threads::ReloadThread::run() {
-  LOG(INFO) << "GUI::threads::ReloadThread::run()";
+  DLOG(INFO) << "GUI::threads::ReloadThread::run()";
   for (int i = 0; i < _attempts; ++i)
   {
     if(Utils::ImageData::validFile(_fn)){
@@ -85,7 +85,7 @@ void GUI::threads::ReloadThread::run() {
 GUI::Layer::~Layer() {}
 
 GUI::Layer::Layer() {
-  LOG(INFO) << "GUI::Layer::Layer()";
+  DLOG(INFO) << "GUI::Layer::Layer()";
   _path = "";
   _available = false;
 
@@ -148,7 +148,7 @@ bool GUI::Layer::available() const {
 }
 
 void GUI::Layer::clear() {
-  LOG(INFO) << "GUI::Layer::clear()";
+  DLOG(INFO) << "GUI::Layer::clear()";
 
   _available = false;
 
@@ -158,7 +158,7 @@ void GUI::Layer::clear() {
 }
 
 void GUI::Layer::loadImage(std::string fn) {
-  LOG(INFO) << "GUI::Layer::loadImage()";
+  DLOG(INFO) << "GUI::Layer::loadImage()";
   _available = false;
 
   if (_path != "")
@@ -195,7 +195,7 @@ void GUI::Layer::slotRebuildHistogram()  {
 }
 
 void GUI::Layer::slotMipmapFinished()  {
-  LOG(INFO) << "GUI::Layer::slotMipmapFinished()";
+  DLOG(INFO) << "GUI::Layer::slotMipmapFinished()";
   // override mipmap with new one
   _current_mipmap = _working_mipmap;
   // watch again for file changes
@@ -207,7 +207,7 @@ void GUI::Layer::slotMipmapFinished()  {
 }
 
 void GUI::Layer::slotHistogramFinished()  {
-  LOG(INFO) << "GUI::Layer::slotHistogramFinished()";
+  DLOG(INFO) << "GUI::Layer::slotHistogramFinished()";
   // slotRefresh(0.f, _imgdata->max());
   emit sigHistogramFinished();
 }
@@ -220,16 +220,16 @@ void GUI::Layer::slotRefresh(float min, float max)  {
   o->_scaling.max = max;
   _op = o;
 
-  LOG(INFO) << "img max " << _imgdata->max();
-  LOG(INFO) << "scale " << o->_scaling.scale;
-  LOG(INFO) << "min " << o->_scaling.min;
-  LOG(INFO) << "max " << o->_scaling.max;
+  DLOG(INFO) << "img max " << _imgdata->max();
+  DLOG(INFO) << "scale " << o->_scaling.scale;
+  DLOG(INFO) << "min " << o->_scaling.min;
+  DLOG(INFO) << "max " << o->_scaling.max;
 
   slotApplyOp(_op);
 }
 
 void GUI::Layer::slotApplyOpFinished()  {
-  LOG(INFO) << "GUI::Layer::slotApplyOpFinished()";
+  DLOG(INFO) << "GUI::Layer::slotApplyOpFinished()";
   slotRebuildMipmap();
   emit sigApplyOpFinished();
 }
@@ -253,7 +253,7 @@ void GUI::Layer::slotApplyOp(Utils::Ops::ImgOp* op) {
 void GUI::Layer::slotPathChanged(QString s) {
   // prevent to much reloads
   _watcher->removePath(QString::fromStdString(s.toStdString()));
-  LOG(INFO) << "GUI::Layer::slotPathChanged() " << s.toStdString();
+  DLOG(INFO) << "GUI::Layer::slotPathChanged() " << s.toStdString();
   // wait until file is written
   _thread_Reloader->notify(s.toStdString());
   _thread_Reloader->start();
@@ -261,6 +261,6 @@ void GUI::Layer::slotPathChanged(QString s) {
 
 void GUI::Layer::slotFileIsValid(QString s) {
   // file seems to be a valid image file
-  LOG(INFO) << "GUI::Layer::slotFileIsValid(" << s.toStdString();
+  DLOG(INFO) << "GUI::Layer::slotFileIsValid(" << s.toStdString();
   loadImage(s.toStdString());
 }

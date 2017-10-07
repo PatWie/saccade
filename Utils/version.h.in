@@ -10,11 +10,10 @@ const static std::string SACCADE_BRANCH = "${GIT_BRANCH}";
 const static std::string SACCADE_COMMIT_ID = "${GIT_COMMIT_ID}";
 const static std::string SACCADE_COMMIT_DATE = "${GIT_COMMIT_DATE}";
 
-std::string GetVersionInfo();
+std::string versionInfo();
 
-std::string GetBuildInfo();
+std::string buildInfo();
 
 }  // namespace Utils
-
 
 #endif // VERSION_H

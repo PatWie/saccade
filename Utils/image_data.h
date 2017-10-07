@@ -6,13 +6,11 @@
 #include <string>
 #include <vector>
 
-
 namespace Utils {
 
-namespace Ops{
+namespace Ops {
  class ImgOp;
 }
-
 
 class ImageData {
 
@@ -43,7 +41,6 @@ class ImageData {
 
   static bool validFile(std::string filename);
 
-
  private:
   void buildScale();
   std::string _filename;
@@ -57,11 +54,7 @@ class ImageData {
   int _channels;
   float _max_value;
 
-  // rgb times height*width
-
-
 };
-
 
 }; // namespace Utils
 

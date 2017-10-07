@@ -46,7 +46,7 @@ void GUI::Slides::backward() {
 void GUI::Slides::remove() {
   if (_slides.size() > 0) {
     current()->clear();
-    LOG(INFO) << "_id " << _id;
+    DLOG(INFO) << "_id " << _id;
     int tid = _id;
     _id = _id - 1;
     _slides.erase(_slides.begin() + tid);

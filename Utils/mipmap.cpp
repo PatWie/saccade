@@ -22,7 +22,7 @@ bool Utils::Mipmap::empty() {
 Utils::Mipmap::~Mipmap() {}
 Utils::Mipmap::Mipmap() {
   _empty = true;
-  LOG(INFO) << "Utils::Mipmap::Mipmap";
+  DLOG(INFO) << "Utils::Mipmap::Mipmap";
 
 }
 
@@ -30,7 +30,7 @@ void Utils::Mipmap::setData(float *ptr,
                             uint height, uint width, uint channels,
                             uint tileSize) {
 
-  LOG(INFO) << "Utils::Mipmap::set_image START";
+  DLOG(INFO) << "Utils::Mipmap::set_image START";
 
 
   // unload old textures
@@ -56,7 +56,7 @@ void Utils::Mipmap::setData(float *ptr,
                       working_height, working_width, channels,
                       tileSize);
 
-  LOG(INFO) << "create level " << 0
+  DLOG(INFO) << "create level " << 0
             << " " << working_height
             << " " << working_width;
 
@@ -69,7 +69,7 @@ void Utils::Mipmap::setData(float *ptr,
       delete[] old_ptr;
 
 
-    LOG(INFO) << "create level " << d
+    DLOG(INFO) << "create level " << d
               << " " << working_height
               << " " << working_width;
     MipmapLevel* level = new MipmapLevel();
@@ -81,7 +81,7 @@ void Utils::Mipmap::setData(float *ptr,
   delete [] working_ptr;
 
 
-  LOG(INFO) << "Utils::Mipmap::set_image END";
+  DLOG(INFO) << "Utils::Mipmap::set_image END";
   _empty = false;
 }
 
@@ -183,8 +183,8 @@ void Utils::Mipmap::draw(Utils::GlManager *gl,
                          int top, int left,
                          int bottom, int right,
                          double zoom) {
-  // LOG(INFO) << "Utils::Mipmap::draw START";
-  // LOG(INFO) << "top " << top
+  // DLOG(INFO) << "Utils::Mipmap::draw START";
+  // DLOG(INFO) << "top " << top
   //           << "left " << left
   //           << "bottom " << bottom
   //           << "right " << right
@@ -212,11 +212,11 @@ void Utils::Mipmap::draw(Utils::GlManager *gl,
   */
   zoom = pow( 2.0, -(double)currentLevel );
 
-  // LOG(INFO) << "Utils::Mipmap::draw LEVEL " << currentLevel;
+  // DLOG(INFO) << "Utils::Mipmap::draw LEVEL " << currentLevel;
 
 
   _levels[currentLevel]->draw(gl, top, left, bottom, right, zoom);
-  // LOG(INFO) << "Utils::Mipmap::draw END";
+  // DLOG(INFO) << "Utils::Mipmap::draw END";
   // https://doc-snapshots.qt.io/qt5-dev/qopenglfunctions.html
 
 }

@@ -80,16 +80,26 @@ shortcuts for a single canvas
 | ------                       | ------               |
 | new canvas                   | Ctrl + N             |
 | quit                         | Ctrl + W             |
-| next image                   | key_down, key_right  |
+| next image                   | ⇩, ⇨                 |
 | delete image                 | Del                  |
-| previous image               | key_up, key_left     |
+| previous image               | ⇧, ⇦                 |
 | add new image                | Ctrl + O             |
+| fit window to image          | Ctrl + F             |
+
+shortcuts with global effects (get synchronized)
+
 | zoom in                      | Ctrl + plus          |
 | zoom out                     | Ctrl + minus         |
 | no zoom                      | Ctrl + 0             |
 | fit to window                | Ctrl + 9             |
 | reset histogram              | Ctrl + H             |
 | center image                 | Ctrl + C             |
-| fit window to image          | Ctrl + F             |
 | toggle marker                | Ctrl + M             |
 | selection tool               | Shift + "left click" |
+| shift image 10% right        | Shift + ⇨            |
+| shift image 10% left         | Shift + ⇦            |
+| shift image 10% down         | Shift + ⇩            |
+| shift image 10% up           | Shift + ⇧            |
+| next image in all canvases   | Ctrl + ⇩, ⇨          |
+| prev. image in all canvases  | Ctrl + ⇧, ⇦          |
+

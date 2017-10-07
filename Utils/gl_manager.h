@@ -49,7 +49,7 @@ class GlManager : public QOpenGLFunctions {
   template<typename Dtype>
   void prepare(GlObject<Dtype> *obj) {
     // std::cout << "prepare "<< obj << std::endl;
-      
+
     obj->texture_id = 0;
 
     if (!obj->loaded) {
@@ -61,7 +61,6 @@ class GlManager : public QOpenGLFunctions {
 
     glGenTextures( 1, &obj->texture_id );
     glBindTexture(GL_TEXTURE_2D, obj->texture_id);
-
 
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -86,20 +85,20 @@ class GlManager : public QOpenGLFunctions {
 
   template<typename Dtype>
   void draw(GlObject<Dtype> *obj,
-            double top, double left, 
-            double bottom,double right, 
+            double top, double left,
+            double bottom, double right,
             double depth = 1) {
 
     glBindTexture (GL_TEXTURE_2D, obj->texture_id);
 
     glBegin(GL_QUADS);
-    glTexCoord2d (0.0, 0.0);
+    glTexCoord2d(0.0, 0.0);
     glVertex3d(left, top, depth);
-    glTexCoord2d (1.0, 0.0);
+    glTexCoord2d(1.0, 0.0);
     glVertex3d(right, top, depth);
-    glTexCoord2d (1.0, 1.0);
+    glTexCoord2d(1.0, 1.0);
     glVertex3d(right, bottom, depth);
-    glTexCoord2d (0.0, 1.0);
+    glTexCoord2d(0.0, 1.0);
     glVertex3d(left, bottom, depth);
     glEnd();
 
@@ -115,5 +114,3 @@ class GlManager : public QOpenGLFunctions {
 }; // namespace Utils
 
 #endif // GL_MANAGER_H
-
-// see http://blog.qt.io/blog/2014/09/10/qt-weekly-19-qopenglwidget/

@@ -31,6 +31,9 @@ class Window  : public QMainWindow {
   void sigCommunicateWindowGeometry(ImageWindow*);
   void sigReceiveCanvasChange(Canvas*);
 
+  void sigReceivePrevLayer();
+  void sigReceiveNextLayer();
+
  public slots:
   void slotDialogWindowAction();
   void slotNewWindowAction();
@@ -41,6 +44,9 @@ class Window  : public QMainWindow {
 
   void slotImageWindowCloses(ImageWindow*);
   void slotQuitApp();
+
+  void slotCommunicatePrevLayer();
+  void slotCommunicateNextLayer();
 
  private:
   Slides* _slides;

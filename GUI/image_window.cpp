@@ -46,6 +46,17 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   connect( _horSlider, &QScrollBar::sliderMoved,
            this, &GUI::ImageWindow::slotHorSliderMoved);
 
+  connect(this, &GUI::ImageWindow::sigCommunicatePrevLayer,
+          parentWindow, &GUI::Window::slotCommunicatePrevLayer);
+
+  connect(this, &GUI::ImageWindow::sigCommunicateNextLayer,
+          parentWindow, &GUI::Window::slotCommunicateNextLayer);
+
+  connect(parentWindow, &GUI::Window::sigReceivePrevLayer,
+          _canvas, &GUI::Canvas::slotPrevLayer);
+  connect(parentWindow, &GUI::Window::sigReceiveNextLayer,
+          _canvas, &GUI::Canvas::slotNextLayer);
+
   _canvas->slotRepaint();
 
   // toolbar
@@ -77,6 +88,8 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
            _canvas, &GUI::Canvas::slotNextLayer);
   connect( this, &GUI::ImageWindow::sigRemoveCurrentLayer,
            _canvas, &GUI::Canvas::slotRemoveCurrentLayer);
+  connect( this, &GUI::ImageWindow::sigShiftCanvas,
+           _canvas, &GUI::Canvas::slotShiftCanvas);
 
 
   // menubar
@@ -213,15 +226,15 @@ bool GUI::ImageWindow::event(QEvent *e) {
 }
 
 void GUI::ImageWindow::slotRefreshBuffer() {
-  LOG(INFO) << "GUI::Window::slotRefreshBuffer()";
-  LOG(INFO) << _toolbar_histogram->data()->range()->min << " "
+  DLOG(INFO) << "GUI::Window::slotRefreshBuffer()";
+  DLOG(INFO) << _toolbar_histogram->data()->range()->min << " "
             <<  _toolbar_histogram->data()->range()->max;
 
   Layer *layer = _canvas->layer();
   if (layer != nullptr) {
     const double bin_width = _toolbar_histogram->data()->image()->max() /
                              static_cast<double>(256);
-    LOG(INFO) << "bin_width = " << bin_width;
+    DLOG(INFO) << "bin_width = " << bin_width;
     layer->slotRefresh(_toolbar_histogram->data()->range()->min * bin_width,
                        _toolbar_histogram->data()->range()->max * bin_width);
   }
@@ -232,7 +245,7 @@ void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
   QList<QUrl> urls = ev->mimeData()->urls();
   foreach (QUrl url, urls) {
     if (Utils::ImageData::validFile(url.toLocalFile().toStdString())) {
-      LOG(INFO) << "dropped " << url.toLocalFile().toStdString();
+      DLOG(INFO) << "dropped " << url.toLocalFile().toStdString();
       loadImage(url.toLocalFile().toStdString());
     }
   }
@@ -253,7 +266,7 @@ void GUI::ImageWindow::loadImage(std::string fn) {
 }
 
 void GUI::ImageWindow::slotOpenImage() {
-  LOG(INFO) << "GUI::Window::slotOpenImage()";
+  DLOG(INFO) << "GUI::Window::slotOpenImage()";
 
   QStringList filenames = QFileDialog::getOpenFileNames(this,
                           tr("Open Image"), _parentWindow->_openPath,
@@ -286,7 +299,7 @@ void GUI::ImageWindow::slotReceiveCanvasChange(Canvas* sender) {
 }
 
 void GUI::ImageWindow::slotReceiveLayerChange() {
-  LOG(INFO) << "GUI::ImageWindow::slotReceiveLayerChange()";
+  DLOG(INFO) << "GUI::ImageWindow::slotReceiveLayerChange()";
   slotRepaintHistogram();
   slotRepaintStatusbar();
   slotRepaintTitle();
@@ -296,19 +309,52 @@ void GUI::ImageWindow::slotReceiveLayerChange() {
 
 void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
 
-  switch (event->key()) {
-  case Qt::Key_Left:
-  case Qt::Key_Down:
-    emit sigPrevLayer();
-    break;
-  case Qt::Key_Right:
-  case Qt::Key_Up:
-    emit sigNextLayer();
-    break;
-  default:
-    QMainWindow::keyPressEvent(event);
+  Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
+
+  const bool pressedShift = keymod == Qt::ShiftModifier;
+  const bool pressedCtrl = keymod == Qt::ControlModifier;
+
+  if (pressedShift) {
+    // shift image position
+    switch (event->key()) {
+    case Qt::Key_Left:
+      emit sigShiftCanvas(0, -1, true); break;
+    case Qt::Key_Down:
+      emit sigShiftCanvas(-1, 0, true); break;
+    case Qt::Key_Right:
+      emit sigShiftCanvas(0, 1, true); break;
+    case Qt::Key_Up:
+      emit sigShiftCanvas(1, 0, true); break;
+      break;
+    default:
+      QMainWindow::keyPressEvent(event);
+    }
+  }else if(pressedCtrl){
+    // switch layer in all windows
+    switch (event->key()) {
+    case Qt::Key_Left:
+    case Qt::Key_Down:
+      emit sigCommunicatePrevLayer(); break;
+    case Qt::Key_Right:
+    case Qt::Key_Up:
+      emit sigCommunicateNextLayer(); break;
+    default:
+      QMainWindow::keyPressEvent(event);
+    }
+  } 
+  else {
+    switch (event->key()) {
+    case Qt::Key_Left:
+    case Qt::Key_Down:
+      emit sigPrevLayer(); break;
+    case Qt::Key_Right:
+    case Qt::Key_Up:
+      emit sigNextLayer(); break;
+    default:
+      QMainWindow::keyPressEvent(event);
+    }
   }
-  QMainWindow::keyPressEvent(event);
+
 }
 
 
@@ -433,20 +479,20 @@ void GUI::ImageWindow::slotRepaintHistogram() {
 
 
 void GUI::ImageWindow::slotCommunicateWindowGeometry() {
-  // LOG(INFO) << "GUI::ImageWindow::slotCommunicateWindowGeometry";
+  // DLOG(INFO) << "GUI::ImageWindow::slotCommunicateWindowGeometry";
   emit sigCommunicateWindowGeometry(this);
 }
 
 void GUI::ImageWindow::slotReceiveWindowGeometry(ImageWindow* sender) {
-  // LOG(INFO) << "GUI::ImageWindow::slotReceiveWindowGeometry";
+  // DLOG(INFO) << "GUI::ImageWindow::slotReceiveWindowGeometry";
   if ( this != sender ) {
     resize(sender->width(), sender->height());
   }
 }
 
 void GUI::ImageWindow::closeEvent(QCloseEvent * event) {
-  LOG(INFO) << "GUI::ImageWindow::closeEvent";
-  
+  DLOG(INFO) << "GUI::ImageWindow::closeEvent";
+
   event->ignore();
   emit sigImageWindowCloses(this);
   event->accept();

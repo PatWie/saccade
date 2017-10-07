@@ -30,11 +30,18 @@ class Histogram : public QFrame {
    * @param h histogram data
    */
   void setData(Utils::HistogramData *h);
+  /**
+   * @brief Get precomputed underlying histogram data
+   * @return underlying histogram data
+   */
   const Utils::HistogramData* data();
 
  protected:
   void paintEvent(QPaintEvent *e);
 
+  /**
+   * @brief create menu with range and scaling settings
+   */
   void contextMenuEvent(QContextMenuEvent *event);
 
   void mousePressEvent(QMouseEvent * e);
@@ -56,9 +63,22 @@ class Histogram : public QFrame {
   void sigRefreshBuffer();
 
  public slots:
-// reset range to default of image
+  /**
+   * @brief set limits of range
+   * @param min left delimiter
+   * @param max right delimiter
+   */
   void slotSetRange(float, float);
+
+  /**
+     * @brief reset limits of range to cover the full spectrum
+     */
   void slotResetRange();
+
+  /**
+   * @brief change mapping mode (linear/log)
+   * @param  mode (0=log, 1=linear)
+   */
   void slotSetMappingMode(int);
 
  private:
