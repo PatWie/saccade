@@ -24,7 +24,13 @@ This project is the missing scientific HDR image viewer inspired by [shiver/idis
 - supported fileformats: png jpg JPG bmp ppm tif CR2
 - helpful commands to arange multiple windows
 
-## Requirements
+## Install from binary
+
+I have prepared a [pre-compile binary](https://github.com/PatWie/saccade/releases) *with all dependencies* for vanilla Ubuntu 16.04. Static linking of Qt5.9 quite cumbersome, so until I figured out how to automate them with CI they will be published not on a regulary basis. You should try to build this project from source if you need the *git-head* version. 
+
+## Install from Source
+
+### Requirements
 
 I use it on Ubuntu 16.04 with Qt5.9. The requirements are currently:
 
@@ -36,13 +42,9 @@ I use it on Ubuntu 16.04 with Qt5.9. The requirements are currently:
 
 I plan to add CUDA for speed up some functions.
 
-## Get release as binary
+### Get dependencies and compile
 
-I have prepared a [pre-compile binary](https://github.com/PatWie/saccade/releases) for Ubuntu16.04. Static linking of Qt5.9 quite cumbersome, so until I figured out how to automate them with drone.io they will be published not on a regulary basis. You should try to build this from source. 
-
-## Install from Source
-
-See the [dockerfile](https://github.com/PatWie/saccade/blob/docker/.docker/dynamic/Dockerfile) for all commands.
+See the [dockerfile](https://github.com/PatWie/saccade/blob/docker/.docker/dynamic/Dockerfile) for all installing all dependencies.
 
 Assuming you are on Ubuntu 16.04 getting all dependencies is done by
 
