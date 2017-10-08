@@ -1,6 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>Icon/256x256/saccade.png</file>
-    <file>Ubuntu-R.tff</file>
+    <file>./Ubuntu-R.tff</file>
 </qresource>
 </RCC>
