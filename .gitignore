@@ -55,6 +55,9 @@ build
 
 Utils/version.h
 
-deploy/
-.deploy/
+deploy/libs
+deploy/output/
+deploy/static/
+deploy/saccade.tar.gz
+deploy/saccade/
 saccade.pro
