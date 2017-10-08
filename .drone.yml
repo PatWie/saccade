@@ -11,10 +11,11 @@ pipeline:
     image: qt59static
     pull: true
     commands:
-      - .deploy/run
+      - .deploy/pipeline.sh
+      - dir
   github_release:
     image: plugins/github-release
-    secrets: [ github_token ]
+    secrets: [github_token]
     files:
       - saccade_release.tar.gz
    checksum:
