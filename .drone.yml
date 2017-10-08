@@ -13,7 +13,7 @@ pipeline:
       - dir
   publish:
     image: plugins/drone-github-release
-    secrets: [github_token]
+    secrets: [ github_token ]
     files:
       - saccade_release.tar.gz
     checksum:
