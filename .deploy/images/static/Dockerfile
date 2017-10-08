@@ -20,4 +20,15 @@ make install && \
 cd /opt && \
 rm -rf qt-everywhere-opensource-src-5.9.2 && \
 exit 0
+RUN apt -y install    libfreeimage3 \
+    libfreeimage-dev \
+    libgflags-dev \
+    libgoogle-glog-dev \
+    freeglut3-dev 
 ENV PATH="${PATH}:/usr/local/Qt-5.9.2/bin"
+WORKDIR /data
+VOLUME ["/data"]
+
+# run me by sudo docker run --user="$(id -u):$(id -g)" --net=none -v /tmp/saccade:/data -i -t qt59static cmake .
+# run me by sudo docker run --user="$(id -u):$(id -g)" --net=none -v /tmp/saccade:/data -i -t qt59static qmake .
+# run me by sudo docker run --user="$(id -u):$(id -g)" --net=none -v /tmp/saccade:/data -i -t qt59static make
