@@ -1,9 +1,28 @@
 pipeline:
   build:
     image: patwie/saccade
-    pull: true
     commands:
       - mkdir build
       - cd build
       - cmake ..
       - make
+  deploy:
+    image: patwie/saccade-static
+    commands:
+      - .deploy/pipeline.sh
+      - dir
+  publish:
+    image: plugins/github-release
+    pull: true
+    secrets: [ github_token ]
+    files:
+      - saccade_release.tar.gz
+    checksum:
+      - md5
+      - sha1
+      - sha256
+      - sha512
+      - adler32
+      - crc32
+    when:
+      event: tag
