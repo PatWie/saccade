@@ -7,7 +7,7 @@ pipeline:
       - cmake ..
       - make
   deploy:
-    image: qt59static
+    image: patwie/saccade-static
     commands:
       - .deploy/pipeline.sh
       - dir
