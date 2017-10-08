@@ -18,8 +18,10 @@ GUI::AboutWindow::AboutWindow(QWidget *parent) :
   QString labelText = "";
   labelText.append("<p>" + QString::fromStdString(Utils::buildInfo()) + "</p>");
   labelText.append("<p><a href=\"https://github.com/PatWie/saccade\"><span style=\" text-decoration: underline; color:#ffffff;\">https://github.com/PatWie/saccade</span></a></p>");
-  labelText.append("<p><br/></p>");
+  // labelText.append("<p><br/></p>");
   labelText.append("<p>Patrick Wieschollek<br/>mail@patwie.com</p>");
+  labelText.append("<p><br/></p>");
+  labelText.append("<p>build with Qt5.9 (OpenSource)</p>");
 
   ui->label_2->setText(labelText);
 }
