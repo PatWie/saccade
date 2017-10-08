@@ -1,7 +1,6 @@
 pipeline:
   build:
     image: patwie/saccade
-    pull: true
     commands:
       - mkdir build
       - cd build
@@ -9,19 +8,19 @@ pipeline:
       - make
   deploy:
     image: qt59static
-    pull: true
     commands:
       - .deploy/pipeline.sh
       - dir
-  # github_release:
-  #   image: plugins/github-release
-  #   secrets: [github_token]
-  #   files:
-  #     - saccade_release.tar.gz
-  #  checksum:
-  #     - md5
-  #     - sha1
-  #     - sha256
-  #     - sha512
-  #     - adler32
-  #     - crc32
+  publish:
+    github_release:
+      image: plugins/github-release
+      secrets: [github_token]
+      files:
+        - saccade_release.tar.gz
+     checksum:
+        - md5
+        - sha1
+        - sha256
+        - sha512
+        - adler32
+        - crc32
