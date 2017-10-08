@@ -27,8 +27,7 @@ cd ${SACCADE_DIR}
 ln -s .wrapper saccade
 chmod +x saccade
 cd ..
-dir
-tar -zcvf saccade_release.tar.gz ${SACCADE_DIR}
+tar -zcvf saccade_release.tar.gz saccade_deploy
 cd ${CURRENT_DIR}
 cp /tmp/saccade_release.tar.gz .
 
