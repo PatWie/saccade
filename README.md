@@ -1,5 +1,6 @@
  # Saccade
 [![Build Status](http://ci.patwie.com/api/badges/PatWie/saccade/status.svg)](http://ci.patwie.com/PatWie/saccade)
+[![GitHub release](https://img.shields.io/github/release/PatWie/saccade.svg?style=plastic)](https://github.com/PatWie/saccade/releases)
 
 A **saccade** (*/səˈkɑːd/ sə-KAHD*) is a quick and simultaneous movement of both eyes in the same direction.
 
@@ -34,7 +35,13 @@ I use it on Ubuntu 16.04 with Qt5.9. The requirements are currently:
 
 I plan to add CUDA for speed up some functions.
 
+## Get release as binary
+
+I have prepared a [pre-compile binary](https://github.com/PatWie/saccade/releases) for Ubuntu16.04. Static linking of Qt5.9 quite cumbersome, so until I figured out how to automate them with drone.io they will be published not on a regulary basis. You should try to build this from source. 
+
 ## Install from Source
+
+See the [dockerfile](https://github.com/PatWie/saccade/blob/docker/.docker/dynamic/Dockerfile) for all commands.
 
 Assuming you are on Ubuntu 16.04 getting all dependencies is done by
 
