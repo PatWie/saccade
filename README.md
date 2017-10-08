@@ -1,6 +1,7 @@
  # Saccade
 [![Build Status](http://ci.patwie.com/api/badges/PatWie/saccade/status.svg)](http://ci.patwie.com/PatWie/saccade)
-[![GitHub release](https://img.shields.io/github/release/PatWie/saccade.svg?style=plastic)](https://github.com/PatWie/saccade/releases)
+[![GitHub release](https://img.shields.io/github/release/PatWie/saccade.svg)](https://github.com/PatWie/saccade/releases)
+[![Github commits (since latest release)](https://img.shields.io/github/commits-since/PatWie/saccade/latest.svg)]()
 
 A **saccade** (*/səˈkɑːd/ sə-KAHD*) is a quick and simultaneous movement of both eyes in the same direction.
 
@@ -96,6 +97,8 @@ shortcuts for a single canvas
 
 shortcuts with global effects (get synchronized)
 
+| Action                       | Shortcut             |
+| ------                       | ------               |
 | zoom in                      | Ctrl + plus          |
 | zoom out                     | Ctrl + minus         |
 | no zoom                      | Ctrl + 0             |
