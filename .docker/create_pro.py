@@ -20,6 +20,7 @@ print """RESOURCES     = textures.qrc
 QT           += widgets gui opengl core
 CONFIG += c++11
 CONFIG += static
+CONFIG += release
 
 LIBS += -lgflags -lglog -lglog -lfreeimage -lpthread -fopenmp
 

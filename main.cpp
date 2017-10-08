@@ -51,6 +51,14 @@ int main(int argc, char *argv[]) {
   app.setPalette(p);
   app.setQuitOnLastWindowClosed(false);
 
+  // Load the embedded font.
+  QString fontPath = ":Ubuntu-R.ttf";
+  int fontId = QFontDatabase::addApplicationFont(fontPath);
+  if (fontId != -1) {
+    QFont font("Ubuntu-R");
+    app.setFont(font);
+  }
+
   GUI::Window window(&app);
   window.setWindowIcon(QIcon(":Icon/256x256/saccade.png"));
   window.setWindowTitle("Saccade");
