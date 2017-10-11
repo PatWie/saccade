@@ -173,6 +173,7 @@ class Canvas  : public QOpenGLWidget {
   void slotPrevLayer();
   void slotNextLayer();
   void slotRemoveCurrentLayer();
+  void slotRemoveAllLayers();
 
   // zoom but keep center
   void slotZoomIn();

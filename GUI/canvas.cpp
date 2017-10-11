@@ -568,6 +568,14 @@ void GUI::Canvas::slotRemoveCurrentLayer() {
   DLOG(INFO) << "remove layer";
 }
 
+void GUI::Canvas::slotRemoveAllLayers() {
+  while(_slides->available()){
+    _slides->remove();
+  }
+  slotCommunicateLayerChange();
+  DLOG(INFO) << "remove all layers";
+}
+
 void GUI::Canvas::slotNextLayer() {
   _slides->forward();
   slotCommunicateLayerChange();

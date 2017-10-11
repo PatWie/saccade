@@ -16,7 +16,7 @@
 GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   : QMainWindow(parent), _parentWindow(parentWindow) {
 
-  setWindowTitle("Saccade - Canvas");
+  setWindowTitle("Saccade - empty");
 
   QGroupBox* centralWidget = new QGroupBox(this);
   _centerLayout = new QGridLayout(centralWidget);
@@ -104,6 +104,11 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _removeImageAct->setStatusTip(tr("Remove the current image"));
   connect(_removeImageAct, &QAction::triggered, _canvas, &GUI::Canvas::slotRemoveCurrentLayer);
 
+  _emptyCanvasAct = new QAction(tr("Remove all images in current canvas"), this );
+  _emptyCanvasAct->setShortcut(tr("Ctrl+Del"));
+  _emptyCanvasAct->setStatusTip(tr("Remove the all images in current canvas"));
+  connect(_emptyCanvasAct, &QAction::triggered, _canvas, &GUI::Canvas::slotRemoveAllLayers);
+
   _newWindowAct = new QAction(tr("&New"), this );
   _newWindowAct->setShortcut(tr("Ctrl+N"));
   _newWindowAct->setStatusTip(tr("Create a new Window"));
@@ -158,6 +163,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _fileMenu = menuBar()->addMenu(tr("&File"));
   _fileMenu->addAction(_openImageAct);
   _fileMenu->addAction(_removeImageAct);
+  _fileMenu->addAction(_emptyCanvasAct);
 
   _windowMenu = menuBar()->addMenu(tr("&Window"));
   _windowMenu->addAction(_newWindowAct);
@@ -357,15 +363,12 @@ void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
 
 }
 
-
-// TODO: mirrored
 void GUI::ImageWindow::slotVertSliderMoved(int value) {
   Canvas::property_t p = _canvas->property();
   p.y = value;
   _canvas->slotReceiveProperty(p);
 }
 
-// TODO: mirrored
 void GUI::ImageWindow::slotHorSliderMoved(int value) {
   Canvas::property_t p = _canvas->property();
   p.x = -value;
@@ -386,12 +389,13 @@ void GUI::ImageWindow::slotRepaint() {
 
 void GUI::ImageWindow::slotRepaintTitle() {
   if (_canvas->layer() == nullptr)
-    return;
-
-  const GUI::Layer *current = _canvas->slides()->current();
-  if (current != nullptr) {
-    // update title
-    setWindowTitle(("Saccade - " + current->path()).c_str());
+    setWindowTitle("Saccade - empty");
+  else{
+    const GUI::Layer *current = _canvas->slides()->current();
+    if (current != nullptr) {
+      // update title
+      setWindowTitle(("Saccade - " + current->path()).c_str());
+    }   
   }
 }
 
@@ -436,11 +440,11 @@ void GUI::ImageWindow::slotRepaintStatusbar() {
 void GUI::ImageWindow::slotRepaintSliders() {
   if (_canvas->layer() == nullptr)
     return;
-  const int imgWidth = _canvas->layer()->width();
-  const int imgHeight = _canvas->layer()->height();
+  const double imgWidth = _canvas->layer()->width();
+  const double imgHeight = _canvas->layer()->height();
 
-  const int winWidth = _canvas->width();
-  const int winheight = _canvas->height();
+  const double winWidth = _canvas->width();
+  const double winheight = _canvas->height();
 
   GUI::Canvas::property_t prop = _canvas->property();
 
@@ -448,17 +452,17 @@ void GUI::ImageWindow::slotRepaintSliders() {
     _horSlider->setRange(0, 0);
     _horSlider->setValue(0);
   } else {
-    const int radius = (int) (0.5 * ((double)imgWidth - (double)winWidth / prop.pixel_size));
+    const int radius = 0.5 * (imgWidth - winWidth / prop.pixel_size);
     _horSlider->setRange(-radius - 1, radius + 1);
-    _horSlider->setValue(-(int)prop.x);
+    _horSlider->setValue(-prop.x);
   }
   if ( imgHeight * prop.pixel_size < winheight ) {
     _vertSlider->setRange(0, 0);
     _vertSlider->setValue(0);
   } else {
-    const int radius = (int) (0.5 * ((double)imgHeight - (double)winheight / prop.pixel_size));
+    const int radius = 0.5 * (imgHeight - winheight / prop.pixel_size);
     _vertSlider->setRange(-radius - 1, radius + 1);
-    _vertSlider->setValue((int)prop.y);
+    _vertSlider->setValue(prop.y);
   }
 }
 
@@ -479,12 +483,12 @@ void GUI::ImageWindow::slotRepaintHistogram() {
 
 
 void GUI::ImageWindow::slotCommunicateWindowGeometry() {
-  // DLOG(INFO) << "GUI::ImageWindow::slotCommunicateWindowGeometry";
+  DLOG(INFO) << "GUI::ImageWindow::slotCommunicateWindowGeometry";
   emit sigCommunicateWindowGeometry(this);
 }
 
 void GUI::ImageWindow::slotReceiveWindowGeometry(ImageWindow* sender) {
-  // DLOG(INFO) << "GUI::ImageWindow::slotReceiveWindowGeometry";
+  DLOG(INFO) << "GUI::ImageWindow::slotReceiveWindowGeometry";
   if ( this != sender ) {
     resize(sender->width(), sender->height());
   }
