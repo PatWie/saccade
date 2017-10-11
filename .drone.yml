@@ -12,17 +12,8 @@ pipeline:
       - .deploy/pipeline.sh
       - dir
   publish:
-    image: plugins/github-release
-    pull: true
-    secrets: [ github_token ]
-    files:
-      - saccade_release.tar.gz
-    checksum:
-      - md5
-      - sha1
-      - sha256
-      - sha512
-      - adler32
-      - crc32
+    image: publish_file
+    commands:
+      - /opt/publish.sh
     when:
-      event: tag
+      branch: master

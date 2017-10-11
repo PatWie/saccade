@@ -1,7 +1,6 @@
  # Saccade
 [![Build Status](http://ci.patwie.com/api/badges/PatWie/saccade/status.svg)](http://ci.patwie.com/PatWie/saccade)
-[![GitHub release](https://img.shields.io/github/release/PatWie/saccade.svg)](https://github.com/PatWie/saccade/releases)
-[![Github commits (since latest release)](https://img.shields.io/github/commits-since/PatWie/saccade/latest.svg)]()
+[![GitHub release](https://img.shields.io/badge/release-get_latest-blue.svg)](https://files.patwie.com/builds/saccade/)
 
 A **saccade** (*/səˈkɑːd/ sə-KAHD*) is a quick and simultaneous movement of both eyes in the same direction.
 
@@ -26,7 +25,7 @@ This project is the missing scientific HDR image viewer inspired by [shiver/idis
 
 ## Install from binary
 
-I have prepared a [pre-compile binary](https://github.com/PatWie/saccade/releases) *with all dependencies* for vanilla Ubuntu 16.04. Static linking of Qt5.9 quite cumbersome, so until I figured out how to automate them with CI they will be published not on a regulary basis. You should try to build this project from source if you need the *git-head* version. 
+The related binaries for the master branch are generated automatically and static linked to Qt5.9 to reduce dependencies and filesize. The [pre-compile binaries](https://files.patwie.com/builds/saccade/) are available with *all dependencies* for Ubuntu 16.04.
 
 ## Install from Source
 
@@ -92,7 +91,8 @@ shortcuts for a single canvas
 | new canvas                   | Ctrl + N             |
 | quit                         | Ctrl + W             |
 | next image                   | ⇩, ⇨                 |
-| delete image                 | Del                  |
+| delete single image          | Del                  |
+| delete all images            | Ctrl + Del           |
 | previous image               | ⇧, ⇦                 |
 | add new image                | Ctrl + O             |
 | fit window to image          | Ctrl + F             |
@@ -113,6 +113,6 @@ shortcuts with global effects (get synchronized)
 | shift image 10% left         | Shift + ⇦            |
 | shift image 10% down         | Shift + ⇩            |
 | shift image 10% up           | Shift + ⇧            |
-| next image in all canvases   | Ctrl + ⇩, ⇨          |
-| prev. image in all canvases  | Ctrl + ⇧, ⇦          |
+| next image in all canvases   | Ctrl + ⇩, Ctrl + ⇨   |
+| prev. image in all canvases  | Ctrl + ⇧, Ctrl + ⇦   |
 

@@ -126,6 +126,7 @@ class ImageWindow  : public QMainWindow {
   QMenu* _fileMenu;
   QAction* _openImageAct;
   QAction* _removeImageAct;
+  QAction* _emptyCanvasAct;
 
   QMenu* _windowMenu;
   QAction* _newWindowAct;
