@@ -142,7 +142,14 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _resetHistogramAct = new QAction(tr("&Reset the histogram"), this );
   _resetHistogramAct->setShortcut(tr("Ctrl+H"));
   _resetHistogramAct->setStatusTip(tr("Reset the histogram range"));
-  connect(_resetHistogramAct, &QAction::triggered, _toolbar_histogram, &GUI::Histogram::slotResetRange);
+  connect(_resetHistogramAct,  &QAction::triggered,
+    this, [this] () { _toolbar_histogram->slotResetRange(HistogramRefreshTarget::CURRENT); });
+
+  _resetHistogramEntireCanvasAct = new QAction(tr("&Reset the histogram for all layers"), this );
+  _resetHistogramEntireCanvasAct->setShortcut(tr("Ctrl+Shift+H"));
+  _resetHistogramEntireCanvasAct->setStatusTip(tr("Reset the histogram range for all layers"));
+  connect(_resetHistogramEntireCanvasAct,  &QAction::triggered,
+    this, [this] () { _toolbar_histogram->slotResetRange(HistogramRefreshTarget::ENTIRE_CANVAS); });
 
   _dialogWindowAct = new QAction(tr("&About"), this );
   _dialogWindowAct->setShortcut(tr("F1"));
@@ -178,6 +185,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 
   _imageMenu = menuBar()->addMenu(tr("&Image"));
   _imageMenu->addAction(_resetHistogramAct);
+  _imageMenu->addAction(_resetHistogramEntireCanvasAct);
 
   _zoomInAct = new QAction(tr("Zoom in"), this);
   _zoomInAct->setStatusTip(tr("Zoom one step into image"));
@@ -231,18 +239,32 @@ bool GUI::ImageWindow::event(QEvent *e) {
   return QWidget::event(e);
 }
 
-void GUI::ImageWindow::slotRefreshBuffer() {
+void GUI::ImageWindow::slotRefreshBuffer(HistogramRefreshTarget target) {
   DLOG(INFO) << "GUI::Window::slotRefreshBuffer()";
   DLOG(INFO) << _toolbar_histogram->data()->range()->min << " "
-            <<  _toolbar_histogram->data()->range()->max;
+             <<  _toolbar_histogram->data()->range()->max;
 
   Layer *layer = _canvas->layer();
   if (layer != nullptr) {
     const double bin_width = _toolbar_histogram->data()->image()->max() /
                              static_cast<double>(256);
     DLOG(INFO) << "bin_width = " << bin_width;
-    layer->slotRefresh(_toolbar_histogram->data()->range()->min * bin_width,
-                       _toolbar_histogram->data()->range()->max * bin_width);
+    if (target == HistogramRefreshTarget::CURRENT) {
+      layer->slotRefresh(_toolbar_histogram->data()->range()->min * bin_width,
+                         _toolbar_histogram->data()->range()->max * bin_width);
+    } else {
+      DLOG(INFO) << "has " << _canvas->slides()->num() << " layers";
+      const int new_min = _toolbar_histogram->data()->range()->min * bin_width;
+      const int new_max = _toolbar_histogram->data()->range()->max * bin_width;
+      for (int n = 0; n < _canvas->slides()->num(); ++n) {
+        Layer *layer = _canvas->layer(n);
+        layer->histogram()->range()->min = new_min;
+        layer->histogram()->range()->max = new_max;
+        DLOG(INFO) << "update layer " << n;
+        DLOG(INFO) << "update layer " << layer->available();
+        layer->slotRefresh(new_min, new_max);
+      }
+    }
   }
 }
 
@@ -335,7 +357,7 @@ void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
     default:
       QMainWindow::keyPressEvent(event);
     }
-  }else if(pressedCtrl){
+  } else if (pressedCtrl) {
     // switch layer in all windows
     switch (event->key()) {
     case Qt::Key_Left:
@@ -347,8 +369,7 @@ void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
     default:
       QMainWindow::keyPressEvent(event);
     }
-  } 
-  else {
+  } else {
     switch (event->key()) {
     case Qt::Key_Left:
     case Qt::Key_Down:
@@ -390,12 +411,12 @@ void GUI::ImageWindow::slotRepaint() {
 void GUI::ImageWindow::slotRepaintTitle() {
   if (_canvas->layer() == nullptr)
     setWindowTitle("Saccade - empty");
-  else{
+  else {
     const GUI::Layer *current = _canvas->slides()->current();
     if (current != nullptr) {
       // update title
       setWindowTitle(("Saccade - " + current->path()).c_str());
-    }   
+    }
   }
 }
 

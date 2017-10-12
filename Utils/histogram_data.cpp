@@ -23,7 +23,7 @@ Utils::HistogramData::HistogramData() :
 
   _scale_mappings.push_back([](float i)->float{ return i;});
   _scale_mappings.push_back([](float i)->float{ return log(i);});
-  _scale_mapping_id = 1;
+  _scale_mapping_id = 0;
 }
 
 void Utils::HistogramData::setData(const ImageData *data, float scale) {

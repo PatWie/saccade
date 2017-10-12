@@ -213,18 +213,21 @@ void GUI::Layer::slotHistogramFinished()  {
 }
 
 void GUI::Layer::slotRefresh(float min, float max)  {
+  DLOG(INFO) << "GUI::Layer::slotRefresh()";
 
   Utils::Ops::HistogramOp *o = static_cast<Utils::Ops::HistogramOp*>(_op);
   o->_scaling.scale = _imgdata->max();
   o->_scaling.min = min;
   o->_scaling.max = max;
   _op = o;
+  DLOG(INFO) << "GUI::Layer::slotRefresh() : op prepared";
 
   DLOG(INFO) << "img max " << _imgdata->max();
   DLOG(INFO) << "scale " << o->_scaling.scale;
   DLOG(INFO) << "min " << o->_scaling.min;
   DLOG(INFO) << "max " << o->_scaling.max;
 
+  DLOG(INFO) << "GUI::Layer::slotRefresh() : start slotApply()";
   slotApplyOp(_op);
 }
 
@@ -239,14 +242,20 @@ Utils::HistogramData* GUI::Layer::histogram() const{
   return _histdata.get();
 }
 
+Utils::HistogramData* GUI::Layer::histogram(){
+  return _histdata.get();
+}
+
 std::string GUI::Layer::path() const {
   return _path;
 }
 
 void GUI::Layer::slotApplyOp(Utils::Ops::ImgOp* op) {
+  DLOG(INFO) << "GUI::Layer::slotApplyOp()";
   _available = false;
   _bufdata = std::make_shared<Utils::ImageData>(_imgdata.get());
   _thread_opWorker->notify(_bufdata, _bufdata, op);
+  DLOG(INFO) << "_thread_opWorker->start()";
   _thread_opWorker->start();
 }
 

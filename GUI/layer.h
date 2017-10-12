@@ -166,6 +166,7 @@ class Layer  : public QObject {
    * @return pointer to histogram data struct
    */
   Utils::HistogramData* histogram() const;
+  Utils::HistogramData* histogram();
 
 
  signals:
