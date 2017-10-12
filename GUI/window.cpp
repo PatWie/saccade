@@ -148,7 +148,7 @@ void GUI::Window::slotReceiveArangeWindows() {
   int cur_line_height = sorted_windows[0]->height();
 
   for (auto && wnd : sorted_windows) {
-    if (cur_x + padding > width) {
+    if (cur_x + padding + wnd->width() > width) {
       cur_x = start_x;
       cur_y += cur_line_height;
       cur_line_height = 0;

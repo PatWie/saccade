@@ -28,6 +28,10 @@ GUI::Layer* GUI::Slides::operator[](int i) {
   return _slides[i];
 }
 
+unsigned int GUI::Slides::num() const {
+  return _slides.size();
+}
+
 void GUI::Slides::add(Layer* l) {
   _slides.push_back(l);
   if (_slides.size() == 1)

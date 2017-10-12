@@ -20,9 +20,9 @@ GUI::Histogram::Histogram(QWidget *parent)
   _resetRangeResetAct = new QAction(tr("Reset Range"), this);
   _resetRangeLdrAct = new QAction(tr("Fit LDR"), this);
   _resetRange01Act = new QAction(tr("Fit [0,1]"), this);
-  connect(_resetRangeResetAct, &QAction::triggered, this, [this] { slotSetRange(0, 0); });
-  connect(_resetRangeLdrAct, &QAction::triggered, this, [this] { slotSetRange(0, 255); });
-  connect(_resetRange01Act, &QAction::triggered, this, [this] { slotSetRange(0, 1); });
+  connect(_resetRangeResetAct, &QAction::triggered, this, [this] { slotSetRange(0, 0, HistogramRefreshTarget::CURRENT); });
+  connect(_resetRangeLdrAct, &QAction::triggered, this, [this] { slotSetRange(0, 255, HistogramRefreshTarget::CURRENT); });
+  connect(_resetRange01Act, &QAction::triggered, this, [this] { slotSetRange(0, 1, HistogramRefreshTarget::CURRENT); });
 
   _setMappingLinearAct = new QAction(tr("Set linear mapping"), this);
   _setMappingLogAct = new QAction(tr("Set log mapping"), this);
@@ -59,7 +59,7 @@ void GUI::Histogram::contextMenuEvent(QContextMenuEvent *event) {
 void GUI::Histogram::setData(Utils::HistogramData *h) {
   DLOG(INFO) << "GUI::Histogram::setData";
   _histogram = h;
-  if(_histogram != nullptr)
+  if (_histogram != nullptr)
     _expected_width = _histogram->bins();
   update();
 }
@@ -246,16 +246,24 @@ void GUI::Histogram::mouseReleaseEvent(QMouseEvent * e) {
     this->setCursor(tmp);
     // if there was an action, this action will now take effect
     if (_dragging.mode != dragging_t::NONE) {
-      emit sigRefreshBuffer();
+
+      Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
+      if (keymod == Qt::ShiftModifier) {
+        emit sigRefreshBuffer(HistogramRefreshTarget::ENTIRE_CANVAS);
+      } else {
+        emit sigRefreshBuffer(HistogramRefreshTarget::CURRENT);
+      }
+
       _dragging.mode = dragging_t::NONE;
     }
   }
 }
 
-void GUI::Histogram::slotResetRange() {
-  slotSetRange(0, 0);
+void GUI::Histogram::slotResetRange(HistogramRefreshTarget t) {
+  slotSetRange(0, 0, t);
 }
-void GUI::Histogram::slotSetRange(float min, float max) {
+
+void GUI::Histogram::slotSetRange(float min, float max, HistogramRefreshTarget t) {
   if (hasHistogram()) {
     if (min == 0 && max == 0) {
       // by 0,0 we encode reset
@@ -265,7 +273,7 @@ void GUI::Histogram::slotSetRange(float min, float max) {
       _histogram->range()->min = min;
       _histogram->range()->max = max;
     }
-    emit sigRefreshBuffer();
+    emit sigRefreshBuffer(t);
     update();
   }
 }

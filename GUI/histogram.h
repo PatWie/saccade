@@ -7,18 +7,21 @@
 #include <QAction>
 
 #include "../Utils/histogram_data.h"
+#include "../Utils/misc.h"
 
 // namespace Utils {
 // class HistogramData;
 // }; // namespace Utils
 
 namespace GUI {
+
 /**
  * @brief Represent color histogram of an image
  */
 class Histogram : public QFrame {
   Q_OBJECT
  public:
+
   Histogram(QWidget *parent);
   ~Histogram();
 
@@ -60,7 +63,7 @@ class Histogram : public QFrame {
 
  signals:
   // histogram-range changed -> request buffer change
-  void sigRefreshBuffer();
+  void sigRefreshBuffer(HistogramRefreshTarget);
 
  public slots:
   /**
@@ -68,12 +71,12 @@ class Histogram : public QFrame {
    * @param min left delimiter
    * @param max right delimiter
    */
-  void slotSetRange(float, float);
+  void slotSetRange(float, float, HistogramRefreshTarget);
 
   /**
      * @brief reset limits of range to cover the full spectrum
      */
-  void slotResetRange();
+  void slotResetRange(HistogramRefreshTarget);
 
   /**
    * @brief change mapping mode (linear/log)

@@ -12,6 +12,8 @@
 
 #include "canvas.h"
 #include "marker.h"
+#include "../Utils/misc.h"
+
 
 namespace GUI {
 class Slides;
@@ -91,7 +93,7 @@ class ImageWindow  : public QMainWindow {
   /**
    * @brief image content has changed and the buffer needs to update
    */
-  void slotRefreshBuffer();
+  void slotRefreshBuffer(HistogramRefreshTarget);
 
   void slotRepaint();
 
@@ -150,6 +152,7 @@ class ImageWindow  : public QMainWindow {
   QAction *_zoomOutTestAct;
 
   QAction *_resetHistogramAct;
+  QAction *_resetHistogramEntireCanvasAct;
 
   // toolbar
   QToolBar* _toolbar;

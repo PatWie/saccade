@@ -11,6 +11,9 @@ struct always_false {
     enum { value = false };
 };
 
+
+enum class HistogramRefreshTarget {CURRENT, ENTIRE_CANVAS};
+
 // color channels or gray channel
 const static QColor misc_theme_red(241, 79, 76, 255);
 const static QColor misc_theme_green(105, 213, 107, 255);

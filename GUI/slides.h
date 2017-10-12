@@ -29,6 +29,8 @@ class Slides {
             uint bottom, uint right,
             double zoom);
 
+  unsigned int num() const;
+
   bool available() const;
 
   void backward();

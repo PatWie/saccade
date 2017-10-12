@@ -69,8 +69,9 @@ const GUI::Layer* GUI::Canvas::layer(int i) const {
 
 GUI::Layer* GUI::Canvas::layer(int i) {
   // if there is any layer return it
-  if (!_slides->available())
-    return nullptr;
+  // TODO: check const implementation (we need to remove this to apply batch ops)
+  // if (!_slides->available())
+  //   return nullptr;
   if (i == -1)
     return _slides->current();
   else

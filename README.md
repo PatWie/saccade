@@ -75,44 +75,52 @@ and you find the app in the Ubuntu searchbar. When debugging the application it 
 
 ## Keyboard Shortcuts
 
+The concept of Saccade is that are multiple canvases (each window so speaking) consists of different layers (all images per canvas). Some action might affect only the *visible* layer accross all canvases (global effects). Some might affect only the *all* layers in current canvas (local effect)
+
 General shortcuts
 
-| Action                       | Shortcut             |
-| ------                       | ------               |
-| quit entire app              | Ctrl + Q             |
-| about and version info       | F1                   |
-| distribute window geometry   | F2                   |
-| automatically arange windows | F3                   |
+| Action                        | Shortcut                  |
+| ------                        | ------                    |
+| quit entire app               | Ctrl + Q                  |
+| about and version info        | F1                        |
+| distribute window geometry    | F2                        |
+| automatically arrange windows | F3                        |
+| new canvas                    | Ctrl + N                  |
 
-shortcuts for a single canvas
+shortcuts for a single canvas (visible layer)
 
-| Action                       | Shortcut             |
-| ------                       | ------               |
-| new canvas                   | Ctrl + N             |
-| quit                         | Ctrl + W             |
-| next image                   | ⇩, ⇨                 |
-| delete single image          | Del                  |
-| delete all images            | Ctrl + Del           |
-| previous image               | ⇧, ⇦                 |
-| add new image                | Ctrl + O             |
-| fit window to image          | Ctrl + F             |
+| Action                        | Shortcut                  |
+| ------                        | ------                    |
+| quit                          | Ctrl + W                  |
+| add new image                 | Ctrl + O                  |
+| next image                    | ⇩, ⇨                      |
+| delete single image           | Del                       |
+| previous image                | ⇧, ⇦                      |
+| fit window to image           | Ctrl + F                  |
+| reset histogram               | Ctrl + H                  |
 
-shortcuts with global effects (get synchronized)
+shortcuts for a local effects (all layers in single canvas)
 
-| Action                       | Shortcut             |
-| ------                       | ------               |
-| zoom in                      | Ctrl + plus          |
-| zoom out                     | Ctrl + minus         |
-| no zoom                      | Ctrl + 0             |
-| fit to window                | Ctrl + 9             |
-| reset histogram              | Ctrl + H             |
-| center image                 | Ctrl + C             |
-| toggle marker                | Ctrl + M             |
-| selection tool               | Shift + "left click" |
-| shift image 10% right        | Shift + ⇨            |
-| shift image 10% left         | Shift + ⇦            |
-| shift image 10% down         | Shift + ⇩            |
-| shift image 10% up           | Shift + ⇧            |
-| next image in all canvases   | Ctrl + ⇩, Ctrl + ⇨   |
-| prev. image in all canvases  | Ctrl + ⇧, Ctrl + ⇦   |
+| Action                        | Shortcut                  |
+| ------                        | ------                    |
+| reset histogram (all layers)  | Ctrl + Shift + H          |
+| delete all images             | Ctrl + Del                |
+| change hist for all layers    | Shift + mouse (histogram) |
+
+shortcuts for all global effects (synchronized across all canvases)
+
+| Action                        | Shortcut                  |
+| ------                        | ------                    |
+| zoom in                       | Ctrl + plus               |
+| zoom out                      | Ctrl + minus              |
+| no zoom                       | Ctrl + 0                  |
+| fit to window                 | Ctrl + 9                  |
+| center image                  | Ctrl + C                  |
+| toggle marker                 | Ctrl + M                  |
+| shift image 10% right         | Shift + ⇨                 |
+| shift image 10% left          | Shift + ⇦                 |
+| shift image 10% down          | Shift + ⇩                 |
+| shift image 10% up            | Shift + ⇧                 |
+| next image in all canvases    | Ctrl + ⇩, Ctrl + ⇨        |
+| prev. image in all canvases   | Ctrl + ⇧, Ctrl + ⇦        |
 
