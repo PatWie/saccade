@@ -4,13 +4,19 @@
 
 A **saccade** (*/səˈkɑːd/ sə-KAHD*) is a quick and simultaneous movement of both eyes in the same direction.
 
+This project is the missing scientific HDR image viewer inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). 
+
 When working on computer vision problems a good image viewer can ease the process of inspecting images. The *saccade* project aims at providing an efficient image viewer with some sophisticated functions for comparing images. When dragging and zooming an image in one canvas, all other canvases synchronously also zoom and shift, so you get the pixel position in all images. Further, a marker can be set precisely on a specific image and all other views share the marker at exact the same position.
 
 The image viewer features an OpenGL-based canvas to display images with dragging and zooming. It uses the [FreeImage](freeimage.sourceforge.net) library to load images from different types.
 
 <p align="center"> <img src="https://github.com/patwie-stuff/img/blob/master/screenshot.gif?raw=true"> </p>
 
-This project is the missing scientific HDR image viewer inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). 
+The concept of Saccade is that are multiple canvases (each window so speaking) consists of different layers (all images per canvas). Each canvase has an active layer (the one containing the image you see).
+
+Some action might affect only the *active* layer accross *all* canvases (global effects), e.g., zooming and dragging.
+
+When manipulating the histogram, the changes can be applied to only the current *active* layer or *all* layers in the *current* canvas (holding the `SHIFT` key).
 
 ## Features
 
@@ -64,18 +70,19 @@ And finally just get this repository by
     cd saccade
     mkdir build
     cd build
-    cmake ..
+    cmake -DCMAKE_BUILD_TYPE=Release ..
     make
+
+A copy and paste version to automate the GUI installer is described in the [Dockerfile](https://github.com/PatWie/saccade/blob/master/.deploy/images/dynamic/Dockerfile).
 
 To add the saccade application to the uniy-launcher, edit `saccade.desktop` and adjust the paths. Then run
 
     cp saccade.desktop $HOME/.local/share/applications/saccade.desktop
 
-and you find the app in the Ubuntu searchbar. When debugging the application it might be helpful to start it with the flag `--logtostderr 1`.
+and you find the app icon in the Ubuntu searchbar. When debugging the application it might be helpful to start it with the flag `--logtostderr 1`.
 
 ## Keyboard Shortcuts
 
-The concept of Saccade is that are multiple canvases (each window so speaking) consists of different layers (all images per canvas). Some action might affect only the *visible* layer accross all canvases (global effects). Some might affect only the *all* layers in current canvas (local effect)
 
 General shortcuts
 
@@ -91,7 +98,7 @@ shortcuts for a single canvas (visible layer)
 
 | Action                        | Shortcut                  |
 | ------                        | ------                    |
-| quit                          | Ctrl + W                  |
+| quit canvas                   | Ctrl + W                  |
 | add new image                 | Ctrl + O                  |
 | next image                    | ⇩, ⇨                      |
 | delete single image           | Del                       |
@@ -99,15 +106,15 @@ shortcuts for a single canvas (visible layer)
 | fit window to image           | Ctrl + F                  |
 | reset histogram               | Ctrl + H                  |
 
-shortcuts for a local effects (all layers in single canvas)
+shortcuts for local effects (all layers in single canvas)
 
 | Action                        | Shortcut                  |
 | ------                        | ------                    |
 | reset histogram (all layers)  | Ctrl + Shift + H          |
 | delete all images             | Ctrl + Del                |
-| change hist for all layers    | Shift + mouse (histogram) |
+| change hist. for all layers   | Shift + mouse (histogram) |
 
-shortcuts for all global effects (synchronized across all canvases)
+shortcuts for global effects (synchronized across all canvases)
 
 | Action                        | Shortcut                  |
 | ------                        | ------                    |
