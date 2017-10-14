@@ -13,11 +13,9 @@ pipeline:
       - dir
     when:
       branch: master
-      event: merge
   publish:
     image: publish_file
     commands:
       - /opt/publish.sh
     when:
       branch: master
-      event: merge
