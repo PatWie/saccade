@@ -346,13 +346,13 @@ void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
     // shift image position
     switch (event->key()) {
     case Qt::Key_Left:
-      emit sigShiftCanvas(0, -1, true); break;
-    case Qt::Key_Down:
-      emit sigShiftCanvas(-1, 0, true); break;
-    case Qt::Key_Right:
       emit sigShiftCanvas(0, 1, true); break;
-    case Qt::Key_Up:
+    case Qt::Key_Down:
       emit sigShiftCanvas(1, 0, true); break;
+    case Qt::Key_Right:
+      emit sigShiftCanvas(0, -1, true); break;
+    case Qt::Key_Up:
+      emit sigShiftCanvas(-1, 0, true); break;
       break;
     default:
       QMainWindow::keyPressEvent(event);
