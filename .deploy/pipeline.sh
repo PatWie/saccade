@@ -44,7 +44,7 @@ ln -s .wrapper saccade
 chmod +x saccade
 cd ..
 # create tarball for release
-tar -zcvf saccade_release.tar.gz ${SACCADE_DIR}
+tar -C /tmp -zcvf saccade_release.tar.gz saccade
 cd ${CURRENT_DIR}
 cp /tmp/saccade_release.tar.gz .
 
