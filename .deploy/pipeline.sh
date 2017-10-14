@@ -19,7 +19,7 @@ qmake .
 make
 
 
-SACCADE_DIR=/tmp/saccade_deploy
+SACCADE_DIR=/tmp/saccade
 
 mkdir ${SACCADE_DIR}
 mkdir -p ${SACCADE_DIR}/libs
@@ -44,7 +44,7 @@ ln -s .wrapper saccade
 chmod +x saccade
 cd ..
 # create tarball for release
-tar -zcvf saccade_release.tar.gz saccade_deploy
+tar -zcvf saccade_release.tar.gz ${SACCADE_DIR}
 cd ${CURRENT_DIR}
 cp /tmp/saccade_release.tar.gz .
 
