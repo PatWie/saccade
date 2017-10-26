@@ -62,10 +62,10 @@ class HistogramData {
   range_t* range();
   const range_t* range() const;
 
-  const bool available() const;
-  const int bins() const;
-  const int channels() const;
-  const int amount(int channel, int bin) const;
+  bool available() const;
+  int bins() const;
+  int channels() const;
+  int amount(int channel, int bin) const;
 
   const bin_info_t bin_info() const;
 

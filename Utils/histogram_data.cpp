@@ -75,7 +75,7 @@ const Utils::HistogramData::range_t* Utils::HistogramData::range() const {
   return &_range;
 }
 
-const int Utils::HistogramData::amount(int channel, int bin) const {
+int Utils::HistogramData::amount(int channel, int bin) const {
   if (channel < 0 || channel >= _channels ||
       bin < 0 || bin >= _nbins)
     return 0;
@@ -83,13 +83,13 @@ const int Utils::HistogramData::amount(int channel, int bin) const {
     return _data[channel][bin];
 }
 
-const bool Utils::HistogramData::available() const {
+bool Utils::HistogramData::available() const {
   return _available;
 }
-const int Utils::HistogramData::bins() const {
+int Utils::HistogramData::bins() const {
   return _nbins;
 }
-const int Utils::HistogramData::channels() const {
+int Utils::HistogramData::channels() const {
   return _channels;
 }
 const Utils::HistogramData::bin_info_t Utils::HistogramData::bin_info() const {

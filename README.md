@@ -94,6 +94,7 @@ These are very likely to changed in the next versions.
 | ------                        | ------                    |
 | quit viewport                 | Ctrl + W                  |
 | add new image                 | Ctrl + O                  |
+| save current image            | Ctrl + S                  |
 | next image                    | ⇩, ⇨                      |
 | delete single image           | Del                       |
 | previous image                | ⇧, ⇦                      |

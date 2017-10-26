@@ -22,6 +22,9 @@ CONFIG += c++11
 CONFIG += static
 CONFIG += release
 
+QMAKE_LFLAGS += -fopenmp
+QMAKE_CXXFLAGS += -fopenmp
+
 LIBS += -lgflags -lglog -lglog -lfreeimage -lpthread -fopenmp
 
 FORMS += \

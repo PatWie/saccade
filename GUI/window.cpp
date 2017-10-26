@@ -138,7 +138,7 @@ void GUI::Window::slotReceiveArangeWindows() {
   });
 
   QRect rec = QApplication::desktop()->availableGeometry(sorted_windows[0]);
-  const int height = rec.height();
+  // const int height = rec.height();
   const int width = rec.width();
   const int padding = 4;
 

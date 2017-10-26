@@ -84,6 +84,7 @@ class ImageWindow  : public QMainWindow {
    * @brief Trigger "open file"dialog
    */
   void slotOpenImage();
+  void slotSaveImage();
 
   /**
    * @brief request other windows to share same window geometry
@@ -127,6 +128,7 @@ class ImageWindow  : public QMainWindow {
 
   QMenu* _fileMenu;
   QAction* _openImageAct;
+  QAction* _saveImageAct;
   QAction* _removeImageAct;
   QAction* _emptyCanvasAct;
 

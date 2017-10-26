@@ -131,7 +131,6 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
 void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
 
   GUI::Canvas::property_t prop = canvas->property();
-  const double zoom = prop.pixel_size;
 
   glLoadIdentity();
   glScaled(prop.pixel_size, -prop.pixel_size, 1.0);

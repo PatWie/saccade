@@ -70,7 +70,7 @@ void GUI::Slides::remove() {
 void GUI::Slides::forward() {
   if (_slides.size() > 0) {
     _id++;
-    if (_id >= _slides.size())
+    if (_id >= (int) _slides.size())
       _id = _slides.size() - 1;
   }
 

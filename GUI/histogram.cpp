@@ -12,6 +12,8 @@
 GUI::Histogram::Histogram(QWidget *parent)
   : _histogram(nullptr), _min_width(50) {
 
+  Q_UNUSED(parent);
+
   setFrameStyle(QFrame::Panel | QFrame::Sunken);
   setMouseTracking( true );
 
@@ -164,7 +166,7 @@ void GUI::Histogram::mousePressEvent(QMouseEvent * e) {
     // user wants to apply some action
     if ( (e->buttons() & Qt::LeftButton) ) {
       // get entire area
-      QRect area = paintingArea();
+      // QRect area = paintingArea();
       const int x = e->x();
 
       // identify which part the user wants to drag
@@ -239,6 +241,7 @@ void GUI::Histogram::mouseMoveEvent(QMouseEvent * e) {
 }
 
 void GUI::Histogram::mouseReleaseEvent(QMouseEvent * e) {
+  Q_UNUSED(e);
   if (hasHistogram()) {
     // stop clicking means reset cursor style
     QCursor tmp;

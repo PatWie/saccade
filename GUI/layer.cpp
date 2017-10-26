@@ -238,6 +238,9 @@ void GUI::Layer::slotApplyOpFinished()  {
 }
 
 
+const Utils::ImageData* GUI::Layer::buffer() const{
+  return _bufdata.get();
+}
 Utils::HistogramData* GUI::Layer::histogram() const{
   return _histdata.get();
 }

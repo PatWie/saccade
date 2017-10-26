@@ -99,6 +99,11 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _openImageAct->setStatusTip(tr("Open an existing image"));
   connect(_openImageAct, &QAction::triggered, this, &GUI::ImageWindow::slotOpenImage);
 
+  _saveImageAct = new QAction(tr("&Save"), this );
+  _saveImageAct->setShortcut(tr("Ctrl+S"));
+  _saveImageAct->setStatusTip(tr("Save current image"));
+  connect(_saveImageAct, &QAction::triggered, this, &GUI::ImageWindow::slotSaveImage);
+
   _removeImageAct = new QAction(tr("&Remove"), this );
   _removeImageAct->setShortcut(tr("Del"));
   _removeImageAct->setStatusTip(tr("Remove the current image"));
@@ -169,6 +174,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 
   _fileMenu = menuBar()->addMenu(tr("&File"));
   _fileMenu->addAction(_openImageAct);
+  _fileMenu->addAction(_saveImageAct);
   _fileMenu->addAction(_removeImageAct);
   _fileMenu->addAction(_emptyCanvasAct);
 
@@ -256,7 +262,7 @@ void GUI::ImageWindow::slotRefreshBuffer(HistogramRefreshTarget target) {
       DLOG(INFO) << "has " << _canvas->slides()->num() << " layers";
       const int new_min = _toolbar_histogram->data()->range()->min * bin_width;
       const int new_max = _toolbar_histogram->data()->range()->max * bin_width;
-      for (int n = 0; n < _canvas->slides()->num(); ++n) {
+      for (unsigned int n = 0; n < _canvas->slides()->num(); ++n) {
         Layer *layer = _canvas->layer(n);
         layer->histogram()->range()->min = new_min;
         layer->histogram()->range()->max = new_max;
@@ -293,6 +299,20 @@ void GUI::ImageWindow::loadImage(std::string fn) {
   _canvas->addLayer(layer);
 }
 
+void GUI::ImageWindow::slotSaveImage() {
+  DLOG(INFO) << "GUI::Window::slotSaveImage()";
+
+  if (_canvas->layer() == nullptr) {
+
+  } else {
+    // there is a layer
+    const GUI::Layer *current = _canvas->slides()->current();
+    if (current != nullptr) {
+      current->buffer()->write(current->path() + "_edit.png");
+    }
+  }
+
+}
 void GUI::ImageWindow::slotOpenImage() {
   DLOG(INFO) << "GUI::Window::slotOpenImage()";
 

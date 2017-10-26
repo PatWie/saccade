@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(Saccade)
 
-set(SACCADE_VERSION "0.1beta1")
+set(SACCADE_VERSION "0.1beta2")
 
-SET (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 message(STATUS ${CMAKE_MODULE_PATH})
 
@@ -12,8 +12,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
-SET(CMAKE_AUTOUIC ON) 
-SET(CMAKE_AUTORCC ON) 
+set(CMAKE_AUTOUIC ON) 
+set(CMAKE_AUTORCC ON) 
 
 find_package(Qt5Widgets)
 find_package(OpenGL REQUIRED)
@@ -22,7 +22,6 @@ find_package(Qt5OpenGL REQUIRED)
 
 find_package(GFlags)
 find_package(Glog)
-
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -33,6 +32,9 @@ endif()
 
 
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11")
+if (CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wignored-qualifiers -Wunused-parameter")
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 set(SACCADE_SOURCES
     main.cpp
@@ -66,8 +68,8 @@ set(SACCADE_LIBRARIES
   )
 
 include(GenerateVersionDefinitions)
-
 add_subdirectory(GUI)
+
 
 add_executable(saccade main.cpp ${SACCADE_SOURCES})
 target_link_libraries(saccade ${SACCADE_LIBRARIES} ) 

@@ -168,6 +168,8 @@ class Layer  : public QObject {
   Utils::HistogramData* histogram() const;
   Utils::HistogramData* histogram();
 
+  const Utils::ImageData* buffer() const;
+
 
  signals:
   void sigRefresh();
