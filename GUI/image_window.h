@@ -85,6 +85,7 @@ class ImageWindow  : public QMainWindow {
    */
   void slotOpenImage();
   void slotSaveImage();
+  void slotSaveCrop();
 
   /**
    * @brief request other windows to share same window geometry
@@ -129,6 +130,7 @@ class ImageWindow  : public QMainWindow {
   QMenu* _fileMenu;
   QAction* _openImageAct;
   QAction* _saveImageAct;
+  QAction* _saveCropAct;
   QAction* _removeImageAct;
   QAction* _emptyCanvasAct;
 

@@ -128,7 +128,7 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
 }
 
 
-void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
+void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect, float r, float g, float b) {
 
   GUI::Canvas::property_t prop = canvas->property();
 
@@ -139,7 +139,7 @@ void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect) {
   glTranslated(-0.5 * (double)canvas->slides()->width(),
                -0.5 * (double)canvas->slides()->height(), 0.0);
 
-  glColor3d( 1.0, 1.0, 1.0 );
+  glColor3d(r, g, b);
   glLineStipple( 1, 0x5555 );
   glLineWidth( 1.0 );
   glDisable (GL_DEPTH_TEST);

@@ -95,6 +95,9 @@ These are very likely to changed in the next versions.
 | quit viewport                 | Ctrl + W                  |
 | add new image                 | Ctrl + O                  |
 | save current image            | Ctrl + S                  |
+| crop rectangle                | Crlt + left mouse         |
+| toggle crop                   | Ctrl + right click        |
+| save current crop             | Ctrl + X                  |
 | next image                    | ⇩, ⇨                      |
 | delete single image           | Del                       |
 | previous image                | ⇧, ⇦                      |
@@ -113,12 +116,14 @@ These are very likely to changed in the next versions.
 
 | Action                        | Shortcut                  |
 | ------                        | ------                    |
+| zoom rectangle                | Shift + left mouse        |
 | zoom in                       | Ctrl + plus               |
 | zoom out                      | Ctrl + minus              |
 | no zoom                       | Ctrl + 0                  |
 | fit to window                 | Ctrl + 9                  |
 | center image                  | Ctrl + C                  |
 | toggle marker                 | Ctrl + M                  |
+| toggle marker                 | right click               |
 | shift image 10% right         | Shift + ⇨                 |
 | shift image 10% left          | Shift + ⇦                 |
 | shift image 10% down          | Shift + ⇩                 |

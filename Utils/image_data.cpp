@@ -60,7 +60,33 @@ void Utils::ImageData::write(std::string filename) const {
 	delete[] pixels;
 	FreeImage_Unload(Image);
 }
+void Utils::ImageData::write(std::string filename, int t, int l, int b, int r) const {
+	const int n_height = b - t;
+	const int n_width = r - l;
 
+	BYTE* pixels = new BYTE[3 * n_width * n_height];
+
+	for (int c = 0; c < _channels; ++c) {
+		for (int hh = 0; hh < n_height; ++hh) {
+			int h = hh + t;
+			for (int ww = 0; ww < n_width; ++ww) {
+				int w = ww + l;
+				pixels[hh * n_width * _channels + ww * _channels + c] = (BYTE) 255. * _raw_buf[(_channels - c - 1) * (_height * _width) + h * _width + w];
+			}
+		}
+	}
+
+	const int bpp = 8 * 3;
+	const bool topleft = true;
+	const int scanwidth = n_width * 3;
+
+	FIBitmapPtr Image = FreeImage_ConvertFromRawBits(pixels, n_width, n_height,
+	                  scanwidth, bpp,
+	                  0xFF0000, 0x00FF00, 0x0000FF, topleft);
+	FreeImage_Save(FIF_PNG, Image, filename.c_str(), 0);
+	delete[] pixels;
+	FreeImage_Unload(Image);
+}
 Utils::ImageData::ImageData(std::string filename) {
 	DLOG(INFO) << "Utils::ImageData::ImageData()";
 	_filename = filename;

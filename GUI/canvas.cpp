@@ -47,6 +47,9 @@ GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
   _selection.rect = QRect(QPoint(0, 0), QSize(0, 0));
   _selection.active = false;
 
+  _crop.rect = QRect(QPoint(0, 0), QSize(0, 0));
+  _crop.active = false;
+
   // no dragging without clicking
   _dragging.active = false;
   _dragging.start.setX(0.0);
@@ -186,19 +189,26 @@ void GUI::Canvas::zoomOnCenter(double amount) {
 
 }
 
-
 void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   // get position within image coordinates
   _focus = canvasToImg(event->pos());
+
   Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
+  const bool pressedShift = keymod == Qt::ShiftModifier;
+  const bool pressedCtrl = keymod == Qt::ControlModifier;
+  // const bool pressedAlt = keymod == Qt::AltModifier;
 
   // left click: enable dragging/shifting
   if ( (event->buttons() & Qt::LeftButton) ) {
 
-    if (keymod == Qt::ShiftModifier) {
+    if (pressedShift) {
       _selection.active = true;
       _selection.rect = QRect(_focus, QSize(0, 0));
-    } else {
+    }else if(pressedCtrl){
+      _crop.active = true;
+      _crop.rect = QRect(_focus, QSize(0, 0));
+    } 
+    else {
       QCursor tmp;
       tmp.setShape( Qt::SizeAllCursor );
       this->setCursor(tmp);
@@ -219,8 +229,11 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   }
 
   // right click: remove marker
-  if ( (event->buttons() & Qt::RightButton) != 0) {
+  if (( (event->buttons() & Qt::RightButton) != 0) && !pressedCtrl){
     _marker->active = !_marker->active;
+  }
+  if (( (event->buttons() & Qt::RightButton) != 0) && pressedCtrl) {
+    _crop.active = !_crop.active;
   }
 
   slotCommunicateCanvasChange();
@@ -230,6 +243,10 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
   _focus = canvasToImg(event->pos());
 
   Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
+  const bool pressedShift = keymod == Qt::ShiftModifier;
+  const bool pressedCtrl = keymod == Qt::ControlModifier;
+  // const bool pressedAlt = keymod == Qt::AltModifier;
+
   // middle click active --> move marker
   if ( (event->buttons() & Qt::MidButton) ) {
     _marker->active = true;
@@ -237,18 +254,29 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
     _marker->y = _focus.y();
   }
 
-  if ( (event->buttons() & Qt::LeftButton) != 0 && _selection.active) {
-    if (keymod == Qt::ShiftModifier) {
+  if ( (event->buttons() & Qt::LeftButton) != 0 && (_selection.active)) {
+    if (pressedShift) {
       _selection.rect.setBottomRight(_focus);
     } else {
       _selection.active = false;
     }
+
+    
     update();
   } else if ( (event->buttons() & Qt::LeftButton) != 0 && _dragging.active) {
     const double dx = event->x();
     const double dy = event->y();
     _property.x = (dx / _property.pixel_size) - _dragging.start.x();
     _property.y = -(dy / _property.pixel_size) - _dragging.start.y();
+  }
+
+  if((event->buttons() & Qt::LeftButton) != 0 && (_crop.active)){
+    if (pressedCtrl) {
+      _crop.rect.setBottomRight(_focus);
+    }
+    // else {
+    //   _crop.active = false;
+    // }
   }
 
   slotCommunicateCanvasChange();
@@ -287,6 +315,10 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
     tmp.setShape( Qt::ArrowCursor );
     this->setCursor(tmp);
     _dragging.active = false;
+  } else if (_crop.active) {
+    if((event->buttons() & Qt::LeftButton) != 0)
+      _crop.rect.setBottomRight(_focus);
+
   }
 }
 
@@ -455,10 +487,18 @@ QPoint GUI::Canvas::imgToCanvas( QPoint p ) const {
   return QPoint( (int)px, (int)py);
 }
 
+GUI::Canvas::crop_t GUI::Canvas::crop() const {
+  return _crop;
+}
+
+void GUI::Canvas::setCrop(crop_t c) {
+  _crop = c;
+}
 
 GUI::Canvas::property_t GUI::Canvas::property() const {
   return _property;
 }
+
 
 void GUI::Canvas::setProperty(property_t p) {
   _property = p;
@@ -548,6 +588,10 @@ void GUI::Canvas::paintGL() {
     _gl->drawMarker(this, _marker);
     if (_selection.active) {
       _gl->drawSelection(this, _selection.rect);
+    }
+
+    if (_crop.active) {
+      _gl->drawSelection(this, _crop.rect, 1., 0., 0.);
     }
   }
 

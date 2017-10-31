@@ -42,6 +42,7 @@ class ImageData {
   static bool validFile(std::string filename);
 
   void write(std::string filename) const;
+  void write(std::string filename, int t, int l, int b, int r) const;
 
  private:
   void buildScale();

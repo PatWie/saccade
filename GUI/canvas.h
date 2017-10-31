@@ -56,6 +56,12 @@ class Canvas  : public QOpenGLWidget {
     bool active;
   } _selection;
 
+  // information for zooming at particular area (SHIFT + left click)
+  struct crop_t {
+    QRect rect;
+    bool active;
+  } _crop;
+
   // coordinate system for current canvas
   property_t _property;
 
@@ -84,6 +90,8 @@ class Canvas  : public QOpenGLWidget {
   void initializeGL();
   void resizeGL(int w, int h);
   void paintGL();
+
+
 
   /**
    * @brief add a new image to current canvas as an additional layer
@@ -141,6 +149,9 @@ class Canvas  : public QOpenGLWidget {
    * @param  amount of zooming
    */
   void zoomOnCenter(double);
+
+  crop_t crop() const;
+  void setCrop(crop_t);
 
 
   /**

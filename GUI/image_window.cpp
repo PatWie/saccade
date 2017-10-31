@@ -104,6 +104,11 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _saveImageAct->setStatusTip(tr("Save current image"));
   connect(_saveImageAct, &QAction::triggered, this, &GUI::ImageWindow::slotSaveImage);
 
+  _saveCropAct = new QAction(tr("&Save"), this );
+  _saveCropAct->setShortcut(tr("Ctrl+X"));
+  _saveCropAct->setStatusTip(tr("Save current crop"));
+  connect(_saveCropAct, &QAction::triggered, this, &GUI::ImageWindow::slotSaveCrop);
+
   _removeImageAct = new QAction(tr("&Remove"), this );
   _removeImageAct->setShortcut(tr("Del"));
   _removeImageAct->setStatusTip(tr("Remove the current image"));
@@ -175,6 +180,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _fileMenu = menuBar()->addMenu(tr("&File"));
   _fileMenu->addAction(_openImageAct);
   _fileMenu->addAction(_saveImageAct);
+  _fileMenu->addAction(_saveCropAct);
   _fileMenu->addAction(_removeImageAct);
   _fileMenu->addAction(_emptyCanvasAct);
 
@@ -313,6 +319,29 @@ void GUI::ImageWindow::slotSaveImage() {
   }
 
 }
+
+void GUI::ImageWindow::slotSaveCrop() {
+  DLOG(INFO) << "GUI::Window::slotSaveCrop()";
+
+  if(!_canvas->crop().active)
+    return;
+
+  if (_canvas->layer() == nullptr) {
+
+  } else {
+    const QRect c = _canvas->crop().rect;
+    // there is a layer and we have an active crop
+    const GUI::Layer *current = _canvas->slides()->current();
+    if (current != nullptr) {
+      current->buffer()->write(current->path() + "_crop.png", c.top(), c.left(), c.bottom(), c.right());
+    }
+  }
+
+}
+
+
+
+
 void GUI::ImageWindow::slotOpenImage() {
   DLOG(INFO) << "GUI::Window::slotOpenImage()";
 
@@ -338,6 +367,7 @@ void GUI::ImageWindow::slotReceiveCanvasChange(Canvas* sender) {
     _canvas->setProperty(sender->property());
     _canvas->setFocusPixel(sender->focusPixel());
     _canvas->setMarker(sender->marker());
+    _canvas->setCrop(sender->crop());
 
     slotRepaint();
 
