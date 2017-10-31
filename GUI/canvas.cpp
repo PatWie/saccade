@@ -153,11 +153,11 @@ void GUI::Canvas::toggleMarkerAtCursor() {
   slotCommunicateCanvasChange();
 }
 
-void GUI::Canvas::slotShiftCanvas(int v, int h, bool jump){
+void GUI::Canvas::slotShiftCanvas(int v, int h, bool jump) {
 
   const int pixelPerLine = width() / _property.pixel_size;
   const float jump_percent = 5;
-  if(jump){
+  if (jump) {
     h *= pixelPerLine / 100. * jump_percent;
     v *= pixelPerLine / 100. * jump_percent;
   }
@@ -204,11 +204,10 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
     if (pressedShift) {
       _selection.active = true;
       _selection.rect = QRect(_focus, QSize(0, 0));
-    }else if(pressedCtrl){
+    } else if (pressedCtrl) {
       _crop.active = true;
       _crop.rect = QRect(_focus, QSize(0, 0));
-    } 
-    else {
+    } else {
       QCursor tmp;
       tmp.setShape( Qt::SizeAllCursor );
       this->setCursor(tmp);
@@ -229,7 +228,7 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   }
 
   // right click: remove marker
-  if (( (event->buttons() & Qt::RightButton) != 0) && !pressedCtrl){
+  if (( (event->buttons() & Qt::RightButton) != 0) && !pressedCtrl) {
     _marker->active = !_marker->active;
   }
   if (( (event->buttons() & Qt::RightButton) != 0) && pressedCtrl) {
@@ -261,7 +260,7 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
       _selection.active = false;
     }
 
-    
+
     update();
   } else if ( (event->buttons() & Qt::LeftButton) != 0 && _dragging.active) {
     const double dx = event->x();
@@ -270,7 +269,7 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
     _property.y = -(dy / _property.pixel_size) - _dragging.start.y();
   }
 
-  if((event->buttons() & Qt::LeftButton) != 0 && (_crop.active)){
+  if ((event->buttons() & Qt::LeftButton) != 0 && (_crop.active)) {
     if (pressedCtrl) {
       _crop.rect.setBottomRight(_focus);
     }
@@ -316,7 +315,7 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
     this->setCursor(tmp);
     _dragging.active = false;
   } else if (_crop.active) {
-    if((event->buttons() & Qt::LeftButton) != 0)
+    if ((event->buttons() & Qt::LeftButton) != 0)
       _crop.rect.setBottomRight(_focus);
 
   }
@@ -591,7 +590,35 @@ void GUI::Canvas::paintGL() {
     }
 
     if (_crop.active) {
-      _gl->drawSelection(this, _crop.rect, 1., 0., 0.);
+      // _gl->drawSelection(this, _crop.rect, 1., 0., 0.);
+      _gl->drawSelection(this, _crop.rect, 251. / 255., 199. / 255., 99. / 255.);
+      // on left
+      {
+        float leftBorder =  _crop.rect.x();
+        float bottomBorder =  QPoint(bottom_left).y();
+        QRect left(top_left, QPoint(leftBorder, bottomBorder));
+        _gl->drawHighlight(this, left);
+      }
+      // on right
+      {
+        QRect left(QPoint(_crop.rect.topRight().x(), top_left.y()),
+                   bottom_right);
+        _gl->drawHighlight(this, left);
+      }
+      // on top
+      {
+        QRect left(QPoint(_crop.rect.x(), top_left.y()),
+                   _crop.rect.topRight());
+        _gl->drawHighlight(this, left);
+      }
+
+      // on bottom
+      {
+        QRect left(_crop.rect.bottomLeft(),
+                   QPoint(_crop.rect.topRight().x(), bottom_right.y()) );
+        _gl->drawHighlight(this, left);
+      }
+      // _gl->drawHighlight(this, _crop.rect);
     }
   }
 
@@ -614,7 +641,7 @@ void GUI::Canvas::slotRemoveCurrentLayer() {
 }
 
 void GUI::Canvas::slotRemoveAllLayers() {
-  while(_slides->available()){
+  while (_slides->available()) {
     _slides->remove();
   }
   slotCommunicateLayerChange();
