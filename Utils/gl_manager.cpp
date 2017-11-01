@@ -159,7 +159,6 @@ void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect, float r, f
 void Utils::GlManager::drawHighlight(GUI::Canvas* canvas, QRect rect) {
 
   GUI::Canvas::property_t prop = canvas->property();
-  const double zoom = prop.pixel_size;
 
   glLoadIdentity();
   glScaled(prop.pixel_size, -prop.pixel_size, 1.0);
@@ -171,7 +170,6 @@ void Utils::GlManager::drawHighlight(GUI::Canvas* canvas, QRect rect) {
 
   glBindTexture( GL_TEXTURE_2D, 0 );
 
-  unsigned int rgba = 0xff0000ff; // red, no alpha
   glBegin(GL_QUADS);
   glColor4f(1.f,
             1.f,

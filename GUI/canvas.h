@@ -60,6 +60,14 @@ class Canvas  : public QOpenGLWidget {
   struct crop_t {
     QRect rect;
     bool active;
+
+    QRect cropping_region(){
+      const int left_most = std::min(rect.topLeft().x(), rect.topRight().x());
+      const int top_most = std::min(rect.topLeft().y(), rect.bottomRight().y());
+      const int bottom_most = std::max(rect.topLeft().y(), rect.bottomRight().y());
+      const int right_most = std::max(rect.topLeft().x(), rect.topRight().x());
+      return QRect(QPoint(left_most, top_most), QPoint(right_most, bottom_most));
+    }
   } _crop;
 
   // coordinate system for current canvas

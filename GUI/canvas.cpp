@@ -315,8 +315,10 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
     this->setCursor(tmp);
     _dragging.active = false;
   } else if (_crop.active) {
-    if ((event->buttons() & Qt::LeftButton) != 0)
+    if ((event->buttons() & Qt::LeftButton) != 0){
       _crop.rect.setBottomRight(_focus);
+    }
+
 
   }
 }
@@ -590,32 +592,33 @@ void GUI::Canvas::paintGL() {
     }
 
     if (_crop.active) {
+
       // _gl->drawSelection(this, _crop.rect, 1., 0., 0.);
-      _gl->drawSelection(this, _crop.rect, 251. / 255., 199. / 255., 99. / 255.);
+      _gl->drawSelection(this, _crop.cropping_region(), 251. / 255., 199. / 255., 99. / 255.);
       // on left
       {
-        float leftBorder =  _crop.rect.x();
+        float leftBorder =  _crop.cropping_region().x();
         float bottomBorder =  QPoint(bottom_left).y();
         QRect left(top_left, QPoint(leftBorder, bottomBorder));
         _gl->drawHighlight(this, left);
       }
       // on right
       {
-        QRect left(QPoint(_crop.rect.topRight().x(), top_left.y()),
+        QRect left(QPoint(_crop.cropping_region().topRight().x(), top_left.y()),
                    bottom_right);
         _gl->drawHighlight(this, left);
       }
       // on top
       {
-        QRect left(QPoint(_crop.rect.x(), top_left.y()),
-                   _crop.rect.topRight());
+        QRect left(QPoint(_crop.cropping_region().x(), top_left.y()),
+                   _crop.cropping_region().topRight());
         _gl->drawHighlight(this, left);
       }
 
       // on bottom
       {
-        QRect left(_crop.rect.bottomLeft(),
-                   QPoint(_crop.rect.topRight().x(), bottom_right.y()) );
+        QRect left(_crop.cropping_region().bottomLeft(),
+                   QPoint(_crop.cropping_region().topRight().x(), bottom_right.y()) );
         _gl->drawHighlight(this, left);
       }
       // _gl->drawHighlight(this, _crop.rect);

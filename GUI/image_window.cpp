@@ -329,11 +329,17 @@ void GUI::ImageWindow::slotSaveCrop() {
   if (_canvas->layer() == nullptr) {
 
   } else {
-    const QRect c = _canvas->crop().rect;
+    const QRect c = _canvas->crop().cropping_region();
     // there is a layer and we have an active crop
     const GUI::Layer *current = _canvas->slides()->current();
     if (current != nullptr) {
-      current->buffer()->write(current->path() + "_crop.png", c.top(), c.left(), c.bottom(), c.right());
+      std::string fn = current->path() + "_crop_" 
+      + "t" + std::to_string(c.top()) + "_" 
+      + "l" + std::to_string(c.left()) + "_" 
+      + "b" + std::to_string(c.bottom()) + "_" 
+      + "r" + std::to_string(c.right()) 
+      + ".png";
+      current->buffer()->write(fn, c.top(), c.left(), c.bottom(), c.right());
     }
   }
 
