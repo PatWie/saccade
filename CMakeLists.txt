@@ -42,6 +42,7 @@ set(SACCADE_SOURCES
     GUI/layer.cpp
     GUI/slides.cpp
     GUI/canvas.cpp
+    GUI/clickable_label.cpp
     GUI/histogram.cpp
     GUI/about_window.cpp
     GUI/image_window.cpp

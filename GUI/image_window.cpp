@@ -6,6 +6,7 @@
 #include <QtWidgets>
 
 #include "window.h"
+#include "clickable_label.h"
 #include "histogram.h"
 #include "image_window.h"
 #include "../Utils/image_data.h"
@@ -72,11 +73,14 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   statusBar()->addWidget(_statusLabelMouse, 1);
   _statusLabelPatch = new QLabel("0, 0, 0");
   statusBar()->addWidget(_statusLabelPatch, 1);
-  _statusLabelMarker = new QLabel("");
+  _statusLabelMarker = new ClickableLabel();
   statusBar()->addWidget(_statusLabelMarker, 1);
   _statusLabelZoom = new QLabel("zoom: 1");
   statusBar()->addWidget(_statusLabelZoom, 1);
   statusBar()->setSizeGripEnabled ( false );
+
+  connect(_statusLabelMarker, &ClickableLabel::clicked,
+          this, &GUI::ImageWindow::slotClickedMarkerLabel);
 
 
   // slides
@@ -153,13 +157,13 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _resetHistogramAct->setShortcut(tr("Ctrl+H"));
   _resetHistogramAct->setStatusTip(tr("Reset the histogram range"));
   connect(_resetHistogramAct,  &QAction::triggered,
-    this, [this] () { _toolbar_histogram->slotResetRange(HistogramRefreshTarget::CURRENT); });
+  this, [this] () { _toolbar_histogram->slotResetRange(HistogramRefreshTarget::CURRENT); });
 
   _resetHistogramEntireCanvasAct = new QAction(tr("&Reset the histogram for all layers"), this );
   _resetHistogramEntireCanvasAct->setShortcut(tr("Ctrl+Shift+H"));
   _resetHistogramEntireCanvasAct->setStatusTip(tr("Reset the histogram range for all layers"));
   connect(_resetHistogramEntireCanvasAct,  &QAction::triggered,
-    this, [this] () { _toolbar_histogram->slotResetRange(HistogramRefreshTarget::ENTIRE_CANVAS); });
+  this, [this] () { _toolbar_histogram->slotResetRange(HistogramRefreshTarget::ENTIRE_CANVAS); });
 
   _dialogWindowAct = new QAction(tr("&About"), this );
   _dialogWindowAct->setShortcut(tr("F1"));
@@ -244,6 +248,20 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 }
 
 
+void GUI::ImageWindow::slotClickedMarkerLabel() {
+  DLOG(INFO) << "clicked";
+  QClipboard *p_Clipboard = QApplication::clipboard();
+
+  Marker m = _canvas->marker();
+  std::string markerText = "";
+  if (m.active) {
+    markerText = std::to_string((int)m.y) + ", " + std::to_string((int)m.x);
+  p_Clipboard->setText(QString::fromStdString(markerText));
+  }
+
+
+}
+
 bool GUI::ImageWindow::event(QEvent *e) {
   if (e->type() == QEvent::WindowActivate) {
     emit sigFocusChange(this);
@@ -323,7 +341,7 @@ void GUI::ImageWindow::slotSaveImage() {
 void GUI::ImageWindow::slotSaveCrop() {
   DLOG(INFO) << "GUI::Window::slotSaveCrop()";
 
-  if(!_canvas->crop().active)
+  if (!_canvas->crop().active)
     return;
 
   if (_canvas->layer() == nullptr) {
@@ -333,12 +351,12 @@ void GUI::ImageWindow::slotSaveCrop() {
     // there is a layer and we have an active crop
     const GUI::Layer *current = _canvas->slides()->current();
     if (current != nullptr) {
-      std::string fn = current->path() + "_crop_" 
-      + "t" + std::to_string(c.top()) + "_" 
-      + "l" + std::to_string(c.left()) + "_" 
-      + "b" + std::to_string(c.bottom()) + "_" 
-      + "r" + std::to_string(c.right()) 
-      + ".png";
+      std::string fn = current->path() + "_crop_"
+                       + "t" + std::to_string(c.top()) + "_"
+                       + "l" + std::to_string(c.left()) + "_"
+                       + "b" + std::to_string(c.bottom()) + "_"
+                       + "r" + std::to_string(c.right())
+                       + ".png";
       current->buffer()->write(fn, c.top(), c.left(), c.bottom(), c.right());
     }
   }

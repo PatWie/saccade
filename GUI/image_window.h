@@ -20,6 +20,7 @@ class Slides;
 class Window;
 class AboutWindow;
 class Histogram;
+class ClickableLabel;
 
 class ImageWindow  : public QMainWindow {
   Q_OBJECT
@@ -63,6 +64,8 @@ class ImageWindow  : public QMainWindow {
   void sigImageWindowCloses(ImageWindow*);
 
  public slots:
+
+  void slotClickedMarkerLabel();
 
   /**
    * @brief update canvas to be in sync with the sender
@@ -124,7 +127,7 @@ class ImageWindow  : public QMainWindow {
 
   QLabel* _statusLabelMouse;
   QLabel* _statusLabelPatch;
-  QLabel* _statusLabelMarker;
+  ClickableLabel* _statusLabelMarker;
   QLabel* _statusLabelZoom;
 
   QMenu* _fileMenu;
