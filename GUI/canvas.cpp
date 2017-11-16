@@ -11,6 +11,7 @@
 #include "slides.h"
 #include "marker.h"
 #include "../Utils/gl_manager.h"
+#include "../Utils/selection.h"
 
 bool GUI::Canvas::_gl_block = false;
 
@@ -43,12 +44,8 @@ GUI::Canvas::Canvas(QWidget *parent, ImageWindow* parentWin)
   _width = 1;
   _height = 1;
 
-  // selection tool
-  _selection.rect = QRect(QPoint(0, 0), QSize(0, 0));
-  _selection.active = false;
-
-  _crop.rect = QRect(QPoint(0, 0), QSize(0, 0));
-  _crop.active = false;
+  _selection.reset();
+  _crop.reset();
 
   // no dragging without clicking
   _dragging.active = false;
@@ -202,11 +199,11 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   if ( (event->buttons() & Qt::LeftButton) ) {
 
     if (pressedShift) {
-      _selection.active = true;
-      _selection.rect = QRect(_focus, QSize(0, 0));
+      _selection.setActive();
+      _selection.setStart(_focus);
     } else if (pressedCtrl) {
-      _crop.active = true;
-      _crop.rect = QRect(_focus, QSize(0, 0));
+      _crop.setActive();
+      _crop.setStart(_focus);
     } else {
       QCursor tmp;
       tmp.setShape( Qt::SizeAllCursor );
@@ -232,7 +229,7 @@ void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
     _marker->active = !_marker->active;
   }
   if (( (event->buttons() & Qt::RightButton) != 0) && pressedCtrl) {
-    _crop.active = !_crop.active;
+    _crop.toggleActive();
   }
 
   slotCommunicateCanvasChange();
@@ -253,11 +250,11 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
     _marker->y = _focus.y();
   }
 
-  if ( (event->buttons() & Qt::LeftButton) != 0 && (_selection.active)) {
+  if ( (event->buttons() & Qt::LeftButton) != 0 && (_selection.active())) {
     if (pressedShift) {
-      _selection.rect.setBottomRight(_focus);
+      _selection.setStop(_focus);
     } else {
-      _selection.active = false;
+      _selection.setActive(false);
     }
 
 
@@ -269,12 +266,12 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
     _property.y = -(dy / _property.pixel_size) - _dragging.start.y();
   }
 
-  if ((event->buttons() & Qt::LeftButton) != 0 && (_crop.active)) {
+  if ((event->buttons() & Qt::LeftButton) != 0 && (_crop.active())) {
     if (pressedCtrl) {
-      _crop.rect.setBottomRight(_focus);
+      _crop.setStop(_focus);
     }
     // else {
-    //   _crop.active = false;
+    //   _crop.setActive(false);
     // }
   }
 
@@ -287,19 +284,15 @@ void GUI::Canvas::mouseMoveEvent(QMouseEvent* event) {
 void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
   _focus = canvasToImg(event->pos());
 
-  if (_selection.active) {
-    _selection.active = false;
-    _selection.rect.setBottomRight(_focus);
+  if (_selection.active()) {
+    _selection.setActive(false);
+    _selection.setStop(_focus);
 
-    if (_selection.rect.topLeft().manhattanLength() > _selection.rect.bottomRight().manhattanLength()) {
-      QPoint tmp = _selection.rect.topLeft();
-      _selection.rect.setTopLeft(_selection.rect.bottomRight());
-      _selection.rect.setBottomRight(tmp);
-    }
+    const QRect selected_area = _selection.area();
 
-    const QPoint want = _selection.rect.center();
-    const double zoom_width = ((double)_width / (double)_selection.rect.width());
-    const double zoom_height = ((double)_height / (double)_selection.rect.height());
+    const QPoint want = selected_area.center();
+    const double zoom_width = ((double)_width / (double)selected_area.width());
+    const double zoom_height = ((double)_height / (double)selected_area.height());
     _property.pixel_size = std::min(zoom_width, zoom_height);
     // _property.pixel_size *= sqrt(2);
 
@@ -314,9 +307,9 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
     tmp.setShape( Qt::ArrowCursor );
     this->setCursor(tmp);
     _dragging.active = false;
-  } else if (_crop.active) {
+  } else if (_crop.active()) {
     if ((event->buttons() & Qt::LeftButton) != 0){
-      _crop.rect.setBottomRight(_focus);
+      _crop.setStop(_focus);
     }
 
 
@@ -488,11 +481,11 @@ QPoint GUI::Canvas::imgToCanvas( QPoint p ) const {
   return QPoint( (int)px, (int)py);
 }
 
-GUI::Canvas::crop_t GUI::Canvas::crop() const {
+Utils::selection_t GUI::Canvas::crop() const {
   return _crop;
 }
 
-void GUI::Canvas::setCrop(crop_t c) {
+void GUI::Canvas::setCrop(Utils::selection_t c) {
   _crop = c;
 }
 
@@ -587,38 +580,39 @@ void GUI::Canvas::paintGL() {
                   _property.pixel_size);
 
     _gl->drawMarker(this, _marker);
-    if (_selection.active) {
-      _gl->drawSelection(this, _selection.rect);
+    if (_selection.active()) {
+      _gl->drawSelection(this, _selection.area());
     }
 
-    if (_crop.active) {
+    if (_crop.active()) {
 
       // _gl->drawSelection(this, _crop.rect, 1., 0., 0.);
-      _gl->drawSelection(this, _crop.cropping_region(), 251. / 255., 199. / 255., 99. / 255.);
+      const QRect cropping_region = _crop.area();
+      _gl->drawSelection(this, cropping_region, 251. / 255., 199. / 255., 99. / 255.);
       // on left
       {
-        float leftBorder =  _crop.cropping_region().x();
+        float leftBorder =  cropping_region.x();
         float bottomBorder =  QPoint(bottom_left).y();
         QRect left(top_left, QPoint(leftBorder, bottomBorder));
         _gl->drawHighlight(this, left);
       }
       // on right
       {
-        QRect left(QPoint(_crop.cropping_region().topRight().x(), top_left.y()),
+        QRect left(QPoint(cropping_region.topRight().x(), top_left.y()),
                    bottom_right);
         _gl->drawHighlight(this, left);
       }
       // on top
       {
-        QRect left(QPoint(_crop.cropping_region().x(), top_left.y()),
-                   _crop.cropping_region().topRight());
+        QRect left(QPoint(cropping_region.x(), top_left.y()),
+                   cropping_region.topRight());
         _gl->drawHighlight(this, left);
       }
 
       // on bottom
       {
-        QRect left(_crop.cropping_region().bottomLeft(),
-                   QPoint(_crop.cropping_region().topRight().x(), bottom_right.y()) );
+        QRect left(cropping_region.bottomLeft(),
+                   QPoint(cropping_region.topRight().x(), bottom_right.y()) );
         _gl->drawHighlight(this, left);
       }
       // _gl->drawHighlight(this, _crop.rect);

@@ -47,6 +47,8 @@ set(SACCADE_SOURCES
     GUI/about_window.cpp
     GUI/image_window.cpp
     GUI/window.cpp
+    Utils/ascii_loader.cpp
+    Utils/selection.cpp
     Utils/Ops/gamma_op.cpp
     Utils/Ops/histogram_op.cpp
     Utils/gl_manager.cpp

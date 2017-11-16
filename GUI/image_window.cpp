@@ -69,18 +69,26 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 
   // statusbar
   // ==========================================================
-  _statusLabelMouse = new QLabel("(0, 0)");
-  statusBar()->addWidget(_statusLabelMouse, 1);
-  _statusLabelPatch = new QLabel("0, 0, 0");
-  statusBar()->addWidget(_statusLabelPatch, 1);
-  _statusLabelMarker = new ClickableLabel();
-  statusBar()->addWidget(_statusLabelMarker, 1);
+
+  _statusLabelCursorPos = new QLabel();
+  _statusLabelCursorColor = new QLabel();
+  statusBar()->addWidget(_statusLabelCursorPos, 1);
+  statusBar()->addWidget(_statusLabelCursorColor, 1);
+  _statusLabelMarkerPos = new ClickableLabel();
+  _statusLabelMarkerColor = new ClickableLabel();
+  statusBar()->addWidget(_statusLabelMarkerPos, 1);
+  statusBar()->addWidget(_statusLabelMarkerColor, 1);
   _statusLabelZoom = new QLabel("zoom: 1");
   statusBar()->addWidget(_statusLabelZoom, 1);
+  _statusLabelLoader = new QLabel();
+  _ascii_loader = new AsciiLoader(_statusLabelLoader);
+  statusBar()->addWidget(_statusLabelLoader, 1);
   statusBar()->setSizeGripEnabled ( false );
 
-  connect(_statusLabelMarker, &ClickableLabel::clicked,
-          this, &GUI::ImageWindow::slotClickedMarkerLabel);
+  connect(_statusLabelMarkerPos, &ClickableLabel::clicked,
+          this, &GUI::ImageWindow::slotClickedMarkerLabelPos);
+  connect(_statusLabelMarkerColor, &ClickableLabel::clicked,
+          this, &GUI::ImageWindow::slotClickedMarkerLabelColor);
 
 
   // slides
@@ -248,19 +256,22 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
 }
 
 
-void GUI::ImageWindow::slotClickedMarkerLabel() {
-  DLOG(INFO) << "clicked";
+void GUI::ImageWindow::slotClickedMarkerLabelPos() {
   QClipboard *p_Clipboard = QApplication::clipboard();
-
-  Marker m = _canvas->marker();
-  std::string markerText = "";
-  if (m.active) {
-    markerText = std::to_string((int)m.y) + ", " + std::to_string((int)m.x);
-  p_Clipboard->setText(QString::fromStdString(markerText));
+  if (_canvas->marker().active) {
+    p_Clipboard->setText(QString::fromStdString(_canvas->marker().textLocation()));
   }
-
-
 }
+
+void GUI::ImageWindow::slotClickedMarkerLabelColor() {
+  QClipboard *p_Clipboard = QApplication::clipboard();
+  Marker m = _canvas->marker();
+  if (m.active) {
+    p_Clipboard->setText(QString::fromStdString(_canvas->slides()->current()->img()->color(m.y, m.x, false)));
+  }
+}
+
+
 
 bool GUI::ImageWindow::event(QEvent *e) {
   if (e->type() == QEvent::WindowActivate) {
@@ -314,13 +325,22 @@ void GUI::ImageWindow::dragEnterEvent(QDragEnterEvent *ev) {
 }
 
 void GUI::ImageWindow::loadImage(std::string fn) {
+
+  _ascii_loader->start();
   Layer *layer = new Layer();
   layer->loadImage(fn);
 
   connect(layer, &Layer::sigHistogramFinished,
           this, &GUI::ImageWindow::slotRepaint);
 
+  connect(layer, &Layer::sigHistogramFinished,
+          this, &GUI::ImageWindow::slotLoadingFinished);
+
   _canvas->addLayer(layer);
+}
+
+void GUI::ImageWindow::slotLoadingFinished(){
+  _ascii_loader->stop();
 }
 
 void GUI::ImageWindow::slotSaveImage() {
@@ -341,13 +361,13 @@ void GUI::ImageWindow::slotSaveImage() {
 void GUI::ImageWindow::slotSaveCrop() {
   DLOG(INFO) << "GUI::Window::slotSaveCrop()";
 
-  if (!_canvas->crop().active)
+  if (!_canvas->crop().active())
     return;
 
   if (_canvas->layer() == nullptr) {
 
   } else {
-    const QRect c = _canvas->crop().cropping_region();
+    const QRect c = _canvas->crop().area();
     // there is a layer and we have an active crop
     const GUI::Layer *current = _canvas->slides()->current();
     if (current != nullptr) {
@@ -496,9 +516,11 @@ void GUI::ImageWindow::slotRepaintTitle() {
 
 void GUI::ImageWindow::slotRepaintStatusbar() {
   if (_canvas->layer() == nullptr) {
-    _statusLabelMouse->setText("");
-    _statusLabelPatch->setText("");
-    _statusLabelMarker->setText("");
+    _statusLabelCursorPos->setText("");
+    _statusLabelCursorColor->setText("");
+    // _statusLabelPatch->setText("");
+    _statusLabelMarkerPos->setText("");
+    _statusLabelMarkerColor->setText("");
     _statusLabelZoom->setText("");
     return;
   }
@@ -510,19 +532,21 @@ void GUI::ImageWindow::slotRepaintStatusbar() {
     std::stringstream pixelPosText;
     const QPoint p = _canvas->focusPixel();
     pixelPosText << "(" << p.y() << ", " << p.x() << ")";
-    _statusLabelMouse->setText(pixelPosText.str().c_str());
+    _statusLabelCursorPos->setText(pixelPosText.str().c_str());
 
     std::string pixelColorText = "" + _canvas->slides()->current()->img()->color(p.y(), p.x());
-    _statusLabelPatch->setText(pixelColorText.c_str());
+    _statusLabelCursorColor->setText(pixelColorText.c_str());
 
     // update marker
     Marker m = _canvas->marker();
-    std::string markerText = "";
+    std::string markerPosText = "";
+    std::string markerColorText = "";
     if (m.active) {
-      markerText = "marker: (" + std::to_string((int)m.y) + ", " + std::to_string((int)m.x) + ")";
-      markerText = markerText + " " + _canvas->slides()->current()->img()->color(m.y, m.x);
+      markerPosText = "marker: (" + m.textLocation() + ")";
+      markerColorText = _canvas->slides()->current()->img()->color(m.y, m.x);
     }
-    _statusLabelMarker->setText(markerText.c_str());
+    _statusLabelMarkerPos->setText(markerPosText.c_str());
+    _statusLabelMarkerColor->setText(markerColorText.c_str());
 
     // update zoom
     std::ostringstream zoomText;

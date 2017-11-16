@@ -7,6 +7,7 @@
 #include <QOpenGLFunctions>
 
 #include "../Utils/gl_object.h"
+#include "../Utils/selection.h"
 #include "marker.h"
 
 namespace Utils {
@@ -51,24 +52,10 @@ class Canvas  : public QOpenGLWidget {
   } _dragging;
 
   // information for zooming at particular area (SHIFT + left click)
-  struct select_t {
-    QRect rect;
-    bool active;
-  } _selection;
+  Utils::selection_t _selection;
 
   // information for zooming at particular area (SHIFT + left click)
-  struct crop_t {
-    QRect rect;
-    bool active;
-
-    QRect cropping_region(){
-      const int left_most = std::min(rect.topLeft().x(), rect.topRight().x());
-      const int top_most = std::min(rect.topLeft().y(), rect.bottomRight().y());
-      const int bottom_most = std::max(rect.topLeft().y(), rect.bottomRight().y());
-      const int right_most = std::max(rect.topLeft().x(), rect.topRight().x());
-      return QRect(QPoint(left_most, top_most), QPoint(right_most, bottom_most));
-    }
-  } _crop;
+  Utils::selection_t _crop;
 
   // coordinate system for current canvas
   property_t _property;
@@ -158,8 +145,8 @@ class Canvas  : public QOpenGLWidget {
    */
   void zoomOnCenter(double);
 
-  crop_t crop() const;
-  void setCrop(crop_t);
+  Utils::selection_t crop() const;
+  void setCrop(Utils::selection_t);
 
 
   /**

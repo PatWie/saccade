@@ -5,14 +5,38 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <QObject>
+#include <QThread>
 
 namespace Utils {
 
 namespace Ops {
- class ImgOp;
+class ImgOp;
 }
 
-class ImageData {
+namespace threads {
+/**
+ * @brief create Mipmap data structure from image file
+ */
+class ImageWriterThread : public QThread {
+ public:
+  ImageWriterThread();
+  bool notify( float* copied_buffer,
+    int t, int l, int b, int r,
+    int height, int width, int channels,
+    std::string fn);
+  void run();
+ private:
+  float* _buf;
+  int _t, _l, _b, _r, _height, _width, _channels;
+  std::string _fn;
+  bool _running;
+};
+}
+
+class ImageData : QObject{
+
+  Q_OBJECT
 
  public:
   ImageData(std::string filename);
@@ -34,7 +58,7 @@ class ImageData {
   float value(int h, int w, int c) const;
   float value(int t, int c) const;
 
-  std::string color(int h, int w) const;
+  std::string color(int h, int w, bool formated = true) const;
 
   float operator()(int h, int w, int c) const;
   void copyTo(ImageData *dst) const;
@@ -43,6 +67,9 @@ class ImageData {
 
   void write(std::string filename) const;
   void write(std::string filename, int t, int l, int b, int r) const;
+
+  public slots:
+  void writerFinished();
 
  private:
   void buildScale();

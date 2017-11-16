@@ -13,6 +13,7 @@
 #include "canvas.h"
 #include "marker.h"
 #include "../Utils/misc.h"
+#include "../Utils/ascii_loader.h"
 
 
 namespace GUI {
@@ -65,7 +66,8 @@ class ImageWindow  : public QMainWindow {
 
  public slots:
 
-  void slotClickedMarkerLabel();
+  void slotClickedMarkerLabelPos();
+  void slotClickedMarkerLabelColor();
 
   /**
    * @brief update canvas to be in sync with the sender
@@ -99,7 +101,7 @@ class ImageWindow  : public QMainWindow {
    * @brief image content has changed and the buffer needs to update
    */
   void slotRefreshBuffer(HistogramRefreshTarget);
-
+  void slotLoadingFinished();
   void slotRepaint();
 
   void slotRepaintStatusbar();
@@ -125,9 +127,13 @@ class ImageWindow  : public QMainWindow {
   QScrollBar* _vertSlider;
   QScrollBar* _horSlider;
 
-  QLabel* _statusLabelMouse;
-  QLabel* _statusLabelPatch;
-  ClickableLabel* _statusLabelMarker;
+  QLabel* _statusLabelLoader;
+  AsciiLoader* _ascii_loader;
+  QLabel* _statusLabelCursorPos;
+  QLabel* _statusLabelCursorColor;
+  // QLabel* _statusLabelPatch;
+  ClickableLabel* _statusLabelMarkerPos;
+  ClickableLabel* _statusLabelMarkerColor;
   QLabel* _statusLabelZoom;
 
   QMenu* _fileMenu;
