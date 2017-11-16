@@ -4,22 +4,31 @@
 
 A **saccade** (*/səˈkɑːd/ sə-KAHD*) is a quick and simultaneous movement of both eyes in the same direction.
 
-This project is the missing scientific HDR image viewer for Linux inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). It is OpenGL-based and aims at providing an efficient image viewer with some sophisticated functions for comparing images. When dragging and zooming an image in one viewport, all other viewports synchronously zoom and shift in the same way, so you see exactly the same patch in all images. Further, a marker can be set precisely on a specific pixel, and all other views share the marker at exacly the same location. It uses the [FreeImage](freeimage.sourceforge.net) library to load images from different types.
+<p align="center"> <img src="https://github.com/patwie-stuff/img/blob/master/saccade_intro.gif?raw=true"> </p>
 
-<p align="center"> <img src="https://github.com/patwie-stuff/img/blob/master/screenshot.gif?raw=true"> </p>
+This project is the missing scientific HDR image viewer for Linux inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). It is OpenGL-based and aims at providing an efficient image viewer with some sophisticated functions for comparing images. When dragging and zooming an image in one viewport, all other viewports synchronously zoom and shift in the same way, so you see exactly the same patch in all images. 
 
-Hereby, each viewport consists of different image-layers. Some action might affect only the *active* layer across *all* viewports (global effects), e.g., zooming and dragging. When manipulating the histogram, the changes can be applied to only the current *active* layer or *all* layers in the *current* viewport (holding the `SHIFT` key).
+Hereby, each viewport consists of different image-layers. Some action might affect only the *active* layer across *all* viewports (global effects), e.g., zooming and dragging, e.g. setting the crop-region:
+
+<p align="center"> <img src="https://github.com/patwie-stuff/img/blob/master/saccade_crop.gif?raw=true"> </p>
+
+When manipulating the histogram, the changes can be applied to only the current *active* layer or *all* layers in the *current* viewport (holding the `SHIFT` key). Further, a marker can be set precisely on a specific pixel, and all other views share the marker at exacly the same location. It uses the [FreeImage](freeimage.sourceforge.net) library to load images from different types:
+
+<p align="center"> <img src="https://github.com/patwie-stuff/img/blob/master/saccade_histogram.gif?raw=true"> </p>
 
 ## Features
 
 - OpenGL accelerated viewer using mip-mapping data structure
 - synchronize multiple viewports when dragging and zooming within one viewport
 - drag'n drop for open images
+- crop regions from image
+- keyboard short-cuts for all actions
 - set marker on a specific pixel
 - filewatcher (images will be reloaded when they change)
 - interactive histogram widget which effects the image
-- supported file formats: png jpg JPG bmp ppm tif CR2
+- supported file formats: png jpg bmp ppm tif CR2 and many more
 - helpful commands to arrange multiple windows
+- multi-threaded loading and writing
 
 ## Install from binary
 
