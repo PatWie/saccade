@@ -93,11 +93,6 @@ set(SACCADE_SOURCES
     Utils/version.cpp
 )
 
-if(CUDA_ENABLED)
-    LIST(APPEND SACCADE_SOURCES Utils/Ops/histogram_op.cu)
-    LIST(APPEND SACCADE_SOURCES Utils/Ops/gamma_op.cu)
-endif()
-
 set(SACCADE_LIBRARIES
     Qt5::Widgets 
     gflags 
@@ -108,10 +103,18 @@ set(SACCADE_LIBRARIES
     ${OPENGL_glu_LIBRARY}
   )
 
+if(CUDA_ENABLED)
+    LIST(APPEND SACCADE_LIBRARIES cuda_op_histogram)
+endif()
+
+
 include(GenerateVersionDefinitions)
 add_subdirectory(GUI)
 if(CUDA_ENABLED)
     cuda_add_library(cuda_op_histogram Utils/Ops/histogram_op.cu Utils/Ops/gamma_op.cu)
+else()
+    LIST(APPEND SACCADE_SOURCES Utils/Ops/histogram_op.cpp)
+    LIST(APPEND SACCADE_SOURCES Utils/Ops/gamma_op.cpp)
 endif()
 add_executable(saccade main.cpp ${SACCADE_SOURCES} )
-target_link_libraries(saccade ${SACCADE_LIBRARIES} cuda_op_histogram) 
+target_link_libraries(saccade ${SACCADE_LIBRARIES} ) 

@@ -5,7 +5,7 @@
 
 namespace Utils {
 namespace Ops {
-
+#ifdef CUDA_ENABLED
 namespace {
 __global__ void cuda(const float *src, float *dst,
                      size_t H, size_t W, size_t C,
@@ -25,7 +25,7 @@ __global__ void cuda(const float *src, float *dst,
   }
 }
 }; // anonymous namespace
-
+#endif // CUDA_ENABLED
 
 HistogramOp::HistogramOp() {}
 
@@ -45,6 +45,7 @@ void HistogramOp::apply_cpu(const float* src, float* dst,
   }
 }
 
+#ifdef CUDA_ENABLED
 void HistogramOp::apply_gpu(const float* src, float* dst,
                             size_t H, size_t W, size_t C) {
 
@@ -69,7 +70,7 @@ void HistogramOp::apply_gpu(const float* src, float* dst,
   cudaFree(d_dst);
 
 }
-
+#endif // CUDA_ENABLED
 
 
 }

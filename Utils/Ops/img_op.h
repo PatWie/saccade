@@ -10,7 +10,9 @@ class ImgOp {
 
  public:
   virtual void apply_cpu(const float* src, float* dst, size_t H, size_t W, size_t C) = 0;
+#ifdef CUDA_ENABLED
   virtual void apply_gpu(const float* src, float* dst, size_t H, size_t W, size_t C) = 0;
+#endif // CUDA_ENABLED
 };
 
 }
