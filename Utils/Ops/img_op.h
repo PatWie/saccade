@@ -6,11 +6,11 @@
 namespace Utils {
 namespace Ops {
 
-class ImgOp
-{
+class ImgOp {
 
-public:
-  virtual float apply(float inp) = 0;
+ public:
+  virtual void apply_cpu(const float* src, float* dst, size_t H, size_t W, size_t C) = 0;
+  virtual void apply_gpu(const float* src, float* dst, size_t H, size_t W, size_t C) = 0;
 };
 
 }

@@ -37,7 +37,7 @@ void GUI::threads::HistogramThread::notify(ImageData_ptr img,  HistogramData_ptr
 }
 
 void GUI::threads::HistogramThread::run() {
-  _hist->setData(_img.get(), _img->max());
+  _hist->setImage(_img.get(), _img->max());
 }
 
 // ------------------------------------------------------------------------------------------
@@ -54,10 +54,14 @@ void GUI::threads::OperationThread::run() {
   DLOG(INFO) << "GUI::threads::OperationThread::run()";
   const float *src = _src->data();
   float *dst = _dst->data();
-  #pragma omp parallel for
-  for (size_t i = 0; i < _src->elements(); ++i)
-    dst[i] = _op->apply(src[i]);
+
+  #ifdef CUDA_ENABLED
+    _op->apply_gpu(src, dst, _src->height(), _src->width(), _src->channels());
+  #else
+    _op->apply_cpu(src, dst, _src->height(), _src->width(), _src->channels());
+  #endif // CUDA_ENABLED
   DLOG(INFO) << "GUI::threads::OperationThread::run() done";
+
 }
 
 // ------------------------------------------------------------------------------------------

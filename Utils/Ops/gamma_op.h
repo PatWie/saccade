@@ -15,11 +15,11 @@ namespace Ops {
  * @details [long description]
  * @return [description]
  */
-class GammaOp : public ImgOp
-{
-public:
+class GammaOp : public ImgOp {
+ public:
   GammaOp();
-  float apply(float inp);
+  void apply_cpu(const float* src, float* dst, size_t H, size_t W, size_t C);
+  void apply_gpu(const float* src, float* dst, size_t H, size_t W, size_t C);
   float _gamma;
 };
 

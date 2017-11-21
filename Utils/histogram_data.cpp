@@ -26,7 +26,7 @@ Utils::HistogramData::HistogramData() :
   _scale_mapping_id = 0;
 }
 
-void Utils::HistogramData::setData(const ImageData *data, float scale) {
+void Utils::HistogramData::setImage(const ImageData *data, float scale) {
   _available = false;
 
   _nbins = 256;

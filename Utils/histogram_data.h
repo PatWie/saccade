@@ -69,7 +69,7 @@ class HistogramData {
 
   const bin_info_t bin_info() const;
 
-  void setData(const ImageData *data, float max = 1.0f);
+  void setImage(const ImageData *data, float max = 1.0f);
 
 };
 
