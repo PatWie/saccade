@@ -9,6 +9,9 @@
 #include <QThread>
 
 namespace Utils {
+namespace Loader {
+class ImageLoader;
+}; // namespace Loader
 
 namespace Ops {
 class ImgOp;
@@ -22,9 +25,9 @@ class ImageWriterThread : public QThread {
  public:
   ImageWriterThread();
   bool notify( float* copied_buffer,
-    int t, int l, int b, int r,
-    int height, int width, int channels,
-    std::string fn);
+               int t, int l, int b, int r,
+               int height, int width, int channels,
+               std::string fn);
   void run();
  private:
   float* _buf;
@@ -34,7 +37,7 @@ class ImageWriterThread : public QThread {
 };
 }
 
-class ImageData : QObject{
+class ImageData : QObject {
 
   Q_OBJECT
 
@@ -44,12 +47,43 @@ class ImageData : QObject{
   ImageData(ImageData* i);
   ~ImageData();
 
+  /**
+   * @brief pointer to raw float array
+   * @details memory layout is [C,H,W] meaning [c*H*W + h*W + w]
+   * @return [description]
+   */
   float* data() const;
+
+  /**
+   * @brief number of total values (all channels)
+   * @details [long description]
+   * @return [description]
+   */
   size_t elements() const;
+  /**
+   * @brief width of image
+   * @details [long description]
+   * @return [description]
+   */
   int width() const;
+  /**
+   * @brief height of image
+   * @details [long description]
+   * @return [description]
+   */
   int height() const;
+  /**
+   * @brief total area (height * width) of image
+   * @details [long description]
+   * @return [description]
+   */
   int area() const;
-  // only 3 or 4 is supported
+
+  /**
+   * @brief channels of image
+   * @details only 3 or 4 is supported
+   * @return [description]
+   */
   int channels() const;
   void clear(bool remove = true);
 
@@ -68,10 +102,14 @@ class ImageData : QObject{
   void write(std::string filename) const;
   void write(std::string filename, int t, int l, int b, int r) const;
 
-  public slots:
+ public slots:
   void writerFinished();
 
  private:
+  /**
+   * @brief register all possible loaders from "Imageloader/"
+   */
+  void registerLoaders();
   void buildScale();
   std::string _filename;
   // typedef std::unique_ptr<FIBITMAP, decltype(&FreeImage_Unload)> FIBitmapPtr;
@@ -83,6 +121,8 @@ class ImageData : QObject{
   int _width;
   int _channels;
   float _max_value;
+
+  std::vector<Loader::ImageLoader*> _loaders;
 
 };
 

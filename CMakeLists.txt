@@ -91,6 +91,7 @@ set(SACCADE_SOURCES
     Utils/image_data.cpp
     Utils/histogram_data.cpp
     Utils/version.cpp
+    Utils/Imageloader/freeimage_loader.cpp
 )
 
 set(SACCADE_LIBRARIES
