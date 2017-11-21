@@ -4,7 +4,7 @@ pipeline:
     commands:
       - mkdir build
       - cd build
-      - cmake ..
+      - cmake .. -DCUDA_ENABLED=OFF
       - make
   deploy:
     image: patwie/saccade-static
