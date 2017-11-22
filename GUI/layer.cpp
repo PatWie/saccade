@@ -95,24 +95,24 @@ GUI::Layer::Layer() {
 
   // connection to all threads
   _thread_mipmapBuilder = new threads::MipmapThread();
-  connect( _thread_mipmapBuilder, SIGNAL( finished() ),
-           this, SLOT( slotMipmapFinished() ));
+  connect(_thread_mipmapBuilder, &threads::MipmapThread::finished,
+          this, &GUI::Layer::slotMipmapFinished);
 
   _thread_Reloader = new threads::ReloadThread();
-  connect( _thread_Reloader, SIGNAL( sigFileIsValid(QString) ),
-           this, SLOT( slotFileIsValid(QString) ));
+  connect(_thread_Reloader, &threads::ReloadThread::sigFileIsValid,
+          this, &GUI::Layer::slotFileIsValid);
 
   _thread_histogram = new threads::HistogramThread();
-  connect( _thread_histogram, SIGNAL( finished() ),
-           this, SLOT( slotHistogramFinished() ));
+  connect(_thread_histogram, &threads::HistogramThread::finished,
+          this, &GUI::Layer::slotHistogramFinished);
 
   _thread_opWorker = new threads::OperationThread();
-  connect( _thread_opWorker, SIGNAL( finished() ),
-           this, SLOT( slotApplyOpFinished() ));
+  connect(_thread_opWorker, &threads::OperationThread::finished,
+          this, &GUI::Layer::slotApplyOpFinished);
 
   _watcher = new QFileSystemWatcher();
-  connect(_watcher, SIGNAL(fileChanged(QString)),
-          this, SLOT(slotPathChanged(QString)));
+  connect(_watcher, &QFileSystemWatcher::fileChanged,
+          this, &GUI::Layer::slotPathChanged);
 
   // this needs to be available all time
   _current_mipmap = std::make_shared<Utils::Mipmap>();

@@ -47,6 +47,9 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   connect( _horSlider, &QScrollBar::sliderMoved,
            this, &GUI::ImageWindow::slotHorSliderMoved);
 
+  connect(this, &GUI::ImageWindow::sigKeyReleaseEvent,
+          _canvas, &Canvas::slotKeyReleaseEvent);
+
   connect(this, &GUI::ImageWindow::sigCommunicatePrevLayer,
           parentWindow, &GUI::Window::slotCommunicatePrevLayer);
 
@@ -371,10 +374,10 @@ void GUI::ImageWindow::slotSaveCrop() {
     // there is a layer and we have an active crop
     const GUI::Layer *current = _canvas->slides()->current();
     if (current != nullptr) {
-      std::string fn = current->path() + "_crop_"
-                       + "t" + std::to_string(c.top()) + "_"
-                       + "l" + std::to_string(c.left()) + "_"
-                       + "b" + std::to_string(c.bottom()) + "_"
+      std::string fn = current->path() + "-crop-"
+                       + "t" + std::to_string(c.top()) + "-"
+                       + "l" + std::to_string(c.left()) + "-"
+                       + "b" + std::to_string(c.bottom()) + "-"
                        + "r" + std::to_string(c.right())
                        + ".png";
       current->buffer()->write(fn, c.top(), c.left(), c.bottom(), c.right());
@@ -404,6 +407,20 @@ QSize GUI::ImageWindow::sizeHint() const {
   return QSize(512, 512);
 }
 
+void GUI::ImageWindow::keyReleaseEvent (QKeyEvent *event){
+  emit sigKeyReleaseEvent(event);
+  // DLOG(INFO) << "keyReleaseEvent";
+  // Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
+  // const bool pressedShift = keymod == Qt::ShiftModifier;
+  // const bool pressedCtrl = keymod == Qt::ControlModifier;
+
+  // DLOG(INFO) << event->text().toStdString();
+  // DLOG(INFO) << event->modifiers();
+  // if(!pressedShift)
+  //   _selection.setActive(false);
+  // if(!pressedCtrl)
+  //   _crop.setActive(false);
+}
 
 void GUI::ImageWindow::slotReceiveCanvasChange(Canvas* sender) {
   if ( _canvas != sender ) {
@@ -412,6 +429,7 @@ void GUI::ImageWindow::slotReceiveCanvasChange(Canvas* sender) {
     _canvas->setFocusPixel(sender->focusPixel());
     _canvas->setMarker(sender->marker());
     _canvas->setCrop(sender->crop());
+    _canvas->setSelection(sender->selection());
 
     slotRepaint();
 

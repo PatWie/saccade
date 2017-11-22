@@ -40,6 +40,7 @@ class ImageWindow  : public QMainWindow {
   void closeEvent(QCloseEvent * event);
 
   bool event(QEvent *e);
+  void keyReleaseEvent (QKeyEvent *event);
 
  protected:
   /**
@@ -51,6 +52,8 @@ class ImageWindow  : public QMainWindow {
  private slots:
 
  signals:
+  void sigKeyReleaseEvent(QKeyEvent*);
+
   void sigPrevLayer();
   void sigNextLayer();
 

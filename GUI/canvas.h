@@ -119,6 +119,7 @@ class Canvas  : public QOpenGLWidget {
   void mouseReleaseEvent(QMouseEvent* event);
   void wheelEvent( QWheelEvent * event);
 
+
   /**
    * @brief Convert from canvas-system to image-system
    * @details useful for mapping mouse->pos() to image pixel
@@ -158,6 +159,10 @@ class Canvas  : public QOpenGLWidget {
   // handle markers
   void setMarker(Marker marker);
   Marker marker() const;
+
+  void setSelection(Utils::selection_t selection);
+  Utils::selection_t selection() const;
+
   QPoint focusPixel() const;
   void setFocusPixel(QPoint);
 
@@ -194,6 +199,7 @@ class Canvas  : public QOpenGLWidget {
   void toggleMarkerAtCursor();
   // void slotSetZoom();
 
+  void slotKeyReleaseEvent(QKeyEvent *event);
 
  protected:
   /**

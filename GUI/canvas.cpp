@@ -186,6 +186,20 @@ void GUI::Canvas::zoomOnCenter(double amount) {
 
 }
 
+void GUI::Canvas::slotKeyReleaseEvent (QKeyEvent *event){
+  DLOG(INFO) << "keyReleaseEvent";
+  DLOG(INFO) << event->text().toStdString();
+  DLOG(INFO) << event->modifiers();
+  DLOG(INFO) << event->nativeScanCode();
+
+  if(event->nativeScanCode() == 50){
+    DLOG(INFO) << "!pressedShift";
+    _selection.setActive(false);
+    update();
+  }
+
+}
+
 void GUI::Canvas::mousePressEvent(QMouseEvent* event) {
   // get position within image coordinates
   _focus = canvasToImg(event->pos());
@@ -504,6 +518,15 @@ GUI::Marker GUI::Canvas::marker() const {
 
 void GUI::Canvas::setMarker(Marker m) {
   *_marker = m;
+}
+
+
+Utils::selection_t GUI::Canvas::selection() const {
+  return _selection;
+}
+
+void GUI::Canvas::setSelection(Utils::selection_t s) {
+  _selection = s;
 }
 
 
