@@ -1,20 +1,20 @@
 pipeline:
   build:
-    image: patwie/saccade
+    image: saccade_dynamic
     commands:
       - mkdir build
       - cd build
       - cmake .. -DCUDA_ENABLED=OFF
       - make
   deploy:
-    image: patwie/saccade-static
+    image: saccade_static
     commands:
       - .deploy/pipeline.sh
       - dir
     when:
       branch: master
   publish:
-    image: publish_file
+    image: saccade_publish
     commands:
       - /opt/publish.sh
     when:
