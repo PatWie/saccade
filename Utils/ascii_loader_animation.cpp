@@ -1,9 +1,9 @@
-#include "ascii_loader.h"
+#include "ascii_loader_animation.h"
 #include <QTime>
 #include <glog/logging.h>
 
 
-AsciiLoader::AsciiLoader(QLabel *dst) {
+AsciiLoaderAnimation::AsciiLoaderAnimation(QLabel *dst) {
   symbols[0] = QString::fromUtf8("\u25D0");
   symbols[1] = QString::fromUtf8("\u25D3");
   symbols[2] = QString::fromUtf8("\u25D1");
@@ -16,22 +16,22 @@ AsciiLoader::AsciiLoader(QLabel *dst) {
   connect(_timer, SIGNAL(timeout()), this, SLOT(showAnimation()));
 }
 
-AsciiLoader::~AsciiLoader() {}
+AsciiLoaderAnimation::~AsciiLoaderAnimation() {}
 
 
-void AsciiLoader::start() {
+void AsciiLoaderAnimation::start() {
   off = 0;
   _timer->start(500);
 }
 
-void AsciiLoader::stop() {
+void AsciiLoaderAnimation::stop() {
   off = 0;
   _timer->stop();
   _dst->setText("");
 }
 
-void AsciiLoader::showAnimation() {
+void AsciiLoaderAnimation::play() {
   off = (off + 1) % 4;
   _dst->setText(symbols[off]);
-  
+
 }

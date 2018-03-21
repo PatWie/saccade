@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QObject>
 
-class AsciiLoader : QObject{
+class AsciiLoaderAnimation : QObject{
   Q_OBJECT
 
   QString symbols[4];
@@ -14,14 +14,14 @@ class AsciiLoader : QObject{
   QTimer* _timer;
   int off;
  public:
-  AsciiLoader(QLabel *dst);
-  ~AsciiLoader();
+  AsciiLoaderAnimation(QLabel *dst);
+  ~AsciiLoaderAnimation();
 
   void start();
   void stop();
 
  public slots:
-  void showAnimation();
+  void play();
 
 };
 

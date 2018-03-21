@@ -15,8 +15,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON) 
-set(CMAKE_AUTORCC ON) 
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 find_package(Qt5Widgets)
 find_package(OpenGL REQUIRED)
@@ -82,7 +82,7 @@ set(SACCADE_SOURCES
     GUI/about_window.cpp
     GUI/image_window.cpp
     GUI/window.cpp
-    Utils/ascii_loader.cpp
+    Utils/ascii_loader_animation.cpp
     Utils/selection.cpp
     Utils/gl_manager.cpp
     Utils/mipmap_tile.cpp
@@ -95,8 +95,8 @@ set(SACCADE_SOURCES
 )
 
 set(SACCADE_LIBRARIES
-    Qt5::Widgets 
-    gflags 
+    Qt5::Widgets
+    gflags
     glog
     ${GLOG_LIBRARIES}
     ${FREEIMAGE_LIBRARIES}
@@ -118,4 +118,4 @@ else()
     LIST(APPEND SACCADE_SOURCES Utils/Ops/gamma_op.cpp)
 endif()
 add_executable(saccade main.cpp ${SACCADE_SOURCES} )
-target_link_libraries(saccade ${SACCADE_LIBRARIES} ) 
+target_link_libraries(saccade ${SACCADE_LIBRARIES} )

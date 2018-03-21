@@ -13,7 +13,7 @@
 #include "canvas.h"
 #include "marker.h"
 #include "../Utils/misc.h"
-#include "../Utils/ascii_loader.h"
+#include "../Utils/ascii_loader_animation.h"
 
 
 namespace GUI {
@@ -75,7 +75,7 @@ class ImageWindow  : public QMainWindow {
   /**
    * @brief update canvas to be in sync with the sender
    * @details sender can be the canvas it contains itself
-   * 
+   *
    * @param sender canvas which asks for synchronization
    */
   void slotReceiveCanvasChange(Canvas*);
@@ -83,7 +83,7 @@ class ImageWindow  : public QMainWindow {
   /**
    * @brief receive request from canvas to update visible information
    * @details repaint connected widgets as histogram, title, sliders, ...
-   * 
+   *
    * @param sender canvas which asks for synchronization
    */
   void slotReceiveLayerChange();
@@ -131,7 +131,7 @@ class ImageWindow  : public QMainWindow {
   QScrollBar* _horSlider;
 
   QLabel* _statusLabelLoader;
-  AsciiLoader* _ascii_loader;
+  AsciiLoaderAnimation* _ascii_loader_animation;
   QLabel* _statusLabelCursorPos;
   QLabel* _statusLabelCursorColor;
   // QLabel* _statusLabelPatch;

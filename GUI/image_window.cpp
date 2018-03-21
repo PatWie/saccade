@@ -84,7 +84,7 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _statusLabelZoom = new QLabel("zoom: 1");
   statusBar()->addWidget(_statusLabelZoom, 1);
   _statusLabelLoader = new QLabel();
-  _ascii_loader = new AsciiLoader(_statusLabelLoader);
+  _ascii_loader_animation = new AsciiLoaderAnimation(_statusLabelLoader);
   statusBar()->addWidget(_statusLabelLoader, 1);
   statusBar()->setSizeGripEnabled ( false );
 
@@ -329,7 +329,7 @@ void GUI::ImageWindow::dragEnterEvent(QDragEnterEvent *ev) {
 
 void GUI::ImageWindow::loadImage(std::string fn) {
 
-  _ascii_loader->start();
+  _ascii_loader_animation->start();
   Layer *layer = new Layer();
   layer->loadImage(fn);
 
@@ -343,7 +343,7 @@ void GUI::ImageWindow::loadImage(std::string fn) {
 }
 
 void GUI::ImageWindow::slotLoadingFinished(){
-  _ascii_loader->stop();
+  _ascii_loader_animation->stop();
 }
 
 void GUI::ImageWindow::slotSaveImage() {
