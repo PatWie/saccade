@@ -19,19 +19,34 @@ class ImgOp;
 
 namespace threads {
 /**
- * @brief create Mipmap data structure from image file
+ * @brief Write given image to disk.
  */
 class ImageWriterThread : public QThread {
  public:
   ImageWriterThread();
+  /**
+   * @brief setup all parameters when dumping image to disk
+   * @details [long description]
+   *
+   * @param copied_buffer [description]
+   * @param top top margin
+   * @param left left margin
+   * @param bottom bottom margin
+   * @param right right margin
+   * @param height original image height
+   * @param width original image width
+   * @param channels original image channels
+   * @param fn target filename
+   * @return [description]
+   */
   bool notify( float* copied_buffer,
-               int t, int l, int b, int r,
+               int top, int left, int bottom, int rright,
                int height, int width, int channels,
                std::string fn);
   void run();
  private:
-  float* _buf;
-  int _t, _l, _b, _r, _height, _width, _channels;
+  float* _buffer;
+  int _top, _left, _bottom, _right, _height, _width, _channels;
   std::string _fn;
   bool _running;
 };
@@ -92,12 +107,12 @@ class ImageData : QObject {
   float value(int h, int w, int c) const;
   float value(int t, int c) const;
 
-  std::string color(int h, int w, bool formated = true) const;
+  std::string colorString(int h, int w, bool formated = true) const;
 
   float operator()(int h, int w, int c) const;
   void copyTo(ImageData *dst) const;
 
-  static bool validFile(std::string filename);
+  static bool knownImageFormat(std::string filename);
 
   void write(std::string filename) const;
   void write(std::string filename, int t, int l, int b, int r) const;

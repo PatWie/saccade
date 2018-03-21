@@ -18,17 +18,17 @@ Utils::threads::ImageWriterThread::ImageWriterThread() {
 }
 
 bool Utils::threads::ImageWriterThread::notify( float* copied_buffer,
-    int t, int l, int b, int r,
+    int top, int left, int bottom, int right,
     int height, int width, int channels,
     std::string fn) {
 	if (_running)
 		return false;
 	_running = true;
-	_buf = copied_buffer;
-	_t = std::max(t, 0);
-	_l = std::max(l, 0);
-	_b = std::min(b, height);
-	_r = std::min(r, width);
+	_buffer = copied_buffer;
+	_top = std::max(top, 0);
+	_left = std::max(left, 0);
+	_bottom = std::min(bottom, height);
+	_right = std::min(right, width);
 	_height = height;
 	_width = width;
 	_channels = channels;
@@ -38,17 +38,20 @@ bool Utils::threads::ImageWriterThread::notify( float* copied_buffer,
 
 void Utils::threads::ImageWriterThread::run() {
 	typedef FIBITMAP* FIBitmapPtr;
-	const int n_height = _b - _t;
-	const int n_width = _r - _l;
+	const int n_height = _bottom - _top;
+	const int n_width = _right - _left;
+
+	auto read_accessor = [&](int h, int w, int c){return (_channels - c - 1) * (_height * _width) + h * _width + w;};
+	auto write_accessor = [&](int h, int w, int c){return h * n_width * _channels + w * _channels + c;};
 
 	BYTE* pixels = new BYTE[3 * n_width * n_height];
 
 	for (int c = 0; c < _channels; ++c) {
 		for (int hh = 0; hh < n_height; ++hh) {
-			int h = hh + _t;
+			int h = hh + _top;
 			for (int ww = 0; ww < n_width; ++ww) {
-				int w = ww + _l;
-				pixels[hh * n_width * _channels + ww * _channels + c] = (BYTE) 255. * _buf[(_channels - c - 1) * (_height * _width) + h * _width + w];
+				int w = ww + _left;
+				pixels[write_accessor(hh, ww, c)] = (BYTE) 255. * _buffer[read_accessor(h, w, c)];
 			}
 		}
 	}
@@ -63,7 +66,7 @@ void Utils::threads::ImageWriterThread::run() {
 	FreeImage_Save(FIF_PNG, Image, _fn.c_str(), 0);
 	delete[] pixels;
 	FreeImage_Unload(Image);
-	delete[] _buf;
+	delete[] _buffer;
 	_running = false;
 }
 
@@ -79,7 +82,7 @@ JPG:
 - rgb (24)
 */
 
-bool Utils::ImageData::validFile(std::string filename) {
+bool Utils::ImageData::knownImageFormat(std::string filename) {
 	const FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename.c_str(), 0);
 	return (format != FIF_UNKNOWN);
 }
@@ -97,24 +100,16 @@ void Utils::ImageData::registerLoaders() {
 	_loaders.push_back(new Loader::FreeImageLoader());
 }
 
-Utils::ImageData::ImageData(Utils::ImageData *i) {
-	_height = i->height();
-	_width = i->width();
-	_channels = i->channels();
-	_raw_buf = new float[i->elements()];
-	memcpy( _raw_buf, i->data(), sizeof(float) * i->elements() );
+Utils::ImageData::ImageData(Utils::ImageData *img) {
+	_height = img->height();
+	_width = img->width();
+	_channels = img->channels();
+	_raw_buf = new float[img->elements()];
+	memcpy( _raw_buf, img->data(), sizeof(float) * img->elements() );
 }
 
 void Utils::ImageData::write(std::string filename) const {
-
-	threads::ImageWriterThread *writer = new threads::ImageWriterThread();
-	float *tmp_buf = new float[elements()];
-	memcpy( tmp_buf, _raw_buf, sizeof(float) * elements() );
-	if (writer->notify(tmp_buf, 0, 0, _height, _width, _height, _width, _channels, filename)) {
-		connect( writer, SIGNAL( finished() ), this, SLOT( writerFinished() ));
-		writer->start();
-
-	}
+	write(filename, 0, 0, _height, _width);
 }
 
 void Utils::ImageData::writerFinished() {
@@ -124,9 +119,8 @@ void Utils::ImageData::writerFinished() {
 		if ( ! t->isFinished()) {
 			DLOG(INFO) << "found running thread";
 			t->wait();
-			delete t;
-		} else
-			delete t;
+		}
+		delete t;
 	}
 }
 
@@ -146,7 +140,7 @@ Utils::ImageData::ImageData(std::string filename) {
 	_raw_buf = _loaders[0]->load(filename, &_height, &_width, &_channels, &_max_value);
 }
 
-
+// pixel value accessors
 float Utils::ImageData::operator()(int h, int w, int c) const {
 	return value(h, w, c);
 }
@@ -158,6 +152,7 @@ float Utils::ImageData::value(int t, int c) const {
 	return _raw_buf[c * (_height * _width) + t];
 }
 
+
 float* Utils::ImageData::data() const {return _raw_buf;}
 size_t Utils::ImageData::elements() const {return _height * _width * _channels;}
 int Utils::ImageData::width() const {return _width;}
@@ -166,7 +161,7 @@ int Utils::ImageData::channels() const {return _channels;}
 int Utils::ImageData::area() const {return _height * _width;}
 float Utils::ImageData::max() const {return _max_value;}
 
-std::string Utils::ImageData::color(int h, int w, bool formated) const {
+std::string Utils::ImageData::colorString(int h, int w, bool formated) const {
 	std::stringstream stream;
 	stream << std::setprecision(5);
 
@@ -212,7 +207,7 @@ std::string Utils::ImageData::color(int h, int w, bool formated) const {
 
 void Utils::ImageData::clear(bool remove) {
 	DLOG(INFO) << "Utils::ImageData::clear";
-	// the _bud_data is already delete (so dont do it here again)
+	// the _buf_data is already delete (so dont do it here again)
 	if (remove)
 		if (_raw_buf != nullptr)
 			delete[] _raw_buf;

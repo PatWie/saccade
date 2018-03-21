@@ -75,7 +75,7 @@ void GUI::threads::ReloadThread::run() {
   DLOG(INFO) << "GUI::threads::ReloadThread::run()";
   for (int i = 0; i < _attempts; ++i)
   {
-    if(Utils::ImageData::validFile(_fn)){
+    if(Utils::ImageData::knownImageFormat(_fn)){
       emit sigFileIsValid(QString::fromStdString(_fn));
       break;
     }

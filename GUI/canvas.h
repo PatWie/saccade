@@ -153,8 +153,8 @@ class Canvas  : public QOpenGLWidget {
   /**
    * @brief get a copy of used OpenGL coordinate system
    */
-  axis_t property() const;
-  void setProperty(axis_t);
+  axis_t axis() const;
+  void setAxis(axis_t);
 
   // handle markers
   void setMarker(Marker marker);
@@ -178,7 +178,7 @@ class Canvas  : public QOpenGLWidget {
 
   // get change from other view
   // void slotReceiveCanvasChange(Canvas*);
-  void slotReceiveProperty(axis_t property);
+  void slotReceiveProperty(axis_t axis);
 
   void slotRepaint();
   void slotPrevLayer();

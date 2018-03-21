@@ -302,7 +302,7 @@ void GUI::Canvas::mouseReleaseEvent(QMouseEvent* event) {
     _selection.setActive(false);
     _selection.setStop(_focus);
 
-    const QRect selected_area = _selection.area();
+    const QRect selected_area = _selection.rectangle();
 
     const QPoint want = selected_area.center();
     const double zoom_width = ((double)_width / (double)selected_area.width());
@@ -503,13 +503,13 @@ void GUI::Canvas::setCrop(Utils::selection_t c) {
   _crop = c;
 }
 
-GUI::Canvas::axis_t GUI::Canvas::property() const {
+GUI::Canvas::axis_t GUI::Canvas::axis() const {
   return _axis;
 }
 
 
-void GUI::Canvas::setProperty(axis_t p) {
-  _axis = p;
+void GUI::Canvas::setAxis(axis_t a) {
+  _axis = a;
 }
 
 GUI::Marker GUI::Canvas::marker() const {
@@ -530,9 +530,9 @@ void GUI::Canvas::setSelection(Utils::selection_t s) {
 }
 
 
-void GUI::Canvas::slotReceiveProperty(axis_t property) {
-  _axis.x = property.x;
-  _axis.y = property.y;
+void GUI::Canvas::slotReceiveProperty(axis_t axis) {
+  _axis.x = axis.x;
+  _axis.y = axis.y;
   slotCommunicateCanvasChange();
 }
 
@@ -604,13 +604,13 @@ void GUI::Canvas::paintGL() {
 
     _gl->drawMarker(this, _marker);
     if (_selection.active()) {
-      _gl->drawSelection(this, _selection.area());
+      _gl->drawSelection(this, _selection.rectangle());
     }
 
     if (_crop.active()) {
 
       // _gl->drawSelection(this, _crop.rect, 1., 0., 0.);
-      const QRect cropping_region = _crop.area();
+      const QRect cropping_region = _crop.rectangle();
       _gl->drawSelection(this, cropping_region, 251. / 255., 199. / 255., 99. / 255.);
       // on left
       {

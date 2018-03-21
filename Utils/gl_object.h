@@ -12,15 +12,19 @@ template<typename Dtype>
 class GlObject  : protected QOpenGLFunctions {
  public:
 
-  // requires to be H, W, C
+  // dimension of image data
   size_t height, width, channels;
+  // buffer data
   Dtype *data;
+
+  // OpenGL information
   GLuint texture_id;
   GLuint buffer_id;
-
-  bool loaded;
   GLint interpolation;
   GLenum _type;
+
+  // flags
+  bool loaded;
 
   GlObject(size_t h = 0, size_t w = 0, size_t c = 0)
     : height(h), width(w), channels(c),
@@ -28,22 +32,23 @@ class GlObject  : protected QOpenGLFunctions {
       texture_id(0), buffer_id(0),
       loaded(false), interpolation(GL_NEAREST) {
 
+    // saccade currently only supports float and byte data in OpenGL
     if (std::is_same<Dtype, float>::value)
       _type = GL_FLOAT;
     if (std::is_same<Dtype, unsigned char>::value)
       _type = GL_UNSIGNED_BYTE;
   }
 
-  size_t len() const {
+  size_t elements() const {
     return width * height * channels;
   }
 
   size_t size() const {
-    return len() * sizeof(Dtype);
+    return elements() * sizeof(Dtype);
   }
 
   void allocate() {
-    data = new Dtype[len()];
+    data = new Dtype[elements()];
   }
 
   GLenum type() const {
@@ -57,11 +62,12 @@ class GlObject  : protected QOpenGLFunctions {
   GLint internalformat() const {
     if(channels == 1)
       return GL_LUMINANCE;
-    if(channels == 3)
+    else if(channels == 3)
       return GL_RGB;
-    if(channels == 4)
+    else if(channels == 4)
       return GL_RGBA;
-    return GL_RGB;
+    else
+      return GL_RGB;
   }
 
 };

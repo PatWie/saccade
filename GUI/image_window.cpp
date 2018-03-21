@@ -270,7 +270,7 @@ void GUI::ImageWindow::slotClickedMarkerLabelColor() {
   QClipboard *p_Clipboard = QApplication::clipboard();
   Marker m = _canvas->marker();
   if (m.active) {
-    p_Clipboard->setText(QString::fromStdString(_canvas->slides()->current()->img()->color(m.y, m.x, false)));
+    p_Clipboard->setText(QString::fromStdString(_canvas->slides()->current()->img()->colorString(m.y, m.x, false)));
   }
 }
 
@@ -316,7 +316,7 @@ void GUI::ImageWindow::slotRefreshBuffer(HistogramRefreshTarget target) {
 void GUI::ImageWindow::dropEvent(QDropEvent *ev) {
   QList<QUrl> urls = ev->mimeData()->urls();
   foreach (QUrl url, urls) {
-    if (Utils::ImageData::validFile(url.toLocalFile().toStdString())) {
+    if (Utils::ImageData::knownImageFormat(url.toLocalFile().toStdString())) {
       DLOG(INFO) << "dropped " << url.toLocalFile().toStdString();
       loadImage(url.toLocalFile().toStdString());
     }
@@ -370,7 +370,7 @@ void GUI::ImageWindow::slotSaveCrop() {
   if (_canvas->layer() == nullptr) {
 
   } else {
-    const QRect c = _canvas->crop().area();
+    const QRect c = _canvas->crop().rectangle();
     // there is a layer and we have an active crop
     const GUI::Layer *current = _canvas->slides()->current();
     if (current != nullptr) {
@@ -425,7 +425,7 @@ void GUI::ImageWindow::keyReleaseEvent (QKeyEvent *event){
 void GUI::ImageWindow::slotReceiveCanvasChange(Canvas* sender) {
   if ( _canvas != sender ) {
     // update canvas
-    _canvas->setProperty(sender->property());
+    _canvas->setAxis(sender->axis());
     _canvas->setFocusPixel(sender->focusPixel());
     _canvas->setMarker(sender->marker());
     _canvas->setCrop(sender->crop());
@@ -497,15 +497,15 @@ void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
 }
 
 void GUI::ImageWindow::slotVertSliderMoved(int value) {
-  Canvas::axis_t p = _canvas->property();
-  p.y = value;
-  _canvas->slotReceiveProperty(p);
+  Canvas::axis_t axis = _canvas->axis();
+  axis.y = value;
+  _canvas->slotReceiveProperty(axis);
 }
 
 void GUI::ImageWindow::slotHorSliderMoved(int value) {
-  Canvas::axis_t p = _canvas->property();
-  p.x = -value;
-  _canvas->slotReceiveProperty(p);
+  Canvas::axis_t axis = _canvas->axis();
+  axis.x = -value;
+  _canvas->slotReceiveProperty(axis);
 }
 
 void GUI::ImageWindow::slotRepaint() {
@@ -552,7 +552,7 @@ void GUI::ImageWindow::slotRepaintStatusbar() {
     pixelPosText << "(" << p.y() << ", " << p.x() << ")";
     _statusLabelCursorPos->setText(pixelPosText.str().c_str());
 
-    std::string pixelColorText = "" + _canvas->slides()->current()->img()->color(p.y(), p.x());
+    std::string pixelColorText = "" + _canvas->slides()->current()->img()->colorString(p.y(), p.x());
     _statusLabelCursorColor->setText(pixelColorText.c_str());
 
     // update marker
@@ -561,14 +561,14 @@ void GUI::ImageWindow::slotRepaintStatusbar() {
     std::string markerColorText = "";
     if (m.active) {
       markerPosText = "marker: (" + m.textLocation() + ")";
-      markerColorText = _canvas->slides()->current()->img()->color(m.y, m.x);
+      markerColorText = _canvas->slides()->current()->img()->colorString(m.y, m.x);
     }
     _statusLabelMarkerPos->setText(markerPosText.c_str());
     _statusLabelMarkerColor->setText(markerColorText.c_str());
 
     // update zoom
     std::ostringstream zoomText;
-    zoomText << "zoom: " << std::setprecision(3) << _canvas->property().pixel_size;
+    zoomText << "zoom: " << std::setprecision(3) << _canvas->axis().pixel_size;
     _statusLabelZoom->setText(zoomText.str().c_str());
 
   }
@@ -583,7 +583,7 @@ void GUI::ImageWindow::slotRepaintSliders() {
   const double winWidth = _canvas->width();
   const double winheight = _canvas->height();
 
-  GUI::Canvas::axis_t prop = _canvas->property();
+  GUI::Canvas::axis_t prop = _canvas->axis();
 
   if ( imgWidth * prop.pixel_size < winWidth ) {
     _horSlider->setRange(0, 0);

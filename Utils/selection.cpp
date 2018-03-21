@@ -1,6 +1,6 @@
 #include "selection.h"
 
-const QRect Utils::selection_t::area() const{
+const QRect Utils::selection_t::rectangle() const{
   const int left_most = std::min(_start.x(), _stop.x());
   const int top_most = std::min(_start.y(), _stop.y());
   const int bottom_most = std::max(_start.y(), _stop.y());

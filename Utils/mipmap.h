@@ -20,11 +20,11 @@ class Mipmap {
                uint height, uint width, uint channels,
                uint tileSize = 512);
 
-  float* downsample(const float* ptr, uint* height, uint* width, uint channels) const;
+  float* downsample(const float* ptr,
+                    uint* height, uint* width, uint channels) const;
   void bindBuffer();
   void draw(Utils::GlManager *gl,
-            int top, int left,
-            int bottom, int right,
+            int top, int left, int bottom, int right,
             double zoom);
 
   std::vector<MipmapLevel*> _levels;
@@ -34,7 +34,6 @@ class Mipmap {
 
  private:
   ImageData *_img;
-
   bool _empty;
 
 };

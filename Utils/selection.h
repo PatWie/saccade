@@ -10,7 +10,7 @@ class selection_t {
   bool _active;
 
  public:
-  const QRect area() const;
+  const QRect rectangle() const;
 
   QPoint start() const;
   QPoint stop() const;
@@ -18,6 +18,7 @@ class selection_t {
 
   void setStart(QPoint p);
   void setStop(QPoint p);
+
   void setActive(bool a=true);
   void toggleActive();
 

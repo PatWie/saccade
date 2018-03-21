@@ -6,10 +6,9 @@
 
 #include "gl_object.h"
 
-namespace GUI
-{
-  class Canvas;
-  class Marker;
+namespace GUI {
+class Canvas;
+class Marker;
 }; // namespace GUI
 
 namespace Utils {
@@ -17,6 +16,9 @@ namespace Utils {
 /**
  * @brief OpenGL and Qt seems to only work if there is a
  *        dedicated class with an OpenGL context
+ *
+ * @summary This class is responsible to create a single OpenGL context, which is shared
+ * across all windows
  */
 class GlManager : public QOpenGLFunctions {
   QOpenGLContext* ctx;
@@ -48,18 +50,16 @@ class GlManager : public QOpenGLFunctions {
    */
   template<typename Dtype>
   void prepare(GlObject<Dtype> *obj) {
-    // std::cout << "prepare "<< obj << std::endl;
 
     obj->texture_id = 0;
 
     if (!obj->loaded) {
-      obj->texture_id = 0;
-      glGenBuffers( 1, &obj->buffer_id );
-      glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, obj->buffer_id );
+      glGenBuffers(1, &obj->buffer_id);
+      glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, obj->buffer_id);
       obj->loaded = true;
     }
 
-    glGenTextures( 1, &obj->texture_id );
+    glGenTextures(1, &obj->texture_id);
     glBindTexture(GL_TEXTURE_2D, obj->texture_id);
 
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -103,11 +103,36 @@ class GlManager : public QOpenGLFunctions {
     glEnd();
 
     glBindTexture (GL_TEXTURE_2D, 0);
-    glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
   }
 
+  /**
+   * @brief draw pixel location marker
+   * @details [long description]
+   *
+   * @param canvas where to draw
+   * @param marker marker object with coordinates
+   */
   void drawMarker(GUI::Canvas* canvas, GUI::Marker* marker);
-  void drawSelection(GUI::Canvas* canvas, QRect marker, float r = 1.0f, float g = 1.0f, float b = 1.0f);
+  /**
+   * @brief draq marquee selection rectangle
+   * @details [long description]
+   *
+   * @param canvas [description]
+   * @param rect [description]
+   * @param r color value red
+   * @param g color value green
+   * @param b color value blue
+   */
+  void drawSelection(GUI::Canvas* canvas, QRect rect,
+                     float r = 1.0f, float g = 1.0f, float b = 1.0f);
+  /**
+   * @brief hide everything outside given rectangle by "white fog"
+   * @details [long description]
+   *
+   * @param canvas [description]
+   * @param rect [description]
+   */
   void drawHighlight(GUI::Canvas* canvas, QRect rect);
 
 };

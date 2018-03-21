@@ -75,13 +75,13 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
   if (!marker->active)
     return;
 
-  GUI::Canvas::axis_t prop = canvas->property();
-  const double zoom = prop.pixel_size;
+  GUI::Canvas::axis_t axis = canvas->axis();
+  const double zoom = axis.pixel_size;
 
   glLoadIdentity();
-  glScaled(prop.pixel_size, -prop.pixel_size, 1.0);
-  glTranslated(prop.x, -prop.y, 0.0);
-  glRotatef(prop.angle, 0.0, 0.0, 1.0);
+  glScaled(axis.pixel_size, -axis.pixel_size, 1.0);
+  glTranslated(axis.x, -axis.y, 0.0);
+  glRotatef(axis.angle, 0.0, 0.0, 1.0);
   glTranslated(-0.5 * (double)canvas->slides()->width(),
                -0.5 * (double)canvas->slides()->height(), 0.0);
 
@@ -130,12 +130,12 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
 
 void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect, float r, float g, float b) {
 
-  GUI::Canvas::axis_t prop = canvas->property();
+  GUI::Canvas::axis_t axis = canvas->axis();
 
   glLoadIdentity();
-  glScaled(prop.pixel_size, -prop.pixel_size, 1.0);
-  glTranslated(prop.x, -prop.y, 0.0);
-  glRotatef(prop.angle, 0.0, 0.0, 1.0);
+  glScaled(axis.pixel_size, -axis.pixel_size, 1.0);
+  glTranslated(axis.x, -axis.y, 0.0);
+  glRotatef(axis.angle, 0.0, 0.0, 1.0);
   glTranslated(-0.5 * (double)canvas->slides()->width(),
                -0.5 * (double)canvas->slides()->height(), 0.0);
 
@@ -158,12 +158,12 @@ void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect, float r, f
 
 void Utils::GlManager::drawHighlight(GUI::Canvas* canvas, QRect rect) {
 
-  GUI::Canvas::axis_t prop = canvas->property();
+  GUI::Canvas::axis_t axis = canvas->axis();
 
   glLoadIdentity();
-  glScaled(prop.pixel_size, -prop.pixel_size, 1.0);
-  glTranslated(prop.x, -prop.y, 0.0);
-  glRotatef(prop.angle, 0.0, 0.0, 1.0);
+  glScaled(axis.pixel_size, -axis.pixel_size, 1.0);
+  glTranslated(axis.x, -axis.y, 0.0);
+  glRotatef(axis.angle, 0.0, 0.0, 1.0);
   glTranslated(-0.5 * (double)canvas->slides()->width(),
                -0.5 * (double)canvas->slides()->height(), 0.0);
 
