@@ -26,7 +26,7 @@ class Canvas  : public QOpenGLWidget {
   /**
    * @brief internal coordinate system for OpenGL
    */
-  struct property_t {
+  struct axis_t {
     // number of displayed pixel per real pixel
     double pixel_size = 1.;
     // not supported yet (should be rotation)
@@ -58,7 +58,7 @@ class Canvas  : public QOpenGLWidget {
   Utils::selection_t _crop;
 
   // coordinate system for current canvas
-  property_t _property;
+  axis_t _axis;
 
   // geometry of current canvas
   int _width, _height;
@@ -153,8 +153,8 @@ class Canvas  : public QOpenGLWidget {
   /**
    * @brief get a copy of used OpenGL coordinate system
    */
-  property_t property() const;
-  void setProperty(property_t);
+  axis_t property() const;
+  void setProperty(axis_t);
 
   // handle markers
   void setMarker(Marker marker);
@@ -178,7 +178,7 @@ class Canvas  : public QOpenGLWidget {
 
   // get change from other view
   // void slotReceiveCanvasChange(Canvas*);
-  void slotReceiveProperty(property_t property);
+  void slotReceiveProperty(axis_t property);
 
   void slotRepaint();
   void slotPrevLayer();
@@ -205,16 +205,16 @@ class Canvas  : public QOpenGLWidget {
   /**
    * @brief zoom relative to point
    * @details it tries to zoom around the point
-   * 
+   *
    * @param QPoint q point on focus
    * @param int delta zoom-direction
    */
   void zoom_rel(QPoint q, int delta);
-  
+
   /**
    * @brief generate checkerboard pattern
    * @details background texture for canvas
-   * 
+   *
    * @param char buffer
    * @param int width
    * @param int height

@@ -75,7 +75,7 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
   if (!marker->active)
     return;
 
-  GUI::Canvas::property_t prop = canvas->property();
+  GUI::Canvas::axis_t prop = canvas->property();
   const double zoom = prop.pixel_size;
 
   glLoadIdentity();
@@ -130,7 +130,7 @@ void Utils::GlManager::drawMarker(GUI::Canvas* canvas, GUI::Marker* marker) {
 
 void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect, float r, float g, float b) {
 
-  GUI::Canvas::property_t prop = canvas->property();
+  GUI::Canvas::axis_t prop = canvas->property();
 
   glLoadIdentity();
   glScaled(prop.pixel_size, -prop.pixel_size, 1.0);
@@ -158,7 +158,7 @@ void Utils::GlManager::drawSelection(GUI::Canvas* canvas, QRect rect, float r, f
 
 void Utils::GlManager::drawHighlight(GUI::Canvas* canvas, QRect rect) {
 
-  GUI::Canvas::property_t prop = canvas->property();
+  GUI::Canvas::axis_t prop = canvas->property();
 
   glLoadIdentity();
   glScaled(prop.pixel_size, -prop.pixel_size, 1.0);

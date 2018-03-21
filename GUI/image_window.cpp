@@ -497,13 +497,13 @@ void GUI::ImageWindow::keyPressEvent( QKeyEvent * event ) {
 }
 
 void GUI::ImageWindow::slotVertSliderMoved(int value) {
-  Canvas::property_t p = _canvas->property();
+  Canvas::axis_t p = _canvas->property();
   p.y = value;
   _canvas->slotReceiveProperty(p);
 }
 
 void GUI::ImageWindow::slotHorSliderMoved(int value) {
-  Canvas::property_t p = _canvas->property();
+  Canvas::axis_t p = _canvas->property();
   p.x = -value;
   _canvas->slotReceiveProperty(p);
 }
@@ -583,7 +583,7 @@ void GUI::ImageWindow::slotRepaintSliders() {
   const double winWidth = _canvas->width();
   const double winheight = _canvas->height();
 
-  GUI::Canvas::property_t prop = _canvas->property();
+  GUI::Canvas::axis_t prop = _canvas->property();
 
   if ( imgWidth * prop.pixel_size < winWidth ) {
     _horSlider->setRange(0, 0);
