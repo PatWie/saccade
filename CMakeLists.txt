@@ -23,6 +23,8 @@ find_package(OpenGL REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
+find_package(PythonLibs REQUIRED)
+
 find_package(GFlags)
 find_package(Glog)
 if(OPENMP_ENABLED)
@@ -92,6 +94,7 @@ set(SACCADE_SOURCES
     Utils/histogram_data.cpp
     Utils/version.cpp
     Utils/Imageloader/freeimage_loader.cpp
+    Utils/Imageloader/opticalflow_loader.cpp
 )
 
 set(SACCADE_LIBRARIES
@@ -117,5 +120,6 @@ else()
     LIST(APPEND SACCADE_SOURCES Utils/Ops/histogram_op.cpp)
     LIST(APPEND SACCADE_SOURCES Utils/Ops/gamma_op.cpp)
 endif()
-add_executable(saccade main.cpp ${SACCADE_SOURCES} )
-target_link_libraries(saccade ${SACCADE_LIBRARIES} )
+
+add_executable(saccade main.cpp ${SACCADE_SOURCES} ${PYTHON_INCLUDE_DIRS})
+target_link_libraries(saccade ${SACCADE_LIBRARIES} ${PYTHON_LIBRARIES})

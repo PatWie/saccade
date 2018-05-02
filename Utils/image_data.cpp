@@ -9,6 +9,7 @@
 #include <glog/logging.h>
 #include "misc.h"
 #include "Imageloader/freeimage_loader.h"
+#include "Imageloader/opticalflow_loader.h"
 
 
 // threads
@@ -83,8 +84,18 @@ JPG:
 */
 
 bool Utils::ImageData::knownImageFormat(std::string filename) {
-	const FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename.c_str(), 0);
-	return (format != FIF_UNKNOWN);
+	// todo (remove this construction all the time)
+	std::vector<Loader::ImageLoader*> _tmp_loaders;
+	_tmp_loaders.push_back(new Loader::FreeImageLoader());
+	_tmp_loaders.push_back(new Loader::OpticalFlowLoader());
+
+	for (auto && loader : _tmp_loaders) {
+		if (loader->canLoad(filename)) {
+			return true;
+		}
+	}
+	return false;
+
 }
 
 Utils::ImageData::~ImageData() {
@@ -98,6 +109,7 @@ Utils::ImageData::ImageData(float*d, int h, int w, int c)
 
 void Utils::ImageData::registerLoaders() {
 	_loaders.push_back(new Loader::FreeImageLoader());
+	_loaders.push_back(new Loader::OpticalFlowLoader());
 }
 
 Utils::ImageData::ImageData(Utils::ImageData *img) {
@@ -136,8 +148,22 @@ void Utils::ImageData::write(std::string filename, int t, int l, int b, int r) c
 
 }
 Utils::ImageData::ImageData(std::string filename) {
+	DLOG(INFO) << "Utils::ImageData::ImageData " << filename;
 	registerLoaders();
-	_raw_buf = _loaders[0]->load(filename, &_height, &_width, &_channels, &_max_value);
+
+	int l_id = 0;
+	for (auto && loader : _loaders) {
+		if (loader->canLoad(filename)) {
+			DLOG(INFO) << "loader " << l_id << " can load " << filename;
+			_raw_buf = loader->load(filename, &_height, &_width, &_channels, &_max_value);
+			break;
+		} else {
+			DLOG(INFO) << "loader " << l_id << " cannot load " << filename;
+		}
+		l_id++;
+	}
+
+	// _raw_buf = _loaders[0]->load(filename, &_height, &_width, &_channels, &_max_value);
 }
 
 // pixel value accessors
