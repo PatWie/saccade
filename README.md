@@ -6,7 +6,11 @@ A **saccade** (*/səˈkɑːd/ sə-KAHD*) is a quick and simultaneous movement of
 
 <p align="center"> <img src="https://github.com/patwie-stuff/img/blob/master/saccade_intro.gif?raw=true"> </p>
 
-This project is the missing scientific HDR image viewer for Linux inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). It is OpenGL-based and aims at providing an efficient image viewer with some sophisticated functions for comparing images. When dragging and zooming an image in one viewport, all other viewports synchronously zoom and shift in the same way, so you see exactly the same patch in all images. 
+This project is the missing scientific HDR image viewer for Linux inspired by [shiver/idisplay](https://sourceforge.net/p/shiver/idisplay). It is OpenGL-based and aims at providing an efficient image viewer with some sophisticated functions for comparing images. When dragging and zooming an image in one viewport, all other viewports synchronously zoom and shift in the same way, so you see exactly the same patch in all images.
+
+Supports the following file formats:
+    - image: *.png *.jpg *.jpeg *.bmp *.ppm *.tif *.CR2 *.JPG *.JPEG, *.JPE
+    - optical-flow: *.flo
 
 Hereby, each viewport consists of different image-layers. Some action might affect only the *active* layer across *all* viewports (global effects), e.g., zooming and dragging, e.g. setting the crop-region:
 
@@ -50,7 +54,7 @@ I plan to add CUDA for speeding up some functions.
 
 ### Get dependencies and compile
 
-See the [dockerfile](https://github.com/PatWie/saccade/blob/docker/.docker/dynamic/Dockerfile) for how to install all dependencies for development. Or follow the following guide:
+The [dockerfile](https://github.com/PatWie/saccade/blob/master/Dockerfile) lists all dependencies for building this project. Or follow the following guide:
 
 Assuming you are on Ubuntu 16.04 getting all dependencies is done by
 
@@ -85,7 +89,7 @@ and you find the app icon in the Ubuntu search bar. When debugging the applicati
 
 ## Keyboard Shortcuts
 
-These are very likely to changed in the next versions. 
+These are very likely to changed in the next versions.
 
 **General shortcuts**
 
