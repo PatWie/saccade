@@ -81,6 +81,8 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
   _statusLabelMarkerColor = new ClickableLabel();
   statusBar()->addWidget(_statusLabelMarkerPos, 1);
   statusBar()->addWidget(_statusLabelMarkerColor, 1);
+  _statusCropInfoLabel = new ClickableLabel();
+  statusBar()->addWidget(_statusCropInfoLabel, 1);
   _statusLabelZoom = new QLabel("zoom: 1");
   statusBar()->addWidget(_statusLabelZoom, 1);
   _statusLabelLoader = new QLabel();
@@ -92,6 +94,8 @@ GUI::ImageWindow::ImageWindow(QWidget* parent, GUI::Window* parentWindow)
           this, &GUI::ImageWindow::slotClickedMarkerLabelPos);
   connect(_statusLabelMarkerColor, &ClickableLabel::clicked,
           this, &GUI::ImageWindow::slotClickedMarkerLabelColor);
+  connect(_statusCropInfoLabel, &ClickableLabel::clicked,
+          this, &GUI::ImageWindow::slotClickedCropInfoLabel);
 
 
   // slides
@@ -274,7 +278,13 @@ void GUI::ImageWindow::slotClickedMarkerLabelColor() {
   }
 }
 
-
+void GUI::ImageWindow::slotClickedCropInfoLabel() {
+  QClipboard *p_Clipboard = QApplication::clipboard();
+  Utils::selection_t obj = _canvas->crop();
+  if (obj.active()) {
+    p_Clipboard->setText(QString::fromStdString(obj.toString()));
+  }
+}
 
 bool GUI::ImageWindow::event(QEvent *e) {
   if (e->type() == QEvent::WindowActivate) {
@@ -342,7 +352,7 @@ void GUI::ImageWindow::loadImage(std::string fn) {
   _canvas->addLayer(layer);
 }
 
-void GUI::ImageWindow::slotLoadingFinished(){
+void GUI::ImageWindow::slotLoadingFinished() {
   _ascii_loader_animation->stop();
 }
 
@@ -407,7 +417,7 @@ QSize GUI::ImageWindow::sizeHint() const {
   return QSize(512, 512);
 }
 
-void GUI::ImageWindow::keyReleaseEvent (QKeyEvent *event){
+void GUI::ImageWindow::keyReleaseEvent (QKeyEvent *event) {
   emit sigKeyReleaseEvent(event);
   // DLOG(INFO) << "keyReleaseEvent";
   // Qt::KeyboardModifiers keymod = QGuiApplication::keyboardModifiers();
@@ -521,9 +531,9 @@ void GUI::ImageWindow::slotRepaint() {
 
 
 void GUI::ImageWindow::slotRepaintTitle() {
-  if (_canvas->layer() == nullptr)
+  if (_canvas->layer() == nullptr) {
     setWindowTitle("Saccade - empty");
-  else {
+  } else {
     const GUI::Layer *current = _canvas->slides()->current();
     if (current != nullptr) {
       // update title
@@ -540,12 +550,12 @@ void GUI::ImageWindow::slotRepaintStatusbar() {
     _statusLabelMarkerPos->setText("");
     _statusLabelMarkerColor->setText("");
     _statusLabelZoom->setText("");
+    _statusCropInfoLabel->setText("");
     return;
   }
 
   const GUI::Layer *current = _canvas->slides()->current();
   if (current != nullptr) {
-
     // update pixel
     std::stringstream pixelPosText;
     const QPoint p = _canvas->focusPixel();
@@ -571,6 +581,11 @@ void GUI::ImageWindow::slotRepaintStatusbar() {
     zoomText << "zoom: " << std::setprecision(3) << _canvas->axis().pixel_size;
     _statusLabelZoom->setText(zoomText.str().c_str());
 
+    // update crop
+    Utils::selection_t crop = _canvas->crop();
+    if (crop.active()) {
+      _statusCropInfoLabel->setText(QString::fromStdString("crop(" + crop.toString() + ")"));
+    }
   }
 }
 

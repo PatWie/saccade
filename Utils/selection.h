@@ -2,6 +2,7 @@
 #define SELECTION_H
 
 #include <QRect>
+#include <string>
 
 namespace Utils {
 class selection_t {
@@ -21,6 +22,8 @@ class selection_t {
 
   void setActive(bool a=true);
   void toggleActive();
+
+  std::string toString() const;
 
   void reset();
 };

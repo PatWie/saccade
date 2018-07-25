@@ -71,6 +71,7 @@ class ImageWindow  : public QMainWindow {
 
   void slotClickedMarkerLabelPos();
   void slotClickedMarkerLabelColor();
+  void slotClickedCropInfoLabel();
 
   /**
    * @brief update canvas to be in sync with the sender
@@ -134,6 +135,7 @@ class ImageWindow  : public QMainWindow {
   AsciiLoaderAnimation* _ascii_loader_animation;
   QLabel* _statusLabelCursorPos;
   QLabel* _statusLabelCursorColor;
+  ClickableLabel* _statusCropInfoLabel;
   // QLabel* _statusLabelPatch;
   ClickableLabel* _statusLabelMarkerPos;
   ClickableLabel* _statusLabelMarkerColor;
