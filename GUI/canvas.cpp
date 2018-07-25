@@ -429,9 +429,12 @@ void GUI::Canvas::checkerboard(unsigned char* data,
 
   for (unsigned int h = 0; h < height; h++ ) {
     const int off = h % 2;
-    for (unsigned int w = 0; w < width; w += 2 ) {
+    // for (unsigned int w = 0; w < width; w += 2 ) {
+    for (unsigned int w = 0; w < width; w += 1 ) {
       for (unsigned int c = 0; c < channels; c++ ) {
-        data[(h * width + w + off)*channels + c] = 255;
+        // data[(h * width + w + off)*channels + c] = 255;
+        data[(h * width + w + off)*channels + c] = (w % 2 == 0) ? 89 : 43;
+        // data[(h * width + w + off)*channels + c] = (w % 2 == 0) ? 86 : 43;
       }
     }
   }
@@ -541,7 +544,8 @@ void GUI::Canvas::initializeGL() {
   _gl->initializeOpenGLFunctions();
   _gl->printContextInformation();
 
-  _gl->glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+  // _gl->glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+  _gl->glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   _gl->set_size(width(), height());
   _gl->projection_identity();
   _gl->modelview_identity();

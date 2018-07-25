@@ -16,6 +16,7 @@ This project is the missing scientific HDR image viewer for Linux. It is OpenGL-
 - crop regions from image
 - keyboard short-cuts for all actions
 - set marker on a specific pixel
+- double-click on information in statusbar copies the values into the clipboard
 - filewatcher (images will be reloaded when they change)
 - interactive histogram widget which effects the image
 - supported file formats: png jpg bmp ppm tif CR2 and many more

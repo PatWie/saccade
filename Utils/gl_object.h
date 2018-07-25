@@ -20,7 +20,8 @@ class GlObject  : protected QOpenGLFunctions {
   // OpenGL information
   GLuint texture_id;
   GLuint buffer_id;
-  GLint interpolation;
+  GLint min_interpolation;
+  GLint max_interpolation;
   GLenum _type;
 
   // flags
@@ -30,7 +31,7 @@ class GlObject  : protected QOpenGLFunctions {
     : height(h), width(w), channels(c),
       data(nullptr),
       texture_id(0), buffer_id(0),
-      loaded(false), interpolation(GL_NEAREST) {
+      loaded(false), min_interpolation(GL_LINEAR), max_interpolation(GL_NEAREST) {
 
     // saccade currently only supports float and byte data in OpenGL
     if (std::is_same<Dtype, float>::value)

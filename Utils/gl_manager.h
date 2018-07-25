@@ -70,8 +70,8 @@ class GlManager : public QOpenGLFunctions {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, obj->interpolation);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, obj->interpolation);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, obj->min_interpolation);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, obj->max_interpolation);
 
     glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB,
                  obj->size(),
