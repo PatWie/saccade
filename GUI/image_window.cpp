@@ -404,7 +404,7 @@ void GUI::ImageWindow::slotOpenImage() {
 
   QStringList filenames = QFileDialog::getOpenFileNames(this,
                           tr("Open Image"), _parentWindow->_openPath,
-                          tr("Image Files (*.png *.jpg *.jpeg *.bmp *.ppm *.tif *.CR2 *.JPG *.JPEG, *.JPE, *.flo)"));
+                          tr("Image Files (*.png *.jpg *.pfm *.jpeg *.bmp *.ppm *.tif *.CR2 *.JPG *.JPEG *.JPE *.flo)"));
 
   if ( !filenames.isEmpty() ) {
     for (int i = 0; i < filenames.count(); i++)

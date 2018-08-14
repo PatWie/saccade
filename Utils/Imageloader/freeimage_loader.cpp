@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 #include <cmath>
 #include <string>
+#include <limits>
 
 namespace Utils {
 namespace Loader {
@@ -103,6 +104,9 @@ float* FreeImageLoader::load(std::string fn, int *_height, int *_width, int *_ch
     (*_channels) = 1;
   }
 
+  FREE_IMAGE_TYPE image_type = FreeImage_GetImageType(_data);
+
+
   bool is_rgba = ((*_channels) == 4);
   int off = 0;
   if (is_rgba) {
@@ -124,14 +128,22 @@ float* FreeImageLoader::load(std::string fn, int *_height, int *_width, int *_ch
     *_max_value = std::pow(2, (float)24 / (*_channels));
   }
 
+  if (image_type == FIT_FLOAT) {
+    DLOG(INFO) << "FreeImage_GetColorType: FIT_FLOAT";
+    (*_channels) = 1;
+    is_rgba = false;
+    off = 0;
+    // *_max_value = std::numeric_limits<float>::max();
+  }
+
   CHECK_GE((*_channels), 0);
 
   float* _raw_buf = new float[(*_channels) * (*_height) * (*_width)];
-
+  DLOG(INFO) << "raw_buf has size "<< (*_channels) << " " << (*_height) << " " << (*_width) ;
   double sc;
 
+  // DLOG(INFO) << std::pow(2, (double) FreeImage_GetBPP(_data) / (*_channels));
 
-  FREE_IMAGE_TYPE image_type = FreeImage_GetImageType(_data);
 
   // https://github.com/patwie-stuff/FreeImage/blob/master/TestAPI/testImageType.cpp
   /*
@@ -252,6 +264,7 @@ float* FreeImageLoader::load(std::string fn, int *_height, int *_width, int *_ch
     }
     *_max_value = 1.0;
     break;
+
   case FIT_RGBAF:
     DLOG(INFO) << "case FIT_RGBAF";
 
