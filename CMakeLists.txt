@@ -23,7 +23,8 @@ find_package(OpenGL REQUIRED)
 find_package(FreeImage REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
-find_package(PythonLibs 3.6 REQUIRED)
+# find_package(PythonLibs 3.6 REQUIRED)
+find_package(PythonLibs REQUIRED)
 
 find_package(GFlags)
 find_package(Glog)
