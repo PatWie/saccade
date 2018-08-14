@@ -22,9 +22,13 @@ GUI::Histogram::Histogram(QWidget *parent)
   _resetRangeResetAct = new QAction(tr("Reset Range"), this);
   _resetRangeLdrAct = new QAction(tr("Fit LDR"), this);
   _resetRange01Act = new QAction(tr("Fit [0,1]"), this);
+  _resetRangeMinMaxAct = new QAction(tr("Fit [0,max]"), this);
   connect(_resetRangeResetAct, &QAction::triggered, this, [this] { slotSetRange(0, 0, HistogramRefreshTarget::CURRENT); });
   connect(_resetRangeLdrAct, &QAction::triggered, this, [this] { slotSetRange(0, 255, HistogramRefreshTarget::CURRENT); });
   connect(_resetRange01Act, &QAction::triggered, this, [this] { slotSetRange(0, 1, HistogramRefreshTarget::CURRENT); });
+  connect(_resetRangeMinMaxAct, &QAction::triggered, this, [this] {
+    slotSetRange(_histogram->range_used()->min, _histogram->range_used()->max, HistogramRefreshTarget::CURRENT);
+  });
 
   _setMappingLinearAct = new QAction(tr("Set linear mapping"), this);
   _setMappingLogAct = new QAction(tr("Set log mapping"), this);
@@ -51,6 +55,7 @@ void GUI::Histogram::contextMenuEvent(QContextMenuEvent *event) {
     menu.addAction(_resetRangeResetAct);
     menu.addAction(_resetRangeLdrAct);
     menu.addAction(_resetRange01Act);
+    menu.addAction(_resetRangeMinMaxAct);
     menu.addSeparator();
     menu.addAction(_setMappingLinearAct);
     menu.addAction(_setMappingLogAct);
@@ -276,6 +281,8 @@ void GUI::Histogram::slotSetRange(float min, float max, HistogramRefreshTarget t
       _histogram->range()->min = min;
       _histogram->range()->max = max;
     }
+    DLOG(INFO) << "_histogram->range()->min " << _histogram->range()->min;
+    DLOG(INFO) << "_histogram->range()->max " << _histogram->range()->max;
     emit sigRefreshBuffer(t);
     update();
   }

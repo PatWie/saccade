@@ -25,6 +25,7 @@ class HistogramData {
 
   // range of visibility
   range_t _range;
+  range_t _range_used;
 
   struct bin_info_t {
     int min;
@@ -61,6 +62,7 @@ class HistogramData {
 
   range_t* range();
   const range_t* range() const;
+  const range_t* range_used() const;
 
   bool available() const;
   int bins() const;

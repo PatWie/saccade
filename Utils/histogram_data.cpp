@@ -43,14 +43,22 @@ void Utils::HistogramData::setImage(const ImageData *data, float scale) {
   _range.min = 0;
   _range.max = scale;
 
+  _range_used.min = std::numeric_limits<float>::max();
+  _range_used.max = std::numeric_limits<float>::lowest();
+
   // range
   const double bin_width = _range.range() / static_cast<double>(_nbins);
   DLOG(INFO) << "bin_width " << bin_width;
+
+
 
   for (int c = 0; c < _channels; ++c) {
     std::vector<double> channelBins(_nbins, 0.);
     for (int n = 0; n < data->area(); n += sampling_freq) {
       const double value = data->value(n, c);
+
+      _range_used.min = std::min(_range_used.min, (float)value);
+      _range_used.max = std::max(_range_used.max, (float)value);
 
       int idx = value / bin_width;
       if (idx < 0 || idx >= _nbins) continue;
@@ -59,6 +67,11 @@ void Utils::HistogramData::setImage(const ImageData *data, float scale) {
     }
     _data.push_back(channelBins);
   }
+
+  _range_used.min = 0;
+
+  DLOG(INFO) << "_range_used.min " << _range_used.min;
+  DLOG(INFO) << "_range_used.max " << _range_used.max;
 
   _available = true;
 }
@@ -73,6 +86,10 @@ Utils::HistogramData::range_t* Utils::HistogramData::range() {
 
 const Utils::HistogramData::range_t* Utils::HistogramData::range() const {
   return &_range;
+}
+
+const Utils::HistogramData::range_t* Utils::HistogramData::range_used() const {
+  return &_range_used;
 }
 
 int Utils::HistogramData::amount(int channel, int bin) const {

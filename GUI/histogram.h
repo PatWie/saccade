@@ -113,6 +113,7 @@ class Histogram : public QFrame {
   QAction* _resetRangeResetAct;
   QAction* _resetRangeLdrAct;
   QAction* _resetRange01Act;
+  QAction* _resetRangeMinMaxAct;
 
   QAction* _setMappingLinearAct;
   QAction* _setMappingLogAct;
