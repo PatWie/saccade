@@ -1,21 +1,42 @@
-pipeline:
-  build:
-    image: saccade_dynamic
-    commands:
-      - mkdir build
-      - cd build
-      - cmake .. -DCUDA_ENABLED=OFF
-      - make
-  deploy:
-    image: saccade_static
-    commands:
-      - .deploy/pipeline.sh
-      - dir
-    when:
-      branch: master
-  publish:
-    image: saccade_publish
-    commands:
-      - /opt/publish.sh
-    when:
-      branch: master
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  pull: never
+  image: saccade_dynamic
+  commands:
+  - mkdir build
+  - cd build
+  - cmake .. -DCUDA_ENABLED=OFF
+  - make
+
+- name: deploy
+  pull: never
+  image: saccade_static
+  commands:
+  - .deploy/pipeline.sh
+  - dir
+  when:
+    branch:
+    - master
+
+- name: publish
+  pull: never
+  image: saccade_publish
+  commands:
+  - /opt/publish.sh
+  when:
+    branch:
+    - master
+
+---
+kind: signature
+hmac: 2cc7926190d75a83ed0e221d1f29f9d07b320c171d859ce5922d9ae8ccc1b24d
+
+...
